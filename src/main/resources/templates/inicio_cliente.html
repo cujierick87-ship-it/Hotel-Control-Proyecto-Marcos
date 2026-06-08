@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HotelControl - Catálogo</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f3f4f6; color: #1f2937; }
+        
+        .navbar { background-color: #1e293b; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center;}
+        .navbar-brand { font-size: 20px; font-weight: bold; color: #fbbf24; text-decoration: none; }
+        
+        /* Estilo para el grupo de botones derecho */
+        .navbar-menu { display: flex; gap: 15px; align-items: center; }
+        .btn-historial { background-color: #fbbf24; color: black; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 14px; }
+        .btn-logout { color: #ef4444; text-decoration: none; font-weight: bold; background: white; padding: 6px 12px; border-radius: 4px; font-size: 14px; }
+        
+        .hero { background: linear-gradient(135deg, #0f172a, #1e293b); padding: 50px 20px; text-align: center; color: white; margin-bottom: 30px;}
+        .hero h1 { font-size: 32px; color: #fbbf24; margin-bottom: 10px;}
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        
+        .card { background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e5e7eb; width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s;}
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        
+        .card-header { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center;}
+        .numero { color: #1f2937; font-weight: bold; font-size: 20px;}
+        .tipo { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        
+        .precio { font-size: 26px; font-weight: bold; color: #111827; margin-bottom: 15px; }
+        .precio span { font-size: 14px; color: #6b7280; font-weight: normal; }
+        
+        .detalles { font-size: 14px; color: #4b5563; margin-bottom: 25px; line-height: 1.6; background: #f9fafb; padding: 15px; border-radius: 6px;}
+        
+        .btn-reservar { display: block; width: 100%; text-align: center; background-color: #10b981; color: white; padding: 12px; text-decoration: none; border-radius: 6px; font-weight: bold; transition: background 0.2s;}
+        .btn-reservar:hover { background-color: #059669; }
+        
+        .btn-ocupada { display: block; width: 100%; text-align: center; background-color: #9ca3af; color: white; padding: 12px; text-decoration: none; border-radius: 6px; font-weight: bold; cursor: not-allowed;}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="navbar-brand">🏨 HotelControl</a>
+        <div class="navbar-menu">
+            <a href="/cliente/historial" class="btn-historial">Ver mis reservas</a>
+            <a href="/logout" class="btn-logout">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <h1>Nuestras Habitaciones</h1>
+        <p>Elige una habitacion disponible.</p>
+    </header>
+
+    <div class="container">
+        <div class="grid">
+            <div class="card" th:each="habitacion : ${habitaciones}" th:if="${habitacion.estado != 'MANTENIMIENTO'}">
+                <div class="card-header">
+                    <span class="numero" th:text="'Habitación ' + ${habitacion.numero}"></span>
+                    <span class="tipo" th:text="${habitacion.tipo}"></span>
+                </div>
+                
+                <div class="precio">
+                    <span th:text="'$' + ${habitacion.precioNoche}"></span> <span>/ noche</span>
+                </div>
+                
+                <div class="detalles">
+                    <p>👥 <b>Capacidad:</b> <span th:text="${habitacion.capacidad} + ' personas'"></span></p>
+                    <p style="margin-top: 8px;">🛏️ <b>Descripción:</b> <span th:text="${habitacion.descripcion}"></span></p>
+                </div>
+                
+                <a th:if="${habitacion.estado == 'DISPONIBLE'}" th:href="@{/cliente/reserva/{id}(id=${habitacion.idHabitacion})}" class="btn-reservar">Seleccionar y Reservar</a>
+                
+                <a th:unless="${habitacion.estado == 'DISPONIBLE'}" href="#" class="btn-ocupada" onclick="return false;">No Disponible</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

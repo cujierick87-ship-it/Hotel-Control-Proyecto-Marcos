@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Historial de Reservas</title>
+        <style>
+            body {
+                font-family: sans-serif;
+                background: #f3f4f6;
+                padding: 40px;
+            }
+            .caja {
+                max-width: 800px;
+                margin: auto;
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+            th, td {
+                padding: 12px;
+                border-bottom: 1px solid #ddd;
+                text-align: left;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="caja">
+            <h2>Listado de Reservas</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha Reserva</th>
+                        <th>Cliente</th>
+                        <th>Habitación</th>
+                        <th>Entrada</th>
+                        <th>Salida</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${listaCompleta}">
+                        <td th:text="${r.fechaReserva}"></td>
+                        <td th:text="${r.nombreCliente}"></td>
+                        <td th:text="'Hab. ' + ${r.habitacion.numero}"></td>
+                        <td th:text="${r.fechaCheckIn}"></td>
+                        <td th:text="${r.fechaCheckOut}"></td>
+                        <td th:text="${r.estado}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <a href="/cliente/inicio">Volver al catálogo</a>
+        </div>
+    </body>
+</html>

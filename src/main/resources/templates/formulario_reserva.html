@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Completar Reserva</title>
+    <style>
+        * { box-sizing: border-box; font-family: sans-serif; }
+        body { background-color: #0f172a; color: white; padding: 40px; display: flex; justify-content: center; }
+        .caja { background: #1e293b; padding: 30px; border-radius: 8px; border: 1px solid #334155; width: 100%; max-width: 500px; }
+        .info { background: #0f172a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 4px solid #fbbf24; }
+        .alerta-error { background: #ef4444; color: white; padding: 12px; border-radius: 4px; margin-bottom: 20px; text-align: center; font-weight: bold; }
+        .campo { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #cbd5e1; font-size: 13px; font-weight: bold; }
+        input { width: 100%; padding: 10px; background: #0f172a; color: white; border: 1px solid #475569; border-radius: 4px; }
+        .btn-confirmar { width: 100%; background: #fbbf24; color: black; padding: 12px; border: none; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; transition: 0.2s;}
+        .btn-confirmar:hover { background: #f59e0b; }
+        .btn-cancelar { display: block; text-align: center; margin-top: 15px; color: #ef4444; text-decoration: none; }
+        .btn-cancelar:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="caja">
+        <h2 style="color: #fbbf24; margin-bottom: 20px; text-align: center;">Confirmar Pago y Reserva</h2>
+        
+        <div th:if="${error}" class="alerta-error" th:text="${error}"></div>
+        
+        <div class="info">
+            <h3 th:text="'Habitacion ' + ${habitacion.numero} + ' - ' + ${habitacion.tipo}"></h3>
+            <p th:text="'Precio base: $' + ${habitacion.precioNoche} + ' / noche'"></p>
+        </div>
+
+        <form th:action="@{/cliente/reserva/guardar(idHab=${habitacion.idHabitacion})}" method="post" th:object="${nuevaReserva}">
+            
+            <div class="campo">
+                <label>Numero de Cedula:</label>
+                <input type="text" th:field="*{cedulaCliente}" required>
+            </div>
+            
+            <div class="campo">
+                <label>Nombre Completo:</label>
+                <input type="text" th:field="*{nombreCliente}" required>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label>Llegada (Check-in):</label>
+                    <input type="date" th:field="*{fechaCheckIn}" required>
+                </div>
+                <div style="flex: 1;">
+                    <label>Salida (Check-out):</label>
+                    <input type="date" th:field="*{fechaCheckOut}" required>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-confirmar">Confirmar y Pagar Habitacion</button>
+            <a href="/cliente/inicio" class="btn-cancelar">Cancelar y volver al catalogo</a>
+        </form>
+    </div>
+
+</body>
+</html>

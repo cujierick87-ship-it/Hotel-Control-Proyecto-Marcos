@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Panel de Control - HotelControl</title>
+        <style>
+            /* Diseño elegante comprimido */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Segoe UI', Tahoma, sans-serif;
+            }
+            body {
+                display: flex;
+                min-height: 100vh;
+                background: #f3f4f6;
+                color: #1f2937;
+            }
+            .sidebar {
+                width: 250px;
+                background: #1e293b;
+                color: white;
+            }
+            .sidebar-header {
+                padding: 20px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #fbbf24;
+                border-bottom: 1px solid #334155;
+            }
+            .sidebar a {
+                display: block;
+                padding: 15px 20px;
+                color: #94a3b8;
+                text-decoration: none;
+                transition: 0.2s;
+            }
+            .sidebar a:hover, .sidebar a.activo {
+                background: #0f172a;
+                color: white;
+                border-left: 4px solid #fbbf24;
+            }
+            .main {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+            }
+            .topbar {
+                background: white;
+                padding: 15px 30px;
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            .content {
+                padding: 30px;
+            }
+            .card {
+                background: white;
+                padding: 25px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                margin-bottom: 25px;
+                border: 1px solid #e5e7eb;
+            }
+            .card h3 {
+                margin-bottom: 20px;
+                color: #374151;
+                border-bottom: 1px solid #f3f4f6;
+                padding-bottom: 10px;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-bottom: 15px;
+            }
+            label {
+                display: block;
+                font-size: 13px;
+                color: #4b5563;
+                font-weight: 600;
+                margin-bottom: 5px;
+            }
+            input, select, textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #d1d5db;
+                border-radius: 6px;
+                background: #f9fafb;
+                outline: none;
+            }
+            .btn {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-weight: bold;
+                text-decoration: none;
+                display: inline-block;
+            }
+            .btn-blue {
+                background: #1e293b;
+                color: white;
+            }
+            .btn-red {
+                background: #ef4444;
+                color: white;
+            }
+            .btn-yellow {
+                background: #f59e0b;
+                color: #111827;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            th, td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            th {
+                background: #f9fafb;
+                color: #6b7280;
+                font-size: 13px;
+                text-transform: uppercase;
+            }
+            .acciones a {
+                text-decoration: none;
+                font-weight: bold;
+                margin-right: 10px;
+            }
+
+            /* ESTILOS DEL CUADRO DE CONFIRMACIÓN (MODAL) */
+            .modal-fondo {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.6);
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+            .modal-caja {
+                background: white;
+                padding: 30px;
+                border-radius: 8px;
+                text-align: center;
+                width: 400px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            }
+            .modal-caja p {
+                margin-bottom: 25px;
+                color: #374151;
+                font-size: 16px;
+                font-weight: 500;
+            }
+        </style>
+    </head>
+    <body>
+
+        <aside class="sidebar">
+            <div class="sidebar-header">🏨 HotelControl</div>
+            <a href="/admin/panel" class="activo">🛏️ Habitaciones</a>
+            <a href="/admin/reservas">📅 Reservas</a>
+            <a href="/admin/personal">👥 Personal</a>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div>Panel / <b>Habitaciones</b></div>
+                <a href="/" style="color: #ef4444; text-decoration: none; font-weight: bold;">Cerrar Sesión</a>
+            </header>
+
+            <section class="content">
+
+                <div class="card">
+                    <h3 th:text="${nuevaHabitacion.idHabitacion != null} ? '📝 Editar Habitación' : '✨ Nueva Habitación'"></h3>
+                    <form th:action="@{/admin/habitaciones/guardar}" method="post" th:object="${nuevaHabitacion}">
+                        <input type="hidden" th:field="*{idHabitacion}">
+                        <div class="grid">
+                            <div><label>Número *</label><input type="text" th:field="*{numero}" required></div>
+                            <div>
+                                <label>Tipo *</label>
+                                <select th:field="*{tipo}">
+                                    <option value="SENCILLA">Sencilla</option>
+                                    <option value="DOBLE">Doble</option>
+                                    <option value="SUITE">Suite</option>
+                                </select>
+                            </div>
+                            <div><label>Capacidad *</label><input type="number" th:field="*{capacidad}" required></div>
+                            <div><label>Precio Noche ($) *</label><input type="number" step="0.01" th:field="*{precioNoche}" required></div>
+                            <div>
+                                <label>Estado *</label>
+                                <select th:field="*{estado}">
+                                    <option value="DISPONIBLE">Disponible</option>
+                                    <option value="OCUPADA">Ocupada</option>
+                                    <option value="MANTENIMIENTO">Mantenimiento</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <label>Descripción</label>
+                            <textarea th:field="*{descripcion}" rows="2"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-blue">💾 Guardar</button>
+                        <a href="/admin/panel" class="btn btn-red" style="margin-left: 5px;">Cancelar</a>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3>Inventario Actual</h3>
+                    <form th:action="@{/admin/habitaciones/buscar}" method="post" style="margin-bottom: 15px; display: flex; gap: 10px;">
+                        <input type="text" name="numeroBuscado" placeholder="Buscar nro exacto..." style="width: 250px;" required>
+                        <button type="submit" class="btn btn-yellow">🔍 Buscar</button>
+                        <a href="/admin/panel" class="btn" style="background:#e5e7eb; color:black;">Ver Todas</a>
+                    </form>
+
+                    <table>
+                        <thead>
+                            <tr><th>Nro.</th><th>Tipo</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="hab : ${habitaciones}">
+                                <td th:text="${hab.numero}"></td>
+                                <td th:text="${hab.tipo}"></td>
+                                <td th:text="'$' + ${hab.precioNoche}"></td>
+                                <td th:text="${hab.estado}"></td>
+                                <td class="acciones">
+                                    <a th:href="@{/admin/habitaciones/editar/{id}(id=${hab.idHabitacion})}" style="color: #f59e0b;">[Editar]</a>
+
+                                    <a href="javascript:void(0);" th:onclick="'abrirModal(' + ${hab.idHabitacion} + ')'" style="color: #ef4444;">[Baja]</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <div id="miModal" class="modal-fondo">
+            <div class="modal-caja">
+                <p>¿Estás seguro de que deseas poner esta habitación en Mantenimiento (Dar de baja)?</p>
+                <a id="btnConfirmar" href="#" class="btn btn-red">Sí, Dar de baja</a>
+                <button onclick="cerrarModal()" class="btn" style="background:#e5e7eb; color:black; margin-left: 10px;">Cancelar</button>
+            </div>
+        </div>
+
+        <script>
+            function abrirModal(id) {
+            document.getElementById("miModal").style.display = "flex"; 
+            document.getElementById("btnConfirmar").href = "/admin/habitaciones/baja/" + id; 
+            }
+
+            function cerrarModal() {
+            document.getElementById("miModal").style.display = "none"; 
+            }
+        </script>
+    </body>
+</html>
