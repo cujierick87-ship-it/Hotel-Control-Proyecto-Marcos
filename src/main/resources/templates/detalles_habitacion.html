@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles de la Habitación</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f8f9fa; color: #333; }
+        
+        .navbar { background-color: #1e293b; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center;}
+        .navbar-brand { font-size: 20px; font-weight: bold; color: #eab308; text-decoration: none; }
+        
+        .container { max-width: 1000px; margin: 40px auto; background: white; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 8px;}
+        
+        .header-title { text-align: center; color: #d4af37; font-size: 36px; letter-spacing: 3px; margin-bottom: 30px; text-transform: uppercase;}
+        
+        .layout { display: flex; gap: 40px; margin-bottom: 40px; }
+        .layout-img { flex: 1; }
+        .layout-img img { width: 100%; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+        
+        .layout-info { flex: 1; display: flex; flex-direction: column; justify-content: center;}
+        
+        .description { font-size: 16px; line-height: 1.8; color: #555; margin-bottom: 20px;}
+        
+        .features { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; padding: 15px; background: #f8f9fa; border: 1px solid #eaeaea;}
+        .feature-item { width: 45%; font-size: 14px; color: #444;}
+        .feature-item span { font-weight: bold; color: #1e293b;}
+        
+        .btn-reservar { display: inline-block; width: 100%; text-align: center; background-color: #e5c158; color: white; padding: 15px; text-decoration: none; font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; transition: background 0.2s;}
+        .btn-reservar:hover { background-color: #d4af37; }
+        
+        .btn-volver { display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none;}
+        .btn-volver:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/cliente/inicio" class="navbar-brand">🏨 HotelControl</a>
+    </nav>
+
+    <div class="container">
+        <h1 class="header-title" th:text="${habitacion.tipo} + ' - Habitación ' + ${habitacion.numero}"></h1>
+        
+        <div class="layout">
+            <div class="layout-img">
+                <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80" alt="Interior de la habitación">
+            </div>
+            
+            <div class="layout-info">
+                <p class="description" th:text="${habitacion.descripcion}">
+                    Nuestras habitaciones modernas son simplemente impresionantes y ofrecen una experiencia espaciosa y cómoda. Disfrute de los mejores acabados y un descanso inigualable.
+                </p>
+                
+                <div class="features">
+                    <div class="feature-item"><span>Precio:</span> $<span th:text="${habitacion.precioNoche}"></span> / Noche</div>
+                    <div class="feature-item"><span>Capacidad:</span> <span th:text="${habitacion.capacidad}"></span> Personas</div>
+                    <div class="feature-item"><span>Estado:</span> Disponible</div>
+                    <div class="feature-item"><span>Wi-Fi:</span> Gratis</div>
+                </div>
+                
+                <a th:href="@{/cliente/reserva/{id}(id=${habitacion.idHabitacion})}" class="btn-reservar">HACER RESERVA</a>
+            </div>
+        </div>
+        
+        <a href="/cliente/inicio" class="btn-volver">← Volver al catálogo</a>
+    </div>
+
+</body>
+</html>

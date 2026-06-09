@@ -55,4 +55,13 @@ public class ClienteController {
         model.addAttribute("listaCompleta", reservaService.obtenerTodasLasReservas());
         return "historial_cliente";
     }
+    
+    //// Para ver el detaale de la habitacion
+    // NUEVO: Ver detalles de la habitación antes de reservar
+    @GetMapping("/cliente/habitacion/detalles/{id}")
+    public String verDetallesHabitacion(@PathVariable Long id, Model model) {
+        // Buscamos la habitación y la mandamos a la nueva vista
+        model.addAttribute("habitacion", habitacionService.obtenerPorId(id));
+        return "detalles_habitacion"; // Crearemos este archivo ahora
+    }
 }

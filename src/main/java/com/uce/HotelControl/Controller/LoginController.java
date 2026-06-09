@@ -55,4 +55,10 @@ public class LoginController {
             }
         };
     }
+    
+    @GetMapping("/logout")
+    public String logout() {
+        // Solo redirigimos al login para que el usuario pueda volver a entrar
+        return "redirect:/login";
+    }
 }

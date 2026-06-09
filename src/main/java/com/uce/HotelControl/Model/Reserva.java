@@ -26,6 +26,14 @@ public class Reserva {
     private String cedulaCliente;
     private String nombreCliente;
 
+    // --- NUEVOS CAMPOS PARA EL FORMULARIO ---
+    private String apellidoCliente;
+    private String correo;
+    private String telefono;
+    private String direccion;
+    private String notas;
+    // ----------------------------------------
+
     // Conectamos la reserva con la habitación elegida
     @ManyToOne
     @JoinColumn(name = "id_habitacion")
@@ -41,8 +49,7 @@ public class Reserva {
     private Double totalPagar;
 
     // Estado: "PENDIENTE", "CONFIRMADA", "CANCELADA"
-    private String estado;
-
+    private String estado = "PENDIENTE"; // Por defecto
     private LocalDate fechaReserva = LocalDate.now();
 
     // Constructor vacío obligatorio para Spring Boot
@@ -71,6 +78,46 @@ public class Reserva {
 
     public void setNombreCliente(String nombreCliente) {
         this.nombreCliente = nombreCliente;
+    }
+
+    public String getApellidoCliente() {
+        return apellidoCliente;
+    }
+
+    public void setApellidoCliente(String apellidoCliente) {
+        this.apellidoCliente = apellidoCliente;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getNotas() {
+        return notas;
+    }
+
+    public void setNotas(String notas) {
+        this.notas = notas;
     }
 
     public Habitacion getHabitacion() {
@@ -121,4 +168,5 @@ public class Reserva {
         this.fechaReserva = fechaReserva;
     }
 
+    
 }

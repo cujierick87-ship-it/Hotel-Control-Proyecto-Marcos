@@ -1,42 +1,40 @@
+
+
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>HotelControl - Catálogo</title>
+    <title>Catálogo de Habitaciones</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f3f4f6; color: #1f2937; }
+        body { background-color: #f8f9fa; color: #333; }
         
         .navbar { background-color: #1e293b; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center;}
-        .navbar-brand { font-size: 20px; font-weight: bold; color: #fbbf24; text-decoration: none; }
-        
-        /* Estilo para el grupo de botones derecho */
+        .navbar-brand { font-size: 20px; font-weight: bold; color: #eab308; text-decoration: none; }
         .navbar-menu { display: flex; gap: 15px; align-items: center; }
-        .btn-historial { background-color: #fbbf24; color: black; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 14px; }
+        .btn-historial { background-color: #eab308; color: black; text-decoration: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; font-size: 14px; }
         .btn-logout { color: #ef4444; text-decoration: none; font-weight: bold; background: white; padding: 6px 12px; border-radius: 4px; font-size: 14px; }
         
-        .hero { background: linear-gradient(135deg, #0f172a, #1e293b); padding: 50px 20px; text-align: center; color: white; margin-bottom: 30px;}
-        .hero h1 { font-size: 32px; color: #fbbf24; margin-bottom: 10px;}
+        .hero { text-align: center; padding: 40px 20px; background: white; border-bottom: 1px solid #ddd; margin-bottom: 40px;}
+        .hero h1 { font-size: 32px; color: #1e293b; letter-spacing: 1px;}
         
-        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
-        .grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+        .grid { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; }
         
-        .card { background-color: white; padding: 25px; border-radius: 8px; border: 1px solid #e5e7eb; width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s;}
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        /* DISEÑO DE LA TARJETA TIPO IMAGEN 2 */
+        .card { background: white; border-radius: 4px; overflow: hidden; width: 320px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: transform 0.2s; border: 1px solid #eaeaea;}
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.12); }
         
-        .card-header { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center;}
-        .numero { color: #1f2937; font-weight: bold; font-size: 20px;}
-        .tipo { background-color: rgba(59, 130, 246, 0.1); color: #3b82f6; padding: 6px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .card-img { width: 100%; height: 200px; object-fit: cover; }
         
-        .precio { font-size: 26px; font-weight: bold; color: #111827; margin-bottom: 15px; }
-        .precio span { font-size: 14px; color: #6b7280; font-weight: normal; }
+        .card-body { padding: 20px; }
+        .card-title { color: #d4af37; font-size: 22px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase;}
         
-        .detalles { font-size: 14px; color: #4b5563; margin-bottom: 25px; line-height: 1.6; background: #f9fafb; padding: 15px; border-radius: 6px;}
+        .card-price { font-size: 18px; color: #1f2937; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+        .card-price span { font-weight: bold; font-size: 20px; }
         
-        .btn-reservar { display: block; width: 100%; text-align: center; background-color: #10b981; color: white; padding: 12px; text-decoration: none; border-radius: 6px; font-weight: bold; transition: background 0.2s;}
-        .btn-reservar:hover { background-color: #059669; }
-        
-        .btn-ocupada { display: block; width: 100%; text-align: center; background-color: #9ca3af; color: white; padding: 12px; text-decoration: none; border-radius: 6px; font-weight: bold; cursor: not-allowed;}
+        .btn-detalles { display: block; width: 100%; text-align: center; background-color: #e5c158; color: white; padding: 12px; text-decoration: none; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; transition: background 0.2s;}
+        .btn-detalles:hover { background-color: #d4af37; }
     </style>
 </head>
 <body>
@@ -44,36 +42,31 @@
     <nav class="navbar">
         <a href="#" class="navbar-brand">🏨 HotelControl</a>
         <div class="navbar-menu">
-            <a href="/cliente/historial" class="btn-historial">Ver mis reservas</a>
+            <a href="/cliente/historial" class="btn-historial">Mis Reservas</a>
             <a href="/logout" class="btn-logout">Cerrar Sesión</a>
         </div>
     </nav>
 
     <header class="hero">
-        <h1>Nuestras Habitaciones</h1>
-        <p>Elige una habitacion disponible.</p>
+        <h1>NUESTRAS HABITACIONES</h1>
+        <p style="color: #666; margin-top: 10px;">Encuentra el espacio perfecto para tu descanso.</p>
     </header>
 
     <div class="container">
         <div class="grid">
-            <div class="card" th:each="habitacion : ${habitaciones}" th:if="${habitacion.estado != 'MANTENIMIENTO'}">
-                <div class="card-header">
-                    <span class="numero" th:text="'Habitación ' + ${habitacion.numero}"></span>
-                    <span class="tipo" th:text="${habitacion.tipo}"></span>
+            <div class="card" th:each="habitacion : ${habitaciones}" th:if="${habitacion.estado == 'DISPONIBLE'}">
+                <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=500&q=80" alt="Habitación" class="card-img">
+                
+                <div class="card-body">
+                    <h3 class="card-title" th:text="${habitacion.tipo}">DELUXE</h3>
+                    
+                    <div class="card-price">
+                        <small>Precio desde</small>
+                        <span>$ <span th:text="${habitacion.precioNoche}"></span> / Noche</span>
+                    </div>
+                    
+                    <a th:href="@{/cliente/habitacion/detalles/{id}(id=${habitacion.idHabitacion})}" class="btn-detalles">DETALLES</a>
                 </div>
-                
-                <div class="precio">
-                    <span th:text="'$' + ${habitacion.precioNoche}"></span> <span>/ noche</span>
-                </div>
-                
-                <div class="detalles">
-                    <p>👥 <b>Capacidad:</b> <span th:text="${habitacion.capacidad} + ' personas'"></span></p>
-                    <p style="margin-top: 8px;">🛏️ <b>Descripción:</b> <span th:text="${habitacion.descripcion}"></span></p>
-                </div>
-                
-                <a th:if="${habitacion.estado == 'DISPONIBLE'}" th:href="@{/cliente/reserva/{id}(id=${habitacion.idHabitacion})}" class="btn-reservar">Seleccionar y Reservar</a>
-                
-                <a th:unless="${habitacion.estado == 'DISPONIBLE'}" href="#" class="btn-ocupada" onclick="return false;">No Disponible</a>
             </div>
         </div>
     </div>
