@@ -1,9 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Detalles de la Habitación</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: #f8f9fa; color: #333; }
@@ -11,15 +13,18 @@
         .navbar { background-color: #1e293b; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center;}
         .navbar-brand { font-size: 20px; font-weight: bold; color: #eab308; text-decoration: none; }
         
-        .container { max-width: 1000px; margin: 40px auto; background: white; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 8px;}
+        .container { max-width: 1100px; margin: 40px auto; background: white; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 8px;}
         
         .header-title { text-align: center; color: #d4af37; font-size: 36px; letter-spacing: 3px; margin-bottom: 30px; text-transform: uppercase;}
         
-        .layout { display: flex; gap: 40px; margin-bottom: 40px; }
-        .layout-img { flex: 1; }
-        .layout-img img { width: 100%; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+        /* Layout dividido 50/50 */
+        .layout { display: flex; gap: 40px; margin-bottom: 40px; align-items: flex-start;}
         
-        .layout-info { flex: 1; display: flex; flex-direction: column; justify-content: center;}
+        .layout-left { flex: 1; }
+        .layout-left img { width: 100%; border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px;}
+        
+        .layout-right { flex: 1; display: flex; flex-direction: column; align-items: center; background: white; padding: 20px; border-radius: 8px; border: 1px solid #eaeaea;}
+        .layout-right h3 { color: #d4af37; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;}
         
         .description { font-size: 16px; line-height: 1.8; color: #555; margin-bottom: 20px;}
         
@@ -27,11 +32,47 @@
         .feature-item { width: 45%; font-size: 14px; color: #444;}
         .feature-item span { font-weight: bold; color: #1e293b;}
         
-        .btn-reservar { display: inline-block; width: 100%; text-align: center; background-color: #e5c158; color: white; padding: 15px; text-decoration: none; font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; transition: background 0.2s;}
+        .btn-reservar { display: inline-block; width: 100%; text-align: center; background-color: #e5c158; color: white; padding: 15px; text-decoration: none; font-size: 18px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; transition: background 0.2s; margin-top: 20px;}
         .btn-reservar:hover { background-color: #d4af37; }
         
         .btn-volver { display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none;}
         .btn-volver:hover { text-decoration: underline; }
+
+        /* =========================================
+           DISEÑO DEL CALENDARIO
+           ========================================= */
+        .flatpickr-calendar.inline {
+            width: 100% !important; 
+            box-shadow: none !important;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .flatpickr-innerContainer, .flatpickr-rContainer, .dayContainer, .flatpickr-days {
+            width: 100% !important;
+        }
+        .flatpickr-day {
+            max-width: none !important;
+            height: 45px !important;
+            line-height: 45px !important;
+            border-radius: 4px !important;
+            margin: 2px !important;
+        }
+
+        /* MAGIA CSS: ESTA CLASE AHORA SOLO PINTA LAS RESERVAS REALES */
+        .flatpickr-day.fecha-reservada {
+            background-color: #ef4444 !important; /* Rojo fuerte */
+            color: white !important;
+            border-color: #ef4444 !important;
+            opacity: 1 !important;
+        }
+
+        /* Fechas disponibles al pasar el ratón */
+        .flatpickr-day:not(.flatpickr-disabled):not(.today):hover {
+            background-color: #eab308 !important; /* Dorado */
+            color: white !important;
+            border-color: #eab308 !important;
+        }
     </style>
 </head>
 <body>
@@ -44,28 +85,81 @@
         <h1 class="header-title" th:text="${habitacion.tipo} + ' - Habitación ' + ${habitacion.numero}"></h1>
         
         <div class="layout">
-            <div class="layout-img">
-                <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80" alt="Interior de la habitación">
-            </div>
-            
-            <div class="layout-info">
+            <div class="layout-left">
+                <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80" alt="Interior">
+                
                 <p class="description" th:text="${habitacion.descripcion}">
-                    Nuestras habitaciones modernas son simplemente impresionantes y ofrecen una experiencia espaciosa y cómoda. Disfrute de los mejores acabados y un descanso inigualable.
+                    Nuestras habitaciones modernas son impresionantes y ofrecen una experiencia espaciosa y cómoda.
                 </p>
                 
                 <div class="features">
                     <div class="feature-item"><span>Precio:</span> $<span th:text="${habitacion.precioNoche}"></span> / Noche</div>
                     <div class="feature-item"><span>Capacidad:</span> <span th:text="${habitacion.capacidad}"></span> Personas</div>
-                    <div class="feature-item"><span>Estado:</span> Disponible</div>
                     <div class="feature-item"><span>Wi-Fi:</span> Gratis</div>
                 </div>
+            </div>
+            
+            <div class="layout-right">
+                <h3>Disponibilidad de Fechas</h3>
                 
-                <a th:href="@{/cliente/reserva/{id}(id=${habitacion.idHabitacion})}" class="btn-reservar">HACER RESERVA</a>
+                <div id="calendario-reservas"></div>
+                
+                <a th:href="@{/cliente/reserva/{id}(id=${habitacion.idHabitacion})}" class="btn-reservar">CONTINUAR CON LA RESERVA</a>
             </div>
         </div>
         
         <a href="/cliente/inicio" class="btn-volver">← Volver al catálogo</a>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // 1. Array vacío para las fechas
+        var fechasOcupadas = [];
+
+        // 2. Thymeleaf inyecta las fechas de la base de datos
+        /*[# th:each="r : ${reservas}"]*/
+        fechasOcupadas.push({
+            from: /*[[${r.fechaCheckIn}]]*/ '',
+            to: /*[[${r.fechaCheckOut}]]*/ ''
+        });
+        /*[/]*/
+
+        // 3. Dibujar el calendario en la pantalla
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr("#calendario-reservas", {
+                inline: true,              
+                locale: "es",              
+                minDate: "today",          // Esto pondrá grises (no rojos) los días pasados
+                disable: fechasOcupadas,   // Esto bloquea los clics en las reservas
+                
+                // LÓGICA NUEVA: Buscar los días en el calendario que coincidan con la DB y pintarlos de rojo
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    var cellDate = dayElem.dateObj;
+                    cellDate.setHours(0,0,0,0);
+                    
+                    fechasOcupadas.forEach(function(r) {
+                        // Separar la fecha (YYYY-MM-DD) para que no haya errores de zona horaria
+                        var fromParts = r.from.split('-');
+                        var toParts = r.to.split('-');
+                        
+                        // Los meses en JavaScript empiezan en 0 (Enero=0, Junio=5)
+                        var fromDate = new Date(fromParts[0], fromParts[1]-1, fromParts[2]);
+                        var toDate = new Date(toParts[0], toParts[1]-1, toParts[2]);
+                        fromDate.setHours(0,0,0,0);
+                        toDate.setHours(0,0,0,0);
+
+                        // Si el día del calendario está dentro de la reserva de la BD, le ponemos la clase roja
+                        if (cellDate >= fromDate && cellDate <= toDate) {
+                            dayElem.classList.add("fecha-reservada");
+                        }
+                    });
+                }
+            });
+        });
+        /*]]>*/
+    </script>
 </body>
 </html>

@@ -1,136 +1,184 @@
+
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HotelControl - Iniciar Sesión</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Pantalla completa, con fondo de hotel y el contenido CENTRADO EXACTAMENTE EN EL MEDIO */
+        body { 
+            display: flex; 
+            justify-content: center; /* Centra horizontalmente */
+            align-items: center;     /* Centra verticalmente */
+            height: 100vh; 
+            background-image: url('https://images.unsplash.com/photo-1542314831-c6a4d14d2319?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            position: relative;
         }
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            height: 100vh;
+        
+        /* Capa oscura transparente para que la tarjeta resalte */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.6);
+            z-index: 0;
+        }
+
+        /* LA TARJETA PRINCIPAL (Formulario a la izq, Paisaje a la der) */
+        .login-card-combined {
             display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-card {
-            background-color: #1e293b;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 400px;
-            border: 1px solid #334155;
+            max-width: 800px;
+            height: 500px;
+            background-color: #111827;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            overflow: hidden; 
+            z-index: 1; /* Mantiene la tarjeta por encima del fondo oscuro */
         }
-        .login-header {
+
+        /* Lado A: El Formulario */
+        .login-form-side {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Lado B: El Paisaje interno */
+        .login-image-side {
+            flex: 1;
+            background-image: url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Textos y cabecera */
+        .header-text {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
-        .login-header h2 {
-            color: #ffffff;
-            font-size: 26px;
-            margin-bottom: 5px;
+        .header-text h1 {
+            font-size: 28px;
+            color: white;
+            margin-bottom: 6px;
         }
-        .login-header p {
+        .header-text p {
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 13px;
         }
+
+        /* Campos de entrada */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         .form-group label {
             display: block;
+            font-size: 13px;
             color: #cbd5e1;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 500;
+            margin-bottom: 6px;
         }
-        .form-group input {
+        .form-control {
             width: 100%;
             padding: 12px;
-            background-color: #0f172a;
-            border: 1px solid #475569;
             border-radius: 6px;
-            color: #ffffff;
-            font-size: 15px;
-            transition: border-color 0.3s;
+            border: 1px solid #334155;
+            background-color: #0f172a;
+            color: white;
+            font-size: 14px;
+            transition: border-color 0.2s;
         }
-        .form-group input:focus {
+        .form-control:focus {
             outline: none;
             border-color: #fbbf24;
         }
-        .alert-error {
-            background-color: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
-            color: #fca5a5;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            text-align: center;
-        }
-        .btn-submit {
+
+        /* Botón Dorado */
+        .btn-ingresar {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             background-color: #fbbf24;
             color: #0f172a;
             border: none;
             border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: background-color 0.2s;
+            margin-top: 10px;
         }
-        .btn-submit:hover {
+        .btn-ingresar:hover {
             background-color: #f59e0b;
         }
-        .login-footer {
-            margin-top: 25px;
+
+        .register-link {
+            display: block;
             text-align: center;
-        }
-        .login-footer a {
+            margin-top: 20px;
             color: #fbbf24;
             text-decoration: none;
-            font-size: 14px;
+            font-size: 13px;
         }
-        .login-footer a:hover {
+        .register-link:hover {
             text-decoration: underline;
+        }
+
+        /* Errores */
+        .error-msg {
+            background-color: #ef4444;
+            color: white;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
+        /* Ajuste automático para pantallas pequeñas */
+        @media (max-width: 768px) {
+            .login-image-side { display: none; }
+            .login-card-combined { max-width: 400px; height: auto; margin: 20px; }
         }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div class="login-header">
-            <h2>Iniciar Sesión</h2>
-            <p>Acceda a su cuenta de HotelControl</p>
-        </div>
 
-        <div class="alert-error" th:if="${error}" th:text="${error}">
-            Mensaje de error simulado
-        </div>
-
-        <form th:action="@{/login}" method="post">
-            <div class="form-group">
-                <label for="nombreUsuario">Usuario</label>
-                <input type="text" id="nombreUsuario" name="nombreUsuario" placeholder="Ingrese su usuario" required>
+    <div class="login-card-combined">
+        
+        <div class="login-form-side">
+            <div class="header-text">
+                <h1>Iniciar Sesión</h1>
+                <p>Acceda a su cuenta de HotelControl</p>
             </div>
-            
-            <div class="form-group">
-                <label for="passwordHash">Contraseña</label>
-                <input type="password" id="passwordHash" name="passwordHash" placeholder="Ingrese su contraseña" required>
-            </div>
-            
-            <button type="submit" class="btn-submit">Ingresar</button>
-        </form>
 
-        <div class="login-footer">
-            <a href="/registro">¿No tiene cuenta? Regístrese aquí</a>
+            <div th:if="${error != null}" class="error-msg" th:text="${error}"></div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label>Usuario</label>
+                    <input type="text" name="nombreUsuario" class="form-control" placeholder="Ingrese su usuario" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" name="passwordHash" class="form-control" placeholder="Ingrese su contraseña" required>
+                </div>
+
+                <button type="submit" class="btn-ingresar">Ingresar</button>
+            </form>
+
+            <a href="/registro" class="register-link">¿No tiene cuenta? Regístrese aquí</a>
         </div>
+
+        <div class="login-image-side"></div>
+
     </div>
+
 </body>
 </html>

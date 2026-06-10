@@ -8,10 +8,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-/**
- *
- * @author Erick HC
- */
 @Controller
 public class LoginController {
 
@@ -19,14 +15,16 @@ public class LoginController {
     private UsuarioService usuarioService;
 
     // --- 1. CARGA DE VISTAS ---
+    
+    // Saltamos la pantalla vieja de inicio y vamos directo al login
     @GetMapping("/")
     public String inicio() {
-        return "index";
+        return "redirect:/login";
     }
 
     @GetMapping("/login")
     public String mostrarLogin() {
-        return "login";
+        return "login"; // Cargará nuestro nuevo diseño dividido
     }
 
     @GetMapping("/registro")
@@ -44,7 +42,6 @@ public class LoginController {
             return "login";
         }
 
-        // Sin sesiones, solo redirigimos según el rol
         return switch (auth.getRol().toUpperCase()) {
             case "ADMINISTRADOR" -> "redirect:/admin/panel";
             case "RECEPCIONISTA" -> "redirect:/recepcion/panel";
@@ -55,10 +52,10 @@ public class LoginController {
             }
         };
     }
-    
+
+    // Puerta de salida maestra
     @GetMapping("/logout")
     public String logout() {
-        // Solo redirigimos al login para que el usuario pueda volver a entrar
         return "redirect:/login";
     }
 }

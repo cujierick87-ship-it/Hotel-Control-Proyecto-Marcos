@@ -1,178 +1,147 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8">
-        <title>Completar Reserva</title>
-        <style>
-            * {
-                box-sizing: border-box;
-                margin: 0;
-                padding: 0;
-                font-family: 'Segoe UI', sans-serif;
-            }
-            body {
-                background-color: #f8f9fa;
-                color: #333;
-            }
+<head>
+    <meta charset="UTF-8">
+    <title>Completar Reserva</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f8f9fa; color: #333; }
+        
+        .navbar { background-color: #1e293b; padding: 15px 50px; display: flex; justify-content: space-between; align-items: center;}
+        .navbar-brand { font-size: 20px; font-weight: bold; color: #eab308; text-decoration: none; }
+        
+        .container { max-width: 800px; margin: 40px auto; background: white; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 4px; border: 1px solid #eaeaea;}
+        
+        .header-title { font-size: 22px; color: #1e293b; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #eee;}
+        
+        /* Grid compacto de 2 columnas */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .full-width { grid-column: span 2; }
+        
+        .form-control { width: 100%; padding: 11px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; color: #555; outline: none; transition: border-color 0.2s;}
+        .form-control:focus { border-color: #e5c158; box-shadow: 0 0 0 2px rgba(229, 193, 88, 0.2); }
+        
+        .form-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; }
+        .btn-reservar { background-color: #e5c158; color: white; padding: 12px 25px; border: none; border-radius: 4px; font-size: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: background 0.2s;}
+        .btn-reservar:hover { background-color: #d4af37; }
+        .btn-volver { color: #666; text-decoration: none; font-size: 14px;}
+        .btn-volver:hover { text-decoration: underline; }
 
-            .navbar {
-                background-color: #1e293b;
-                padding: 15px 50px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .navbar-brand {
-                font-size: 20px;
-                font-weight: bold;
-                color: #eab308;
-                text-decoration: none;
-            }
+        /* =======================================================
+           AJUSTES DEL CALENDARIO: TAMAÑO COMPACTO Y COLORES
+           ======================================================= */
+        .flatpickr-calendar { font-size: 13px !important; width: auto !important; }
+        .flatpickr-day { height: 33px !important; line-height: 33px !important; max-width: 33px !important; margin: 1px !important; }
+        .flatpickr-months { padding: 0 5px !important; }
 
-            .container {
-                max-width: 800px;
-                margin: 40px auto;
-                background: white;
-                padding: 40px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-                border-radius: 4px;
-                border: 1px solid #eaeaea;
-            }
+        /* Rojo para días bloqueados/pasados */
+        .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.prevMonthDay,
+        .flatpickr-day.nextMonthDay {
+            background-color: #fca5a5 !important; 
+            color: #7f1d1d !important;
+            border-color: white !important;
+            border-radius: 0 !important;
+            opacity: 1 !important;
+        }
 
-            .header-title {
-                font-size: 24px;
-                color: #1e293b;
-                margin-bottom: 30px;
-                padding-bottom: 10px;
-                border-bottom: 1px solid #eee;
-            }
+        /* Verde para días disponibles */
+        .flatpickr-day:not(.flatpickr-disabled):not(.prevMonthDay):not(.nextMonthDay) {
+            background-color: #bbf7d0 !important; 
+            color: #065f46 !important;
+            border-color: white !important;
+            border-radius: 0 !important;
+        }
 
-            /* Sistema de Grid para las dos columnas */
-            .form-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-                margin-bottom: 20px;
-            }
-            .full-width {
-                grid-column: span 2;
-            }
+        /* Verde oscuro al pasar el ratón */
+        .flatpickr-day:not(.flatpickr-disabled):hover {
+            background-color: #22c55e !important; 
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
 
-            .form-group {
-                display: flex;
-                flex-direction: column;
-            }
-            .form-control {
-                padding: 12px;
-                border: 1px solid #ccc;
-                border-radius: 2px;
-                font-size: 14px;
-                color: #555;
-                transition: border-color 0.2s;
-            }
-            .form-control:focus {
-                outline: none;
-                border-color: #e5c158;
-            }
+    <nav class="navbar">
+        <a href="/cliente/inicio" class="navbar-brand">🏨 HotelControl</a>
+    </nav>
 
-            .nota-req {
-                font-size: 12px;
-                color: #777;
-                margin-top: 5px;
-            }
+    <div class="container">
+        <h2 class="header-title">Reserva - <span th:text="${habitacion.tipo}"></span> Hab. <span th:text="${habitacion.numero}"></span></h2>
+        
+        <form th:action="@{/cliente/reserva/guardar}" th:object="${nuevaReserva}" method="post">
+            
+            <input type="hidden" name="idHab" th:value="${habitacion.idHabitacion}" />
+            
+            <div class="form-grid">
+                <input type="text" id="fechaCheckIn" class="form-control" th:field="*{fechaCheckIn}" placeholder="Fecha de Inicio*" required autocomplete="off">
+                <input type="text" id="fechaCheckOut" class="form-control" th:field="*{fechaCheckOut}" placeholder="Fecha de Término*" required autocomplete="off">
+                
+                <input type="text" class="form-control" th:field="*{nombreCliente}" placeholder="Nombre*" required>
+                <input type="text" class="form-control" th:field="*{apellidoCliente}" placeholder="Apellido*" required>
+                <input type="text" class="form-control" th:field="*{cedulaCliente}" placeholder="Cédula/Pasaporte*" required>
+                <input type="text" class="form-control" th:field="*{telefono}" placeholder="Móvil (Ej: 099...)">
+                <input type="email" class="form-control" th:field="*{correo}" placeholder="Correo electrónico*" required>
+                <input type="text" class="form-control" th:field="*{direccion}" placeholder="Dirección">
+                
+                <textarea class="form-control full-width" th:field="*{notas}" rows="2" placeholder="Notas adicionales para su estadía..."></textarea>
+            </div>
+            
+            <div class="form-footer">
+                <a th:href="@{/cliente/habitacion/detalles/{id}(id=${habitacion.idHabitacion})}" class="btn-volver">← Volver a detalles</a>
+                <button type="submit" class="btn-reservar">CONFIRMAR RESERVA</button>
+            </div>
+            
+        </form>
+    </div>
 
-            .form-footer {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-top: 30px;
-            }
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
 
-            .btn-reservar {
-                background-color: #e5c158;
-                color: white;
-                padding: 15px 30px;
-                text-decoration: none;
-                border: none;
-                font-size: 16px;
-                font-weight: bold;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-                cursor: pointer;
-                transition: background 0.2s;
-            }
-            .btn-reservar:hover {
-                background-color: #d4af37;
-            }
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // 1. Extraemos las fechas ocupadas de la BD
+        let fechasOcupadas = [];
+        /*[# th:each="r : ${reservas}"]*/
+        fechasOcupadas.push({
+            from: /*[[${r.fechaCheckIn}]]*/ '',
+            to: /*[[${r.fechaCheckOut}]]*/ ''
+        });
+        /*[/]*/
 
-            .btn-volver {
-                color: #666;
-                text-decoration: none;
-                font-size: 14px;
-            }
-            .btn-volver:hover {
-                text-decoration: underline;
-            }
-        </style>
-    </head>
-    <body>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 2. Configuramos el calendario de Salida (Check-Out)
+            const checkOutPicker = flatpickr("#fechaCheckOut", {
+                locale: "es",
+                dateFormat: "Y-m-d", // FORMATO EXACTO QUE NECESITA JAVA (Soluciona el Error 500)
+                minDate: "today",
+                disable: fechasOcupadas,
+                showMonths: 2
+            });
 
-        <nav class="navbar">
-            <a href="/cliente/inicio" class="navbar-brand">🏨 HotelControl</a>
-        </nav>
-
-        <div class="container">
-            <h2 class="header-title">Detalles de su Reserva - <span th:text="${habitacion.tipo}"></span> Hab. <span th:text="${habitacion.numero}"></span></h2>
-
-            <form th:action="@{/cliente/reserva/guardar}" th:object="${nuevaReserva}" method="post">
-
-                <input type="hidden" name="idHab" th:value="${habitacion.idHabitacion}" />
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <input type="date" class="form-control" th:field="*{fechaCheckIn}" required title="Fecha de Inicio">
-                    </div>
-                    <div class="form-group">
-                        <input type="date" class="form-control" th:field="*{fechaCheckOut}" required title="Fecha de Término">
-                    </div>
-
-                    <div class="form-group">
-                        <input type="text" class="form-control" th:field="*{nombreCliente}" placeholder="Nombre*" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" th:field="*{apellidoCliente}" placeholder="Apellido*" required>
-                    </div>
-
-                    <div class="form-group">
-                        <input type="text" class="form-control" th:field="*{cedulaCliente}" placeholder="Cédula/Pasaporte*" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" th:field="*{telefono}" placeholder="Móvil (Ej: 099...)">
-                    </div>
-
-                    <div class="form-group">
-                        <input type="email" class="form-control" th:field="*{correo}" placeholder="Correo electrónico*" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" class="form-control" th:field="*{direccion}" placeholder="Dirección">
-                    </div>
-                    <div class="form-group full-width">
-                        <textarea class="form-control" th:field="*{notas}" rows="3" placeholder="Notas: Agregue cualquier información necesaria para su estadía. Estaremos encantados de ayudarle."></textarea>
-                    </div>
-
-
-                </div>
-
-                <div class="form-footer">
-                    <div>
-                        <span class="nota-req">* - campo requerido</span><br>
-                        <a href="/cliente/inicio" class="btn-volver">← Volver</a>
-                    </div>
-                    <button type="submit" class="btn-reservar">HACER UNA RESERVA</button>
-                </div>
-
-            </form>
-        </div>
-
-    </body>
+            // 3. Configuramos el calendario de Entrada (Check-In)
+            flatpickr("#fechaCheckIn", {
+                locale: "es",
+                dateFormat: "Y-m-d", // FORMATO EXACTO QUE NECESITA JAVA
+                minDate: "today",
+                disable: fechasOcupadas,
+                showMonths: 2,
+                onChange: function(selectedDates) {
+                    // Al elegir fecha de entrada, la salida DEBE ser como mínimo al día siguiente
+                    if (selectedDates.length > 0) {
+                        let minSalida = new Date(selectedDates[0]);
+                        minSalida.setDate(minSalida.getDate() + 1);
+                        checkOutPicker.set("minDate", minSalida);
+                    }
+                }
+            });
+            
+        });
+        /*]]>*/
+    </script>
+</body>
 </html>
