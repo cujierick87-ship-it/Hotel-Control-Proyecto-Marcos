@@ -21,24 +21,25 @@ public class Usuario {
 
     private String cedula;
     private String nombres;
+    private String apellidos;
     private String correo;
     private String telefono;
-    private String nombreUsuario; // Spring lo mapea automáticamente a nombre_usuario
-    private String passwordHash;  // Spring lo mapea automáticamente a password_hash
+    private String nombreUsuario;
+    private String passwordHash;
     private String rol;
     private String estado;
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaRegistro;
-    
-    // Constructor vacío (Obligatorio para JPA)
+
     public Usuario() {
     }
-    
- public Usuario(String cedula, String nombres, String correo, String telefono, 
+
+    public Usuario(String cedula, String nombres, String apellidos, String correo, String telefono,
                    String nombreUsuario, String passwordHash, String rol, String estado, Date fechaRegistro) {
         this.cedula = cedula;
         this.nombres = nombres;
+        this.apellidos = apellidos;
         this.correo = correo;
         this.telefono = telefono;
         this.nombreUsuario = nombreUsuario;
@@ -70,6 +71,14 @@ public class Usuario {
 
     public void setNombres(String nombres) {
         this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
     }
 
     public String getCorreo() {
@@ -127,7 +136,4 @@ public class Usuario {
     public void setFechaRegistro(Date fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
     }
- 
- 
-
 }

@@ -64,4 +64,15 @@ public class UsuarioService {
     public void eliminarUsuario(Long id) {
         usuarioRepository.deleteById(id);
     }
+    
+    // Para validar si existe un nombre de usuario a la hora de resgistrase como CLIENTE
+    public boolean existeNombreUsuario(String nombreUsuario) {
+    Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario);
+
+    if (usuario != null) {
+        return true;
+    }
+
+    return false;
+}
 }
