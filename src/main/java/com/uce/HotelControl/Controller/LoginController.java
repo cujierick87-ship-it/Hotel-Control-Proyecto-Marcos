@@ -9,32 +9,33 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-/**
- *
- * @author Erick HC
- */
 @Controller
 public class LoginController {
 
     @Autowired
     private UsuarioService usuarioService;
 
+    // Redirige la ruta principal hacia la pantalla de login.
     @GetMapping("/")
     public String inicio() {
         return "redirect:/login";
     }
 
+    // Muestra la pantalla de inicio de sesión.
     @GetMapping("/login")
     public String mostrarLogin() {
         return "login";
     }
 
+    // Muestra el formulario para registrar un cliente nuevo.
     @GetMapping("/registro")
     public String mostrarRegistro(Model model) {
         model.addAttribute("nuevoUsuario", new Usuario());
         return "registro_cliente";
     }
 
+    // Procesa el registro del cliente.
+    // Valida usuario repetido, contraseña mínima y teléfono mínimo antes de guardar.
     @PostMapping("/registro")
     public String procesarRegistro(Usuario nuevoUsuario, Model model) {
 
@@ -64,6 +65,8 @@ public class LoginController {
         return "redirect:/login";
     }
 
+    // Procesa el inicio de sesión.
+    // Si las credenciales son correctas, guarda el usuario en sesión y redirige según su rol.
     @PostMapping("/login")
     public String procesarLogin(Usuario usuario, Model model, HttpSession session) {
         Usuario auth = usuarioService.validarLogin(
@@ -76,11 +79,14 @@ public class LoginController {
             return "login";
         }
 
-        // AQUÍ ESTABA EL PROBLEMA:
-        // Guardamos el usuario en sesión para usarlo en otras pantallas.
         session.setAttribute("usuarioLogueado", auth);
 
         if (auth.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
+
+            if (Boolean.TRUE.equals(auth.getRequiereCambioPassword())) {
+                return "redirect:/cambiar-password-inicial";
+            }
+
             return "redirect:/admin/panel";
         }
 
@@ -96,6 +102,65 @@ public class LoginController {
         return "login";
     }
 
+    // Muestra la pantalla para cambiar la contraseña inicial del administrador.
+    // Solo entra aquí si el usuario es administrador y requiere cambiar contraseña.
+    @GetMapping("/cambiar-password-inicial")
+    public String mostrarCambioPasswordInicial(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        if (!usuario.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
+            return "redirect:/login";
+        }
+
+        if (!Boolean.TRUE.equals(usuario.getRequiereCambioPassword())) {
+            return "redirect:/admin/panel";
+        }
+
+        return "cambiar_password_inicial";
+    }
+
+    // Procesa el cambio de contraseña inicial del administrador.
+    // Valida contraseña actual, longitud mínima y confirmación de contraseña.
+    @PostMapping("/cambiar-password-inicial")
+    public String cambiarPasswordInicial(String passwordActual,
+                                          String nuevaPassword,
+                                          String confirmarPassword,
+                                          HttpSession session,
+                                          Model model) {
+
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+
+        if (usuario == null) {
+            return "redirect:/login";
+        }
+
+        if (!usuario.getPasswordHash().equals(passwordActual)) {
+            model.addAttribute("errorActual", "La contraseña actual no es correcta.");
+            return "cambiar_password_inicial";
+        }
+
+        if (nuevaPassword == null || nuevaPassword.length() < 6) {
+            model.addAttribute("errorNueva", "La nueva contraseña debe tener mínimo 6 caracteres.");
+            return "cambiar_password_inicial";
+        }
+
+        if (!nuevaPassword.equals(confirmarPassword)) {
+            model.addAttribute("errorConfirmar", "Las contraseñas no coinciden.");
+            return "cambiar_password_inicial";
+        }
+
+        Usuario actualizado = usuarioService.cambiarPasswordInicial(usuario.getIdUsuario(), nuevaPassword);
+        session.setAttribute("usuarioLogueado", actualizado);
+
+        return "redirect:/admin/panel";
+    }
+
+    // Cierra la sesión del usuario.
+    // Borra los datos guardados en sesión y retorna al login.
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();

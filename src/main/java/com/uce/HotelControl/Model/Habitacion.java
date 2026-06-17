@@ -1,6 +1,6 @@
-
 package com.uce.HotelControl.Model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
  *
  * @author Erick HC
  */
-
 @Entity
 public class Habitacion {
 
@@ -18,19 +17,23 @@ public class Habitacion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idHabitacion;
 
-    private String numero;       // Ej: "101", "205B"
-    private String tipo;         // Ej: "SENCILLA", "DOBLE", "SUITE"
-    private Integer capacidad;   // Ej: 2 (personas)
-    private Double precioNoche;  // Ej: 45.50
-    private String descripcion;  // Ej: "Habitación con vista al mar y cama King"
-    private String estado;       // Ej: "DISPONIBLE", "OCUPADA", "MANTENIMIENTO"
+    private String numero;
+    private String tipo;
+    private Integer capacidad;
+    private Double precioNoche;
+    private String descripcion;
 
-    // Constructor vacío obligatorio para JPA
+    
+    @Column(columnDefinition = "TEXT")
+    private String imagen;
+
+    private String estado;
+
     public Habitacion() {
     }
 
-    // Constructor para inicializar rápido
-    public Habitacion(String numero, String tipo, Integer capacidad, Double precioNoche, String descripcion, String estado) {
+    public Habitacion(String numero, String tipo, Integer capacidad,
+            Double precioNoche, String descripcion, String estado) {
         this.numero = numero;
         this.tipo = tipo;
         this.capacidad = capacidad;
@@ -38,8 +41,6 @@ public class Habitacion {
         this.descripcion = descripcion;
         this.estado = estado;
     }
-
-    // --- Getters y Setters ---
 
     public Long getIdHabitacion() {
         return idHabitacion;
@@ -87,6 +88,14 @@ public class Habitacion {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 
     public String getEstado() {

@@ -5,17 +5,17 @@ import com.uce.HotelControl.Model.Usuario;
 import com.uce.HotelControl.Service.HabitacionService;
 import com.uce.HotelControl.Service.ReservaService;
 import com.uce.HotelControl.Service.UsuarioService;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
-/**
- *
- * @author Erick HC
- */
 @Controller
 public class AdminController {
 
@@ -28,7 +28,8 @@ public class AdminController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // 1. CARGAR EL PANEL NORMAL
+    // Carga el panel principal del administrador.
+    // Muestra habitaciones y prepara el formulario para crear una nueva.
     @GetMapping("/admin/panel")
     public String panelAdmin(Model model) {
         model.addAttribute("habitaciones", habitacionService.obtenerTodasLasHabitaciones());
@@ -36,14 +37,19 @@ public class AdminController {
         return "panel_admin";
     }
 
-    // 2. GUARDAR O ACTUALIZAR
+    // Guarda una habitación nueva o actualiza una existente.
+    // También recibe la imagen subida desde la PC.
     @PostMapping("/admin/habitaciones/guardar")
-    public String guardarHabitacion(Habitacion nuevaHabitacion) {
-        habitacionService.guardarHabitacion(nuevaHabitacion);
+    public String guardarHabitacion(@ModelAttribute Habitacion nuevaHabitacion,
+            @RequestParam("imagenArchivo") MultipartFile imagenArchivo)
+            throws IOException {
+
+        habitacionService.guardarHabitacion(nuevaHabitacion, imagenArchivo);
         return "redirect:/admin/panel";
     }
 
-    // 3. BUSCAR POR NÚMERO (Usamos un POST simple desde el HTML)
+    // Busca una habitación por número.
+    // Muestra en la tabla solo las habitaciones encontradas.
     @PostMapping("/admin/habitaciones/buscar")
     public String buscarHabitacion(String numeroBuscado, Model model) {
         model.addAttribute("habitaciones", habitacionService.buscarPorNumero(numeroBuscado));
@@ -51,7 +57,8 @@ public class AdminController {
         return "panel_admin";
     }
 
-    // 4. CARGAR DATOS EN EL FORMULARIO PARA EDITAR
+    // Carga una habitación en el formulario para editarla.
+    // Permite modificar datos e imagen.
     @GetMapping("/admin/habitaciones/editar/{id}")
     public String editarHabitacion(@PathVariable Long id, Model model) {
         model.addAttribute("habitaciones", habitacionService.obtenerTodasLasHabitaciones());
@@ -59,20 +66,32 @@ public class AdminController {
         return "panel_admin";
     }
 
-    // 5. DAR DE BAJA
+    // Da de baja una habitación.
+    // Cambia su estado a MANTENIMIENTO.
     @GetMapping("/admin/habitaciones/baja/{id}")
     public String darDeBaja(@PathVariable Long id) {
         habitacionService.darDeBaja(id);
         return "redirect:/admin/panel";
     }
 
+    // Actualiza el estado de una habitación desde el panel administrador.
+    // Sirve para cambiar estado operativo sin editar todo el formulario.
+    @PostMapping("/admin/habitaciones/estado")
+    public String actualizarEstadoHabitacion(Long idHabitacion, String estado) {
+        habitacionService.actualizarEstado(idHabitacion, estado);
+        return "redirect:/admin/panel";
+    }
+
+    // Muestra todas las reservas registradas.
+    // Se usa para consulta general del administrador.
     @GetMapping("/admin/reservas")
     public String panelReservas(Model model) {
         model.addAttribute("reservas", reservaService.obtenerTodasLasReservas());
         return "panel_reservas";
     }
 
-    // 1. Mostrar la pantalla de personal
+    // Muestra la pantalla de gestión de personal.
+    // Carga usuarios y prepara el formulario para nuevo personal.
     @GetMapping("/admin/personal")
     public String panelPersonal(Model model) {
         model.addAttribute("usuarios", usuarioService.obtenerTodosLosUsuarios());
@@ -80,14 +99,15 @@ public class AdminController {
         return "panel_personal";
     }
 
-    // 2. Guardar o actualizar un empleado
+    // Guarda o actualiza un usuario del personal.
+    // Se usa para administradores y recepcionistas.
     @PostMapping("/admin/personal/guardar")
     public String guardarPersonal(Usuario usuario) {
         usuarioService.guardarUsuario(usuario);
         return "redirect:/admin/personal";
     }
 
-    // 3. Cargar datos en el formulario para editar
+    // Carga datos de un usuario en el formulario para editarlo.
     @GetMapping("/admin/personal/editar/{id}")
     public String editarPersonal(@PathVariable Long id, Model model) {
         model.addAttribute("usuarios", usuarioService.obtenerTodosLosUsuarios());
@@ -95,7 +115,8 @@ public class AdminController {
         return "panel_personal";
     }
 
-    // 4. Eliminar / Inhabilitar cuenta
+    // Elimina un usuario del personal.
+    // En esta versión se elimina directamente de la base de datos.
     @GetMapping("/admin/personal/eliminar/{id}")
     public String eliminarPersonal(@PathVariable Long id) {
         usuarioService.eliminarUsuario(id);

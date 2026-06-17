@@ -28,6 +28,7 @@ public class Usuario {
     private String passwordHash;
     private String rol;
     private String estado;
+    private Boolean requiereCambioPassword = false;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaRegistro;
@@ -36,7 +37,7 @@ public class Usuario {
     }
 
     public Usuario(String cedula, String nombres, String apellidos, String correo, String telefono,
-                   String nombreUsuario, String passwordHash, String rol, String estado, Date fechaRegistro) {
+            String nombreUsuario, String passwordHash, String rol, String estado, Date fechaRegistro) {
         this.cedula = cedula;
         this.nombres = nombres;
         this.apellidos = apellidos;
@@ -135,5 +136,13 @@ public class Usuario {
 
     public void setFechaRegistro(Date fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
+    }
+
+    public Boolean getRequiereCambioPassword() {
+        return requiereCambioPassword;
+    }
+
+    public void setRequiereCambioPassword(Boolean requiereCambioPassword) {
+        this.requiereCambioPassword = requiereCambioPassword;
     }
 }

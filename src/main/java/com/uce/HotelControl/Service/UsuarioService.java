@@ -6,73 +6,96 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- *
- * @author Erick HC
- */
 @Service
 public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // Método para validar las credenciales
+    // Valida el inicio de sesión.
+    // Busca el usuario por nombre de usuario, compara la contraseña y verifica que esté ACTIVO.
     public Usuario validarLogin(String nombreUsuario, String password) {
         Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario);
 
         if (usuario != null) {
-            // Compara la contraseña y verifica que el estado sea ACTIVO
             if (usuario.getPasswordHash().equals(password) && usuario.getEstado().equals("ACTIVO")) {
-                return usuario; // Credenciales correctas
+                return usuario;
             }
         }
-        return null; // Credenciales incorrectas o usuario inactivo
+
+        return null;
     }
 
-    // Método NUEVO: Guarda al cliente en la base de datos
+    // Registra un nuevo cliente.
+    // Asigna automáticamente rol CLIENTE, estado ACTIVO y fecha de registro.
     public void registrarCliente(Usuario nuevoCliente) {
-        // Le asignamos por defecto los valores obligatorios para un cliente nuevo
         nuevoCliente.setRol("CLIENTE");
         nuevoCliente.setEstado("ACTIVO");
         nuevoCliente.setFechaRegistro(new java.util.Date());
+        nuevoCliente.setRequiereCambioPassword(false);
 
-        // Guardamos en PostgreSQL usando el repositorio
         usuarioRepository.save(nuevoCliente);
     }
 
+    // Verifica si ya existe un usuario con ese nombre de usuario.
+    // Se usa para evitar registros duplicados.
+    public boolean existeNombreUsuario(String nombreUsuario) {
+        Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario);
+
+        if (usuario != null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Cambia la contraseña inicial del administrador.
+    // Después del cambio, desactiva la obligación de cambiar contraseña.
+    public Usuario cambiarPasswordInicial(Long idUsuario, String nuevaPassword) {
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+
+        if (usuario != null) {
+            usuario.setPasswordHash(nuevaPassword);
+            usuario.setRequiereCambioPassword(false);
+            usuarioRepository.save(usuario);
+        }
+
+        return usuario;
+    }
+
+    // Obtiene todos los usuarios registrados.
+    // Se usa en el panel administrativo para gestionar personal.
     public List<Usuario> obtenerTodosLosUsuarios() {
         return usuarioRepository.findAll();
     }
 
+    // Guarda o actualiza un usuario.
+    // Si no tiene estado, fecha o valor de cambio de contraseña, se asignan valores por defecto.
     public void guardarUsuario(Usuario usuario) {
-        // Asegurarnos de que tenga estado y fecha al crearse
         if (usuario.getEstado() == null) {
             usuario.setEstado("ACTIVO");
         }
+
         if (usuario.getFechaRegistro() == null) {
             usuario.setFechaRegistro(new java.util.Date());
         }
+
+        if (usuario.getRequiereCambioPassword() == null) {
+            usuario.setRequiereCambioPassword(false);
+        }
+
         usuarioRepository.save(usuario);
     }
 
+    // Busca un usuario por su ID.
+    // Si no existe, devuelve un usuario vacío para evitar errores en formularios.
     public Usuario obtenerPorId(Long id) {
         return usuarioRepository.findById(id).orElse(new Usuario());
     }
 
-   
-    // Para cumplir con "Inhabilitar cuenta" de tu diagrama de forma sencilla
+    // Elimina un usuario por su ID.
+    // Se usa para la gestión simple de personal desde administración.
     public void eliminarUsuario(Long id) {
         usuarioRepository.deleteById(id);
     }
-    
-    // Para validar si existe un nombre de usuario a la hora de resgistrase como CLIENTE
-    public boolean existeNombreUsuario(String nombreUsuario) {
-    Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario);
-
-    if (usuario != null) {
-        return true;
-    }
-
-    return false;
-}
 }
