@@ -98,4 +98,22 @@ public class UsuarioService {
     public void eliminarUsuario(Long id) {
         usuarioRepository.deleteById(id);
     }
+
+    // Actualiza los datos personales del cliente.
+// No cambia el nombre de usuario para evitar problemas con usuarios repetidos.
+    public Usuario actualizarPerfilCliente(Long idUsuario, Usuario datosPerfil) {
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
+
+        if (usuario != null) {
+            usuario.setNombres(datosPerfil.getNombres());
+            usuario.setApellidos(datosPerfil.getApellidos());
+            usuario.setCedula(datosPerfil.getCedula());
+            usuario.setTelefono(datosPerfil.getTelefono());
+            usuario.setCorreo(datosPerfil.getCorreo());
+
+            usuarioRepository.save(usuario);
+        }
+
+        return usuario;
+    }
 }

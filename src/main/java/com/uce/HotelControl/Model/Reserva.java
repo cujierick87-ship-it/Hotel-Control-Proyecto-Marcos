@@ -32,7 +32,9 @@ public class Reserva {
     private String telefono;
     private String direccion;
     private String notas;
-    // ----------------------------------------
+
+    // ------------ATRIBUTO DE CODIGO PARA CADA RESERVA----------------------------
+    private String codigoReserva;
 
     // Conectamos la reserva con la habitación elegida
     @ManyToOne
@@ -168,5 +170,12 @@ public class Reserva {
         this.fechaReserva = fechaReserva;
     }
 
-    
+    public String getCodigoReserva() {
+        return codigoReserva;
+    }
+
+    public void setCodigoReserva(String codigoReserva) {
+        this.codigoReserva = codigoReserva;
+    }
+
 }

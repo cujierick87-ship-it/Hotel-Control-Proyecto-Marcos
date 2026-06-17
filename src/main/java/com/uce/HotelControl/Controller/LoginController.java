@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class LoginController {
@@ -65,42 +66,52 @@ public class LoginController {
         return "redirect:/login";
     }
 
-    // Procesa el inicio de sesión.
-    // Si las credenciales son correctas, guarda el usuario en sesión y redirige según su rol.
-    @PostMapping("/login")
-    public String procesarLogin(Usuario usuario, Model model, HttpSession session) {
-        Usuario auth = usuarioService.validarLogin(
-                usuario.getNombreUsuario(),
-                usuario.getPasswordHash()
-        );
+// Procesa el inicio de sesión.
+// Si las credenciales son correctas, crea una sesión limpia y guarda el usuario logueado.
+@PostMapping("/login")
+public String procesarLogin(Usuario usuario, Model model, HttpServletRequest request) {
+    Usuario auth = usuarioService.validarLogin(
+            usuario.getNombreUsuario(),
+            usuario.getPasswordHash()
+    );
 
-        if (auth == null) {
-            model.addAttribute("error", "Usuario o contraseña incorrectos");
-            return "login";
-        }
-
-        session.setAttribute("usuarioLogueado", auth);
-
-        if (auth.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
-
-            if (Boolean.TRUE.equals(auth.getRequiereCambioPassword())) {
-                return "redirect:/cambiar-password-inicial";
-            }
-
-            return "redirect:/admin/panel";
-        }
-
-        if (auth.getRol().equalsIgnoreCase("RECEPCIONISTA")) {
-            return "redirect:/recepcion/panel";
-        }
-
-        if (auth.getRol().equalsIgnoreCase("CLIENTE")) {
-            return "redirect:/cliente/inicio";
-        }
-
-        model.addAttribute("error", "Rol no reconocido");
+    if (auth == null) {
+        model.addAttribute("error", "Usuario o contraseña incorrectos");
         return "login";
     }
+
+    // Se invalida cualquier sesión anterior para evitar datos mezclados entre roles.
+    HttpSession sesionAnterior = request.getSession(false);
+    if (sesionAnterior != null) {
+        sesionAnterior.invalidate();
+    }
+
+    // Se crea una sesión nueva y limpia para el usuario actual.
+    HttpSession session = request.getSession(true);
+    session.setAttribute("usuarioLogueado", auth);
+
+    // Tiempo de sesión: 30 minutos.
+    session.setMaxInactiveInterval(30 * 60);
+
+    if (auth.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
+        if (Boolean.TRUE.equals(auth.getRequiereCambioPassword())) {
+            return "redirect:/cambiar-password-inicial";
+        }
+
+        return "redirect:/admin/panel";
+    }
+
+    if (auth.getRol().equalsIgnoreCase("RECEPCIONISTA")) {
+        return "redirect:/recepcion/panel";
+    }
+
+    if (auth.getRol().equalsIgnoreCase("CLIENTE")) {
+        return "redirect:/cliente/inicio";
+    }
+
+    model.addAttribute("error", "Rol no reconocido");
+    return "login";
+}
 
     // Muestra la pantalla para cambiar la contraseña inicial del administrador.
     // Solo entra aquí si el usuario es administrador y requiere cambiar contraseña.

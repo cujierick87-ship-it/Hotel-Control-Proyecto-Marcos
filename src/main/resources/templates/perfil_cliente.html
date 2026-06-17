@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Perfil</title>
+
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
+        body{background:#f3f4f6;color:#1f2937}
+        .top{background:#1e293b;color:white;padding:15px 30px;display:flex;justify-content:space-between}
+        .top h2{color:#fbbf24}
+        .top a{color:white;text-decoration:none;margin-left:15px}
+        .card{max-width:850px;margin:30px auto;background:white;padding:25px;border-radius:8px;box-shadow:0 2px 6px #0002}
+        .grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+        label{display:block;font-weight:bold;margin-bottom:5px;color:#374151}
+        input{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:5px}
+        .full{grid-column:span 2}
+        .btn{margin-top:20px;padding:11px 18px;background:#1e293b;color:white;border:0;border-radius:5px;cursor:pointer}
+        .mensaje{background:#dcfce7;color:#166534;padding:10px;border-radius:5px;margin-bottom:15px}
+        .error{background:#fee2e2;color:#991b1b;padding:8px;border-radius:5px;margin-bottom:8px}
+    </style>
+</head>
+
+<body>
+
+<div class="top">
+    <h2>HotelControl - Mi Perfil</h2>
+
+    <div>
+        <a href="/cliente/inicio">Inicio</a>
+        <a href="/cliente/historial">Mis Reservas</a>
+        <a href="/logout">Cerrar Sesión</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Información personal</h2>
+    <br>
+
+    <div class="mensaje" th:if="${mensaje}" th:text="${mensaje}"></div>
+
+    <form th:action="@{/cliente/perfil/actualizar}" method="post" th:object="${cliente}">
+        <div class="grid">
+
+            <div>
+                <label>Nombres</label>
+                <input type="text" th:field="*{nombres}" required>
+            </div>
+
+            <div>
+                <label>Apellidos</label>
+                <input type="text" th:field="*{apellidos}" required>
+            </div>
+
+            <div>
+                <label>Cédula</label>
+                <input type="text" th:field="*{cedula}" required>
+            </div>
+
+            <div>
+                <label>Teléfono</label>
+                <div class="error" th:if="${errorTelefono}" th:text="${errorTelefono}"></div>
+                <input type="text" th:field="*{telefono}" required>
+            </div>
+
+            <div class="full">
+                <label>Correo electrónico</label>
+                <input type="email" th:field="*{correo}" required>
+            </div>
+
+            <div class="full">
+                <label>Nombre de usuario</label>
+                <input type="text" th:field="*{nombreUsuario}" readonly>
+            </div>
+
+        </div>
+
+        <button class="btn" type="submit">Guardar cambios</button>
+    </form>
+</div>
+
+</body>
+</html>

@@ -1,91 +1,172 @@
 
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Habitaciones - HotelControl</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Habitaciones - HotelControl</title>
 
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
-        body{background:#f8f9fa;color:#333}
-        .navbar{background:#1e293b;padding:15px 50px;display:flex;justify-content:space-between;align-items:center}
-        .brand{color:#eab308;font-size:20px;font-weight:bold;text-decoration:none}
-        .menu a{color:white;text-decoration:none;margin-left:15px;font-weight:bold}
-        .menu .salir{color:#ef4444}
-        .hero{text-align:center;padding:45px 20px;background:white}
-        .hero h1{color:#d4af37;font-size:36px;letter-spacing:3px}
-        .container{max-width:1150px;margin:30px auto;padding:0 20px}
-        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:25px}
-        .card{background:white;border-radius:8px;overflow:hidden;box-shadow:0 4px 12px #0001}
-        .card-img{width:100%;height:190px;object-fit:cover}
-        .body{padding:20px}
-        .title{color:#1e293b;text-transform:uppercase;margin-bottom:8px}
-        .info{color:#666;font-size:14px;margin-bottom:12px}
-        .price{margin:15px 0;color:#d4af37;font-weight:bold;font-size:20px}
-        .btn{display:block;text-align:center;background:#e5c158;color:white;padding:12px;text-decoration:none;font-weight:bold}
-        .vacio{text-align:center;background:white;padding:30px;border-radius:8px;color:#666}
-    </style>
-</head>
+        <style>
+            *{
+                box-sizing:border-box;
+                margin:0;
+                padding:0;
+                font-family:'Segoe UI',sans-serif
+            }
+            body{
+                background:#f8f9fa;
+                color:#333
+            }
+            .navbar{
+                background:#1e293b;
+                padding:15px 50px;
+                display:flex;
+                justify-content:space-between;
+                align-items:center
+            }
+            .brand{
+                color:#eab308;
+                font-size:20px;
+                font-weight:bold;
+                text-decoration:none
+            }
+            .menu a{
+                color:white;
+                text-decoration:none;
+                margin-left:15px;
+                font-weight:bold
+            }
+            .menu .salir{
+                color:#ef4444
+            }
+            .hero{
+                text-align:center;
+                padding:45px 20px;
+                background:white
+            }
+            .hero h1{
+                color:#d4af37;
+                font-size:36px;
+                letter-spacing:3px
+            }
+            .container{
+                max-width:1150px;
+                margin:30px auto;
+                padding:0 20px
+            }
+            .grid{
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+                gap:25px
+            }
+            .card{
+                background:white;
+                border-radius:8px;
+                overflow:hidden;
+                box-shadow:0 4px 12px #0001
+            }
+            .card-img{
+                width:100%;
+                height:190px;
+                object-fit:cover
+            }
+            .body{
+                padding:20px
+            }
+            .title{
+                color:#1e293b;
+                text-transform:uppercase;
+                margin-bottom:8px
+            }
+            .info{
+                color:#666;
+                font-size:14px;
+                margin-bottom:12px
+            }
+            .price{
+                margin:15px 0;
+                color:#d4af37;
+                font-weight:bold;
+                font-size:20px
+            }
+            .btn{
+                display:block;
+                text-align:center;
+                background:#e5c158;
+                color:white;
+                padding:12px;
+                text-decoration:none;
+                font-weight:bold
+            }
+            .vacio{
+                text-align:center;
+                background:white;
+                padding:30px;
+                border-radius:8px;
+                color:#666
+            }
+        </style>
+    </head>
 
-<body>
+    <body>
 
-<nav class="navbar">
-    <a href="/cliente/inicio" class="brand">🏨 HotelControl</a>
+        <nav class="navbar">
+            <a href="/cliente/inicio" class="brand">🏨 HotelControl</a>
 
-    <div class="menu">
-        <a href="/cliente/historial">Mis Reservas</a>
-        <a href="/logout" class="salir">Cerrar Sesión</a>
-    </div>
-</nav>
+            <div class="menu">
+                <a href="/cliente/perfil">Mi Perfil</a>
+                <a href="/cliente/historial">Mis Reservas</a>
+                <a href="/logout" class="salir">Cerrar Sesión</a>
+            </div>
+        </nav>
 
-<header class="hero">
-    <h1>NUESTRAS HABITACIONES</h1>
-    <p>Encuentra el espacio perfecto para tu descanso.</p>
-</header>
+        <header class="hero">
+            <h1>NUESTRAS HABITACIONES</h1>
+            <p>Encuentra el espacio perfecto para tu descanso.</p>
+        </header>
 
-<main class="container">
+        <main class="container">
 
-    <div class="vacio" th:if="${#lists.isEmpty(habitaciones)}">
-        No hay habitaciones disponibles por el momento.
-    </div>
-
-    <div class="grid">
-        <div class="card" th:each="habitacion : ${habitaciones}">
-
-            <img class="card-img"
-                 th:if="${habitacion.imagen != null and habitacion.imagen != ''}"
-                 th:src="${habitacion.imagen}"
-                 alt="Habitación">
-
-            <img class="card-img"
-                 th:if="${habitacion.imagen == null or habitacion.imagen == ''}"
-                 src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=500&q=80"
-                 alt="Habitación">
-
-            <div class="body">
-                <h3 class="title" th:text="${habitacion.tipo}">Habitación</h3>
-
-                <p class="info">
-                    Nro. <span th:text="${habitacion.numero}"></span> |
-                    Estado: <span th:text="${habitacion.estado}"></span>
-                </p>
-
-                <p class="info" th:text="${habitacion.descripcion}"></p>
-
-                <div class="price">
-                    $ <span th:text="${habitacion.precioNoche}"></span> / Noche
-                </div>
-
-                <a class="btn"
-                   th:href="@{/cliente/habitacion/detalles/{id}(id=${habitacion.idHabitacion})}">
-                    DETALLES
-                </a>
+            <div class="vacio" th:if="${#lists.isEmpty(habitaciones)}">
+                No hay habitaciones disponibles por el momento.
             </div>
 
-        </div>
-    </div>
+            <div class="grid">
+                <div class="card" th:each="habitacion : ${habitaciones}">
 
-</main>
+                    <img class="card-img"
+                         th:if="${habitacion.imagen != null and habitacion.imagen != ''}"
+                         th:src="${habitacion.imagen}"
+                         alt="Habitación">
 
-</body>
+                    <img class="card-img"
+                         th:if="${habitacion.imagen == null or habitacion.imagen == ''}"
+                         src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=500&q=80"
+                         alt="Habitación">
+
+                    <div class="body">
+                        <h3 class="title" th:text="${habitacion.tipo}">Habitación</h3>
+
+                        <p class="info">
+                            Nro. <span th:text="${habitacion.numero}"></span> |
+                            Estado: <span th:text="${habitacion.estado}"></span>
+                        </p>
+
+                        <p class="info" th:text="${habitacion.descripcion}"></p>
+
+                        <div class="price">
+                            $ <span th:text="${habitacion.precioNoche}"></span> / Noche
+                        </div>
+
+                        <a class="btn"
+                           th:href="@{/cliente/habitacion/detalles/{id}(id=${habitacion.idHabitacion})}">
+                            DETALLES
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+
+    </body>
 </html>

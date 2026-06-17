@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Comprobante de Reserva</title>
+
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
+        body{background:#f3f4f6;color:#1f2937}
+        .card{max-width:750px;margin:40px auto;background:white;padding:30px;border-radius:8px;box-shadow:0 2px 8px #0002}
+        h1{text-align:center;color:#1e293b}
+        .codigo{text-align:center;color:#d4af37;font-size:22px;font-weight:bold;margin:15px 0}
+        .fila{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #e5e7eb}
+        .fila b{color:#374151}
+        .total{font-size:20px;font-weight:bold;color:#166534}
+        .btns{text-align:center;margin-top:25px}
+        a,button{padding:10px 15px;border:0;border-radius:5px;text-decoration:none;margin:5px;cursor:pointer}
+        a{background:#1e293b;color:white}
+        button{background:#fbbf24;color:#111827;font-weight:bold}
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>Comprobante de Reserva</h1>
+
+    <div class="codigo" th:text="${reserva.codigoReserva}">
+        HC-00000000
+    </div>
+
+    <div class="fila">
+        <b>Cliente:</b>
+        <span th:text="${reserva.nombreCliente} + ' ' + ${reserva.apellidoCliente}"></span>
+    </div>
+
+    <div class="fila">
+        <b>Cédula:</b>
+        <span th:text="${reserva.cedulaCliente}"></span>
+    </div>
+
+    <div class="fila">
+        <b>Habitación:</b>
+        <span th:text="'Hab. ' + ${reserva.habitacion.numero} + ' - ' + ${reserva.habitacion.tipo}"></span>
+    </div>
+
+    <div class="fila">
+        <b>Fecha entrada:</b>
+        <span th:text="${reserva.fechaCheckIn}"></span>
+    </div>
+
+    <div class="fila">
+        <b>Fecha salida:</b>
+        <span th:text="${reserva.fechaCheckOut}"></span>
+    </div>
+
+    <div class="fila">
+        <b>Estado:</b>
+        <span th:text="${reserva.estado}"></span>
+    </div>
+
+    <div class="fila">
+        <b>Notas:</b>
+        <span th:text="${reserva.notas}"></span>
+    </div>
+
+    <div class="fila total">
+        <b>Total a pagar:</b>
+        <span th:text="'$' + ${reserva.totalPagar}"></span>
+    </div>
+
+    <div class="btns">
+        <a href="/cliente/historial">Volver</a>
+        <button onclick="window.print()">Imprimir</button>
+    </div>
+</div>
+
+</body>
+</html>

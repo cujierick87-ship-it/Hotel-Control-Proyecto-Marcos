@@ -8,7 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import java.util.UUID;
 @Service
 public class ReservaService {
 
@@ -18,39 +18,46 @@ public class ReservaService {
     @Autowired
     private HabitacionRepository habitacionRepository;
 
-    // Guarda una reserva hecha por el cliente
-    public void guardarReserva(Reserva reserva) {
+// Guarda una reserva hecha por el cliente.
+// Calcula el total, genera código único y registra la reserva en estado CONFIRMADA.
+    public Reserva guardarReserva(Reserva reserva) {
         Habitacion habitacion = habitacionRepository
                 .findById(reserva.getHabitacion().getIdHabitacion())
                 .orElse(null);
 
-        if (habitacion != null) {
-
-            long dias = ChronoUnit.DAYS.between(
-                    reserva.getFechaCheckIn(),
-                    reserva.getFechaCheckOut()
-            );
-
-            if (dias <= 0) {
-                dias = 1;
-            }
-
-            reserva.setTotalPagar(dias * habitacion.getPrecioNoche());
-
-            // La reserva web queda confirmada automáticamente
-            reserva.setEstado("CONFIRMADA");
-
-            // Se conecta la reserva con la habitación real de la BD
-            reserva.setHabitacion(habitacion);
-
-            /*
-             IMPORTANTE:
-             Aquí NO ponemos la habitación en OCUPADA.
-             La habitación solo pasa a OCUPADA cuando recepción hace Check-In.
-            */
-
-            reservaRepository.save(reserva);
+        if (habitacion == null) {
+            return null;
         }
+
+        if ("MANTENIMIENTO".equalsIgnoreCase(habitacion.getEstado())) {
+            return null;
+        }
+
+        long dias = ChronoUnit.DAYS.between(
+                reserva.getFechaCheckIn(),
+                reserva.getFechaCheckOut()
+        );
+
+        if (dias <= 0) {
+            dias = 1;
+        }
+
+        reserva.setTotalPagar(dias * habitacion.getPrecioNoche());
+
+        reserva.setEstado("CONFIRMADA");
+
+        reserva.setHabitacion(habitacion);
+
+        if (reserva.getCodigoReserva() == null || reserva.getCodigoReserva().isEmpty()) {
+            String codigo = "HC-" + java.util.UUID.randomUUID()
+                    .toString()
+                    .substring(0, 8)
+                    .toUpperCase();
+
+            reserva.setCodigoReserva(codigo);
+        }
+
+        return reservaRepository.save(reserva);
     }
 
     // Acciones del recepcionista: Check-In, Check-Out o Cancelar
@@ -85,5 +92,33 @@ public class ReservaService {
 
     public List<Reserva> buscarPorCedula(String cedula) {
         return reservaRepository.findByCedulaCliente(cedula);
+    }
+
+    // Busca una reserva por ID.
+    // Se usa para mostrar comprobante y cancelar reservas.
+    public Reserva obtenerPorId(Long id) {
+        return reservaRepository.findById(id).orElse(null);
+    }
+
+    // Cancela una reserva del cliente.
+    // Solo permite cancelar si la reserva todavía está CONFIRMADA.
+    public boolean cancelarReservaCliente(Long idReserva, String cedulaCliente) {
+        Reserva reserva = reservaRepository.findById(idReserva).orElse(null);
+
+        if (reserva == null) {
+            return false;
+        }
+
+        if (!reserva.getCedulaCliente().equals(cedulaCliente)) {
+            return false;
+        }
+
+        if (!"CONFIRMADA".equalsIgnoreCase(reserva.getEstado())) {
+            return false;
+        }
+
+        reserva.setEstado("CANCELADA");
+        reservaRepository.save(reserva);
+        return true;
     }
 }

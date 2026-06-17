@@ -4,31 +4,37 @@
 <head>
     <meta charset="UTF-8">
     <title>HotelControl - Iniciar Sesión</title>
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        
-        /* Pantalla completa, con fondo de hotel y el contenido CENTRADO EXACTAMENTE EN EL MEDIO */
-        body { 
-            display: flex; 
-            justify-content: center; /* Centra horizontalmente */
-            align-items: center;     /* Centra verticalmente */
-            height: 100vh; 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             background-image: url('https://images.unsplash.com/photo-1542314831-c6a4d14d2319?q=80&w=1920&auto=format&fit=crop');
             background-size: cover;
             background-position: center;
             position: relative;
         }
-        
-        /* Capa oscura transparente para que la tarjeta resalte */
+
         body::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(15, 23, 42, 0.6);
             z-index: 0;
         }
 
-        /* LA TARJETA PRINCIPAL (Formulario a la izq, Paisaje a la der) */
         .login-card-combined {
             display: flex;
             width: 100%;
@@ -37,11 +43,10 @@
             background-color: #111827;
             border-radius: 12px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            overflow: hidden; 
-            z-index: 1; /* Mantiene la tarjeta por encima del fondo oscuro */
+            overflow: hidden;
+            z-index: 1;
         }
 
-        /* Lado A: El Formulario */
         .login-form-side {
             flex: 1;
             padding: 40px;
@@ -50,7 +55,6 @@
             justify-content: center;
         }
 
-        /* Lado B: El Paisaje interno */
         .login-image-side {
             flex: 1;
             background-image: url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?q=80&w=1000&auto=format&fit=crop');
@@ -58,31 +62,33 @@
             background-position: center;
         }
 
-        /* Textos y cabecera */
         .header-text {
             text-align: center;
             margin-bottom: 25px;
         }
+
         .header-text h1 {
             font-size: 28px;
             color: white;
             margin-bottom: 6px;
         }
+
         .header-text p {
             color: #94a3b8;
             font-size: 13px;
         }
 
-        /* Campos de entrada */
         .form-group {
             margin-bottom: 18px;
         }
+
         .form-group label {
             display: block;
             font-size: 13px;
             color: #cbd5e1;
             margin-bottom: 6px;
         }
+
         .form-control {
             width: 100%;
             padding: 12px;
@@ -93,12 +99,12 @@
             font-size: 14px;
             transition: border-color 0.2s;
         }
+
         .form-control:focus {
             outline: none;
             border-color: #fbbf24;
         }
 
-        /* Botón Dorado */
         .btn-ingresar {
             width: 100%;
             padding: 13px;
@@ -112,6 +118,7 @@
             transition: background-color 0.2s;
             margin-top: 10px;
         }
+
         .btn-ingresar:hover {
             background-color: #f59e0b;
         }
@@ -124,11 +131,11 @@
             text-decoration: none;
             font-size: 13px;
         }
+
         .register-link:hover {
             text-decoration: underline;
         }
 
-        /* Errores */
         .error-msg {
             background-color: #ef4444;
             color: white;
@@ -139,46 +146,78 @@
             font-size: 13px;
             font-weight: bold;
         }
-        
-        /* Ajuste automático para pantallas pequeñas */
+
+        .session-msg {
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
         @media (max-width: 768px) {
-            .login-image-side { display: none; }
-            .login-card-combined { max-width: 400px; height: auto; margin: 20px; }
+            .login-image-side {
+                display: none;
+            }
+
+            .login-card-combined {
+                max-width: 400px;
+                height: auto;
+                margin: 20px;
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <div class="login-card-combined">
-        
-        <div class="login-form-side">
-            <div class="header-text">
-                <h1>Iniciar Sesión</h1>
-                <p>Acceda a su cuenta de HotelControl</p>
-            </div>
+<div class="login-card-combined">
 
-            <div th:if="${error != null}" class="error-msg" th:text="${error}"></div>
-
-            <form th:action="@{/login}" method="post">
-                <div class="form-group">
-                    <label>Usuario</label>
-                    <input type="text" name="nombreUsuario" class="form-control" placeholder="Ingrese su usuario" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>Contraseña</label>
-                    <input type="password" name="passwordHash" class="form-control" placeholder="Ingrese su contraseña" required>
-                </div>
-
-                <button type="submit" class="btn-ingresar">Ingresar</button>
-            </form>
-
-            <a href="/registro" class="register-link">¿No tiene cuenta? Regístrese aquí</a>
+    <div class="login-form-side">
+        <div class="header-text">
+            <h1>Iniciar Sesión</h1>
+            <p>Acceda a su cuenta de HotelControl</p>
         </div>
 
-        <div class="login-image-side"></div>
+        <div th:if="${error != null}" class="error-msg" th:text="${error}"></div>
 
+        <div th:if="${param.sesion}" class="session-msg">
+            Tu sesión expiró o debes iniciar sesión nuevamente.
+        </div>
+
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text"
+                       name="nombreUsuario"
+                       class="form-control"
+                       placeholder="Ingrese su usuario"
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password"
+                       name="passwordHash"
+                       class="form-control"
+                       placeholder="Ingrese su contraseña"
+                       required>
+            </div>
+
+            <button type="submit" class="btn-ingresar">Ingresar</button>
+        </form>
+
+        <a href="/registro" class="register-link">
+            ¿No tiene cuenta? Regístrese aquí
+        </a>
     </div>
+
+    <div class="login-image-side"></div>
+
+</div>
 
 </body>
 </html>

@@ -1,60 +1,126 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8">
-        <title>Historial de Reservas</title>
-        <style>
-            body {
-                font-family: sans-serif;
-                background: #f3f4f6;
-                padding: 40px;
-            }
-            .caja {
-                max-width: 800px;
-                margin: auto;
-                background: white;
-                padding: 20px;
-                border-radius: 8px;
-            }
-            table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 20px;
-            }
-            th, td {
-                padding: 12px;
-                border-bottom: 1px solid #ddd;
-                text-align: left;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="caja">
-            <h2>Listado de Reservas</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Fecha Reserva</th>
-                        <th>Cliente</th>
-                        <th>Habitación</th>
-                        <th>Entrada</th>
-                        <th>Salida</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="r : ${listaCompleta}">
-                        <td th:text="${r.fechaReserva}"></td>
-                        <td th:text="${r.nombreCliente}"></td>
-                        <td th:text="'Hab. ' + ${r.habitacion.numero}"></td>
-                        <td th:text="${r.fechaCheckIn}"></td>
-                        <td th:text="${r.fechaCheckOut}"></td>
-                        <td th:text="${r.estado}"></td>
-                    </tr>
-                </tbody>
-            </table>
-            <br>
-            <a href="/cliente/inicio">Volver al catálogo</a>
-        </div>
-    </body>
+<head>
+    <meta charset="UTF-8">
+    <title>Mis Reservas</title>
+
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
+        body{background:#f3f4f6;color:#1f2937}
+        .top{background:#1e293b;color:white;padding:15px 30px;display:flex;justify-content:space-between}
+        .top h2{color:#fbbf24}
+        .top a{color:white;text-decoration:none;margin-left:15px}
+        .card{max-width:1100px;margin:30px auto;background:white;padding:25px;border-radius:8px;box-shadow:0 2px 6px #0002}
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}
+        th{background:#f9fafb;color:#6b7280}
+        .btn{padding:7px 11px;border-radius:5px;text-decoration:none;color:white;font-size:13px;margin-right:5px;display:inline-block}
+        .azul{background:#1e293b}
+        .rojo{background:#ef4444}
+        .gris{background:#6b7280}
+        dialog{border:0;border-radius:8px;padding:25px;width:420px}
+        dialog::backdrop{background:#0008}
+        .modal-btns{display:flex;justify-content:center;gap:10px;margin-top:20px}
+        button{padding:9px 14px;border:0;border-radius:5px;cursor:pointer;font-weight:bold}
+    </style>
+</head>
+
+<body>
+
+<div class="top">
+    <h2>HotelControl - Mis Reservas</h2>
+
+    <div>
+        <a href="/cliente/inicio">Inicio</a>
+        <a href="/cliente/perfil">Mi Perfil</a>
+        <a href="/logout">Cerrar Sesión</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Historial de reservas</h2>
+    <br>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Código</th>
+            <th>Cliente</th>
+            <th>Habitación</th>
+            <th>Entrada</th>
+            <th>Salida</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="r : ${listaCompleta}">
+            <td th:text="${r.codigoReserva}"></td>
+            <td th:text="${r.nombreCliente} + ' ' + ${r.apellidoCliente}"></td>
+            <td th:text="'Hab. ' + ${r.habitacion.numero}"></td>
+            <td th:text="${r.fechaCheckIn}"></td>
+            <td th:text="${r.fechaCheckOut}"></td>
+            <td th:text="${r.estado}"></td>
+            <td th:text="'$' + ${r.totalPagar}"></td>
+
+            <td>
+                <a class="btn azul"
+                   th:href="@{/cliente/comprobante/{id}(id=${r.idReserva})}">
+                    Comprobante
+                </a>
+
+                <a class="btn rojo"
+                   th:if="${r.estado == 'CONFIRMADA'}"
+                   th:href="@{/cliente/reserva/cancelar/{id}(id=${r.idReserva})}"
+                   onclick="abrirModal(event,this)">
+                    Cancelar
+                </a>
+
+                <span class="btn gris" th:if="${r.estado != 'CONFIRMADA'}">
+                    Sin acción
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<dialog id="modalCancelar">
+    <h3>Condiciones de cancelación</h3>
+    <br>
+    <p>
+        La reserva solo puede cancelarse antes del proceso de check-in.
+        Si el huésped ya ingresó al hotel, la reserva no podrá cancelarse desde el panel del cliente.
+    </p>
+
+    <div class="modal-btns">
+        <button onclick="confirmarCancelacion()" style="background:#ef4444;color:white">Aceptar</button>
+        <button onclick="cerrarModal()">Volver</button>
+    </div>
+</dialog>
+
+<script>
+    let urlCancelar = "";
+
+    function abrirModal(event, enlace) {
+        event.preventDefault();
+        urlCancelar = enlace.getAttribute("href");
+        document.getElementById("modalCancelar").showModal();
+    }
+
+    function cerrarModal() {
+        document.getElementById("modalCancelar").close();
+        urlCancelar = "";
+    }
+
+    function confirmarCancelacion() {
+        if (urlCancelar !== "") {
+            window.location.href = urlCancelar;
+        }
+    }
+</script>
+
+</body>
 </html>
