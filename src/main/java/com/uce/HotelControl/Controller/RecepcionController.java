@@ -34,7 +34,7 @@ public class RecepcionController {
         return "panel_recepcion";
     }
 
-    // 3. Botones de acción: Confirmar, Check-in, Check-out (CU-06)
+    // 3. Botones de acción: Confirmar, Check-in, Check-out 
     @GetMapping("/recepcion/reservas/accion/{accion}/{id}")
     public String accionReserva(@PathVariable String accion, @PathVariable Long id) {
         reservaService.procesarAccionRecepcion(id, accion);

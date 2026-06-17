@@ -4,11 +4,10 @@ import com.uce.HotelControl.Model.Habitacion;
 import com.uce.HotelControl.Model.Reserva;
 import com.uce.HotelControl.Repository.HabitacionRepository;
 import com.uce.HotelControl.Repository.ReservaRepository;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.temporal.ChronoUnit; // 🔥 La herramienta moderna para contar días
-import java.util.List;
 
 @Service
 public class ReservaService {
@@ -17,58 +16,66 @@ public class ReservaService {
     private ReservaRepository reservaRepository;
 
     @Autowired
-    private HabitacionRepository habitacionRepository; 
+    private HabitacionRepository habitacionRepository;
 
-    // ==============================================================================
-    // 1. SOLUCIÓN DE CONCURRENCIA: El primero que reserva y paga, bloquea el cuarto
-    // ==============================================================================
+    // Guarda una reserva hecha por el cliente
     public void guardarReserva(Reserva reserva) {
-        Habitacion habReal = habitacionRepository.findById(reserva.getHabitacion().getIdHabitacion()).orElse(null);
-        
-        if (habReal != null) {
-            // ✅ FORMA CORRECTA PARA LOCALDATE: Cuenta los días automáticamente
-            long dias = ChronoUnit.DAYS.between(reserva.getFechaCheckIn(), reserva.getFechaCheckOut());
-            if (dias <= 0) dias = 1;
-            
-            reserva.setTotalPagar(dias * habReal.getPrecioNoche());
-            
-            // LA MAGIA DE LA JUSTICIA: Auto-confirmamos la reserva simulando el pago
-            reserva.setEstado("CONFIRMADA"); 
-            reserva.setHabitacion(habReal);
-            
-            // BLOQUEO ABSOLUTO: Cambiamos el estado para que nadie más la toque
-            habReal.setEstado("OCUPADA"); 
-            
-            // Guardamos ambos cambios
+        Habitacion habitacion = habitacionRepository
+                .findById(reserva.getHabitacion().getIdHabitacion())
+                .orElse(null);
+
+        if (habitacion != null) {
+
+            long dias = ChronoUnit.DAYS.between(
+                    reserva.getFechaCheckIn(),
+                    reserva.getFechaCheckOut()
+            );
+
+            if (dias <= 0) {
+                dias = 1;
+            }
+
+            reserva.setTotalPagar(dias * habitacion.getPrecioNoche());
+
+            // La reserva web queda confirmada automáticamente
+            reserva.setEstado("CONFIRMADA");
+
+            // Se conecta la reserva con la habitación real de la BD
+            reserva.setHabitacion(habitacion);
+
+            /*
+             IMPORTANTE:
+             Aquí NO ponemos la habitación en OCUPADA.
+             La habitación solo pasa a OCUPADA cuando recepción hace Check-In.
+            */
+
             reservaRepository.save(reserva);
-            habitacionRepository.save(habReal);
         }
     }
 
-    // ==============================================================================
-    // 2. PANEL DEL RECEPCIONISTA
-    // ==============================================================================
+    // Acciones del recepcionista: Check-In, Check-Out o Cancelar
     public void procesarAccionRecepcion(Long idReserva, String accion) {
         Reserva reserva = reservaRepository.findById(idReserva).orElse(null);
-        
+
         if (reserva != null) {
-            Habitacion hab = reserva.getHabitacion(); 
-            
+            Habitacion habitacion = reserva.getHabitacion();
+
             if (accion.equals("CHECKIN")) {
                 reserva.setEstado("CHECK-IN");
-                hab.setEstado("OCUPADA");       
-            } 
-            else if (accion.equals("CHECKOUT")) {
+                habitacion.setEstado("OCUPADA");
+            }
+
+            if (accion.equals("CHECKOUT")) {
                 reserva.setEstado("FINALIZADA");
-                hab.setEstado("LIMPIEZA"); // 🔥 LA MAGIA: El cuarto pasa a estar sucio
+                habitacion.setEstado("LIMPIEZA");
             }
-            else if (accion.equals("CANCELAR")) {
+
+            if (accion.equals("CANCELAR")) {
                 reserva.setEstado("CANCELADA");
-                hab.setEstado("DISPONIBLE"); // Se libera si el recepcionista la cancela
             }
-            
+
             reservaRepository.save(reserva);
-            habitacionRepository.save(hab); 
+            habitacionRepository.save(habitacion);
         }
     }
 

@@ -1,104 +1,389 @@
-
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Módulo de Recepción</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-        body { background: #f3f4f6; color: #1f2937; }
-        .topbar { background: #1e293b; color: white; padding: 15px 30px; display: flex; justify-content: space-between; }
-        .topbar h2 { color: #fbbf24; }
-        .content { padding: 30px; max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
-        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h3 { border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; margin-bottom: 15px; color: #374151; }
-        
-        /* CU-04: Cuadrícula de Habitaciones */
-        .grid-cuartos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-        .cuarto { padding: 15px; border-radius: 6px; text-align: center; color: white; font-weight: bold; }
-        .estado-DISPONIBLE { background: #10b981; } /* Verde */
-        .estado-OCUPADA { background: #ef4444; } /* Rojo */
-        .estado-LIMPIEZA { background: #f59e0b; } /* Amarillo */
-        .btn-limpiar { margin-top: 10px; background: white; color: black; padding: 5px; text-decoration: none; display: block; border-radius: 4px; font-size: 12px; }
 
-        /* CU-05: Buscador y Tabla */
-        .buscador { margin-bottom: 15px; display: flex; gap: 10px; }
-        .buscador input { padding: 8px; width: 250px; border: 1px solid #d1d5db; border-radius: 4px; }
-        .buscador button { padding: 8px 15px; background: #1e293b; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #e5e7eb; font-size: 14px; }
-        th { background: #f9fafb; color: #6b7280; }
-        
-        .btn-accion { padding: 6px 12px; border-radius: 4px; color: white; text-decoration: none; font-size: 12px; margin-right: 5px; display: inline-block; }
-        .btn-blue { background: #3b82f6; }
-        .btn-green { background: #10b981; }
-        .btn-gray { background: #6b7280; }
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .topbar {
+            background: #1e293b;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar h2 {
+            color: #fbbf24;
+        }
+
+        .btn-logout {
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: bold;
+            background: white;
+            padding: 8px 14px;
+            border-radius: 5px;
+        }
+
+        .content {
+            padding: 30px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+
+        h3 {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+
+        .grid-cuartos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .cuarto {
+            width: 150px;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .estado-DISPONIBLE {
+            background: #10b981;
+        }
+
+        .estado-OCUPADA {
+            background: #ef4444;
+        }
+
+        .estado-LIMPIEZA {
+            background: #f59e0b;
+        }
+
+        .estado-MANTENIMIENTO {
+            background: #6b7280;
+        }
+
+        .estado-hab {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .btn-limpiar {
+            display: block;
+            margin-top: 10px;
+            background: white;
+            color: #1f2937;
+            padding: 5px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .buscador {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .buscador input {
+            width: 280px;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+        }
+
+        .buscador button {
+            padding: 10px 15px;
+            background: #1e293b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-ver-todas {
+            padding: 10px 15px;
+            background: #e5e7eb;
+            color: #374151;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f9fafb;
+            color: #6b7280;
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .estado-texto {
+            font-weight: bold;
+        }
+
+        .btn-accion {
+            padding: 7px 12px;
+            border-radius: 5px;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            margin-right: 5px;
+            display: inline-block;
+        }
+
+        .btn-green {
+            background: #10b981;
+        }
+
+        .btn-gray {
+            background: #6b7280;
+        }
+
+        .btn-red {
+            background: #ef4444;
+        }
+
+        .texto-finalizado {
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .texto-notas {
+            max-width: 180px;
+            color: #4b5563;
+        }
+
+        dialog {
+            border: none;
+            border-radius: 10px;
+            padding: 25px;
+            width: 360px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+        }
+
+        dialog::backdrop {
+            background: rgba(0,0,0,0.55);
+        }
+
+        dialog h3 {
+            border: none;
+            margin-bottom: 10px;
+            padding-bottom: 0;
+        }
+
+        .dialog-botones {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-modal-aceptar {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 9px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-modal-cancelar {
+            background: #e5e7eb;
+            color: #374151;
+            border: none;
+            padding: 9px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
 
-    <header class="topbar">
-        <h2>🏨 Módulo Operativo - Recepción</h2>
-        <a href="/" style="color: #ef4444; text-decoration: none; font-weight: bold; background: white; padding: 5px 10px; border-radius: 4px;">Cerrar Sesión</a>
-    </header>
+<header class="topbar">
+    <h2>🏨 Módulo Operativo - Recepción</h2>
+    <a href="/logout" class="btn-logout">Cerrar Sesión</a>
+</header>
 
-    <main class="content">
-        
-        <div class="card">
-            <h3>🛏️ Estado de Habitaciones en Vivo</h3>
-            <div class="grid-cuartos">
-                <div class="cuarto" th:each="hab : ${habitaciones}" th:classappend="'estado-' + ${hab.estado}">
-                    <div th:text="'Hab. ' + ${hab.numero}"></div>
-                    <div style="font-size: 11px; margin-top: 5px;" th:text="${hab.estado}"></div>
-                    
-                    <a th:if="${hab.estado == 'LIMPIEZA'}" th:href="@{/recepcion/habitaciones/limpiar/{id}(id=${hab.idHabitacion})}" class="btn-limpiar">✅ Marcar Limpia</a>
-                </div>
+<main class="content">
+
+    <section class="card">
+        <h3>🛏️ Estado de Habitaciones en Vivo</h3>
+
+        <div class="grid-cuartos">
+            <div class="cuarto"
+                 th:each="hab : ${habitaciones}"
+                 th:classappend="' estado-' + ${hab.estado}">
+
+                <div th:text="'Hab. ' + ${hab.numero}"></div>
+                <div class="estado-hab" th:text="${hab.estado}"></div>
+
+                <a th:if="${hab.estado == 'LIMPIEZA'}"
+                   th:href="@{/recepcion/habitaciones/limpiar/{id}(id=${hab.idHabitacion})}"
+                   class="btn-limpiar">
+                    ✅ Marcar Limpia
+                </a>
             </div>
         </div>
+    </section>
 
-        <div class="card">
-            <h3>📅 Gestión de Reservas y Check-in/out</h3>
-            
-            <form class="buscador" th:action="@{/recepcion/reservas/buscar}" method="post">
-                <input type="text" name="cedula" placeholder="Buscar por número de cédula..." required>
-                <button type="submit">🔍 Buscar</button>
-                <a href="/recepcion/panel" style="padding: 8px 15px; background: #e5e7eb; color: #374151; text-decoration: none; border-radius: 4px;">Ver Todas</a>
-            </form>
+    <section class="card">
+        <h3>📅 Gestión de Reservas y Check-in/out</h3>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nro</th>
-                        <th>Cliente</th>
-                        <th>Cédula</th>
-                        <th>Habitación</th>
-                        <th>Estado Actual</th>
-                        <th>Acciones Operativas</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="res : ${reservas}">
-                        <td th:text="'#' + ${res.idReserva}"></td>
-                        <td th:text="${res.nombreCliente}"></td>
-                        <td th:text="${res.cedulaCliente}"></td>
-                        <td th:text="'Hab. ' + ${res.habitacion.numero}"></td>
-                        <td><b th:text="${res.estado}"></b></td>
-                        
-                        <td>
-                            <a th:if="${res.estado == 'PENDIENTE'}" th:href="@{/recepcion/reservas/accion/CONFIRMAR/{id}(id=${res.idReserva})}" class="btn-accion btn-blue">Confirmar</a>
-                            
-                            <a th:if="${res.estado == 'CONFIRMADA'}" th:href="@{/recepcion/reservas/accion/CHECKIN/{id}(id=${res.idReserva})}" class="btn-accion btn-green">Hacer Check-In</a>
-                            
-                            <a th:if="${res.estado == 'CHECK-IN'}" th:href="@{/recepcion/reservas/accion/CHECKOUT/{id}(id=${res.idReserva})}" class="btn-accion btn-gray" onclick="return confirm('¿Confirmar salida y enviar habitación a limpieza?')">Hacer Check-Out</a>
-                            
-                            <span th:if="${res.estado == 'FINALIZADA'}" style="color: #9ca3af; font-size: 12px;">Completada</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <form class="buscador" th:action="@{/recepcion/reservas/buscar}" method="post">
+            <input type="text" name="cedula" placeholder="Buscar por número de cédula..." required>
+            <button type="submit">🔍 Buscar</button>
+            <a href="/recepcion/panel" class="btn-ver-todas">Ver Todas</a>
+        </form>
 
-    </main>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nro</th>
+                    <th>Cliente</th>
+                    <th>Cédula</th>
+                    <th>Habitación</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                    <th>Estado</th>
+                    <th>Notas</th>
+                    <th>Acciones Operativas</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="res : ${reservas}">
+                    <td th:text="'#' + ${res.idReserva}"></td>
+
+                    <td th:text="${res.nombreCliente} + ' ' + ${res.apellidoCliente}"></td>
+
+                    <td th:text="${res.cedulaCliente}"></td>
+
+                    <td th:text="'Hab. ' + ${res.habitacion.numero}"></td>
+
+                    <td th:text="${res.fechaCheckIn}"></td>
+
+                    <td th:text="${res.fechaCheckOut}"></td>
+
+                    <td>
+                        <span class="estado-texto" th:text="${res.estado}"></span>
+                    </td>
+
+                    <td class="texto-notas" th:text="${res.notas}"></td>
+
+                    <td>
+                        <a th:if="${res.estado == 'CONFIRMADA'}"
+                           th:href="@{/recepcion/reservas/accion/CHECKIN/{id}(id=${res.idReserva})}"
+                           class="btn-accion btn-green"
+                           onclick="abrirConfirmacion(event, this, '¿Confirmar Check-In del huésped?')">
+                            Hacer Check-In
+                        </a>
+
+                        <a th:if="${res.estado == 'CHECK-IN'}"
+                           th:href="@{/recepcion/reservas/accion/CHECKOUT/{id}(id=${res.idReserva})}"
+                           class="btn-accion btn-gray"
+                           onclick="abrirConfirmacion(event, this, '¿Confirmar Check-Out y enviar habitación a limpieza?')">
+                            Hacer Check-Out
+                        </a>
+
+                        <a th:if="${res.estado == 'CONFIRMADA'}"
+                           th:href="@{/recepcion/reservas/accion/CANCELAR/{id}(id=${res.idReserva})}"
+                           class="btn-accion btn-red"
+                           onclick="abrirConfirmacion(event, this, '¿Cancelar esta reserva?')">
+                            Cancelar
+                        </a>
+
+                        <span th:if="${res.estado == 'FINALIZADA'}"
+                              class="texto-finalizado">
+                            Completada
+                        </span>
+
+                        <span th:if="${res.estado == 'CANCELADA'}"
+                              class="texto-finalizado">
+                            Cancelada
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+<dialog id="modalConfirmacion">
+    <h3>Confirmar acción</h3>
+    <p id="textoConfirmacion">¿Está seguro?</p>
+
+    <div class="dialog-botones">
+        <button type="button" class="btn-modal-aceptar" onclick="confirmarAccion()">Aceptar</button>
+        <button type="button" class="btn-modal-cancelar" onclick="cerrarConfirmacion()">Cancelar</button>
+    </div>
+</dialog>
+
+<script>
+    let urlAccion = "";
+
+    function abrirConfirmacion(event, enlace, mensaje) {
+        event.preventDefault();
+        urlAccion = enlace.getAttribute("href");
+        document.getElementById("textoConfirmacion").innerText = mensaje;
+        document.getElementById("modalConfirmacion").showModal();
+    }
+
+    function cerrarConfirmacion() {
+        document.getElementById("modalConfirmacion").close();
+        urlAccion = "";
+    }
+
+    function confirmarAccion() {
+        if (urlAccion !== "") {
+            window.location.href = urlAccion;
+        }
+    }
+</script>
+
 </body>
 </html>
