@@ -1,264 +1,266 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Solicitudes - Administración</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Solicitudes - Administración</title>
 
-    <style>
-        *{
-            box-sizing:border-box;
-            margin:0;
-            padding:0;
-            font-family:'Segoe UI',sans-serif
-        }
+        <style>
+            *{
+                box-sizing:border-box;
+                margin:0;
+                padding:0;
+                font-family:'Segoe UI',sans-serif
+            }
 
-        body{
-            display:flex;
-            min-height:100vh;
-            background:#f3f4f6;
-            color:#1f2937
-        }
+            body{
+                display:flex;
+                min-height:100vh;
+                background:#f3f4f6;
+                color:#1f2937
+            }
 
-        .sidebar{
-            width:250px;
-            background:#1e293b;
-            color:white;
-            min-height:100vh;
-            flex-shrink:0
-        }
+            .sidebar{
+                width:250px;
+                background:#1e293b;
+                color:white;
+                min-height:100vh;
+                flex-shrink:0
+            }
 
-        .sidebar h2{
-            padding:20px;
-            color:#fbbf24;
-            font-size:20px
-        }
+            .sidebar h2{
+                padding:20px;
+                color:#fbbf24;
+                font-size:20px
+            }
 
-        .sidebar a{
-            display:block;
-            padding:14px 20px;
-            color:#cbd5e1;
-            text-decoration:none;
-            font-size:15px
-        }
+            .sidebar a{
+                display:block;
+                padding:14px 20px;
+                color:#cbd5e1;
+                text-decoration:none;
+                font-size:15px
+            }
 
-        .sidebar a:hover,
-        .sidebar .activo{
-            background:#0f172a;
-            color:white;
-            border-left:4px solid #fbbf24
-        }
+            .sidebar a:hover,
+            .sidebar .activo{
+                background:#0f172a;
+                color:white;
+                border-left:4px solid #fbbf24
+            }
 
-        .main{
-            flex:1;
-            min-height:100vh
-        }
+            .main{
+                flex:1;
+                min-height:100vh
+            }
 
-        .topbar{
-            background:white;
-            padding:15px 30px;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            border-bottom:1px solid #e5e7eb
-        }
+            .topbar{
+                background:white;
+                padding:15px 30px;
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                border-bottom:1px solid #e5e7eb
+            }
 
-        .topbar h2{
-            font-size:20px;
-            color:#1e293b
-        }
+            .topbar h2{
+                font-size:20px;
+                color:#1e293b
+            }
 
-        .logout{
-            color:#ef4444;
-            text-decoration:none;
-            font-weight:bold
-        }
+            .logout{
+                color:#ef4444;
+                text-decoration:none;
+                font-weight:bold
+            }
 
-        .content{
-            padding:30px
-        }
+            .content{
+                padding:30px
+            }
 
-        .card{
-            background:white;
-            padding:25px;
-            border-radius:8px;
-            box-shadow:0 2px 6px #0002
-        }
+            .card{
+                background:white;
+                padding:25px;
+                border-radius:8px;
+                box-shadow:0 2px 6px #0002
+            }
 
-        .titulo{
-            margin-bottom:20px;
-            color:#1e293b
-        }
+            .titulo{
+                margin-bottom:20px;
+                color:#1e293b
+            }
 
-        .solicitudes-grid{
-            display:grid;
-            grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
-            gap:18px
-        }
+            .solicitudes-grid{
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+                gap:18px
+            }
 
-        .solicitud-card{
-            border:1px solid #e5e7eb;
-            border-radius:8px;
-            padding:18px;
-            background:#ffffff
-        }
+            .solicitud-card{
+                border:1px solid #e5e7eb;
+                border-radius:8px;
+                padding:18px;
+                background:#ffffff
+            }
 
-        .solicitud-header{
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-            margin-bottom:12px;
-            gap:10px
-        }
+            .solicitud-header{
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:12px;
+                gap:10px
+            }
 
-        .tipo{
-            font-weight:bold;
-            color:#1e293b;
-            font-size:16px
-        }
+            .tipo{
+                font-weight:bold;
+                color:#1e293b;
+                font-size:16px
+            }
 
-        .estado{
-            padding:5px 10px;
-            border-radius:20px;
-            font-size:12px;
-            font-weight:bold
-        }
+            .estado{
+                padding:5px 10px;
+                border-radius:20px;
+                font-size:12px;
+                font-weight:bold
+            }
 
-        .pendiente{
-            background:#fef3c7;
-            color:#b45309
-        }
+            .pendiente{
+                background:#fef3c7;
+                color:#b45309
+            }
 
-        .revisado{
-            background:#dcfce7;
-            color:#15803d
-        }
+            .revisado{
+                background:#dcfce7;
+                color:#15803d
+            }
 
-        .meta{
-            font-size:13px;
-            color:#6b7280;
-            margin-bottom:8px
-        }
+            .meta{
+                font-size:13px;
+                color:#6b7280;
+                margin-bottom:8px
+            }
 
-        .mensaje{
-            background:#f9fafb;
-            border-left:4px solid #fbbf24;
-            padding:12px;
-            border-radius:5px;
-            color:#374151;
-            line-height:1.5;
-            margin:12px 0;
-            min-height:80px;
-            white-space:pre-wrap
-        }
+            .mensaje{
+                background:#f9fafb;
+                border-left:4px solid #fbbf24;
+                padding:12px;
+                border-radius:5px;
+                color:#374151;
+                line-height:1.5;
+                margin:12px 0;
+                min-height:80px;
+                white-space:pre-wrap
+            }
 
-        .acciones{
-            display:flex;
-            justify-content:flex-end;
-            margin-top:12px
-        }
+            .acciones{
+                display:flex;
+                justify-content:flex-end;
+                margin-top:12px
+            }
 
-        .btn-revisado{
-            background:#1e293b;
-            color:white;
-            padding:9px 13px;
-            border-radius:5px;
-            text-decoration:none;
-            font-size:13px;
-            font-weight:bold
-        }
+            .btn-revisado{
+                background:#1e293b;
+                color:white;
+                padding:9px 13px;
+                border-radius:5px;
+                text-decoration:none;
+                font-size:13px;
+                font-weight:bold
+            }
 
-        .btn-revisado:hover{
-            background:#334155
-        }
+            .btn-revisado:hover{
+                background:#334155
+            }
 
-        .sin-accion{
-            color:#15803d;
-            font-weight:bold;
-            font-size:13px
-        }
+            .sin-accion{
+                color:#15803d;
+                font-weight:bold;
+                font-size:13px
+            }
 
-        .vacio{
-            background:#f9fafb;
-            padding:25px;
-            text-align:center;
-            color:#6b7280;
-            border-radius:8px;
-            border:1px dashed #d1d5db
-        }
-    </style>
-</head>
+            .vacio{
+                background:#f9fafb;
+                padding:25px;
+                text-align:center;
+                color:#6b7280;
+                border-radius:8px;
+                border:1px dashed #d1d5db
+            }
+        </style>
+    </head>
 
-<body>
+    <body>
 
-<aside class="sidebar">
-    <h2>🏨 Admin</h2>
+        <aside class="sidebar">
+            <h2>HotelControl</h2>
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="/admin/panel">Habitaciones</a>
+            <a href="/admin/reservas">Reservas</a>
+            <a href="/admin/reportes">Reportes</a>
+            <a href="/admin/clientes">Clientes</a>
+            <a href="/admin/personal">Personal</a>
+            <a href="/admin/solicitudes" class="activo">Solicitudes</a>
+        </aside>
 
-    <a href="/admin/panel">🛏️ Habitaciones</a>
-    <a href="/admin/reservas">📅 Reservas</a>
-    <a href="/admin/personal">👥 Personal</a>
-    <a href="/admin/solicitudes" class="activo">📨 Solicitudes</a>
-</aside>
+        <main class="main">
+            <header class="topbar">
+                <h2>Solicitudes de Recepción</h2>
+                <a href="/logout" class="logout">Cerrar Sesión</a>
+            </header>
 
-<main class="main">
-    <header class="topbar">
-        <h2>Solicitudes de Recepción</h2>
-        <a href="/logout" class="logout">Cerrar Sesión</a>
-    </header>
+            <section class="content">
+                <div class="card">
+                    <h3 class="titulo">Solicitudes, quejas y comentarios enviados por recepción</h3>
 
-    <section class="content">
-        <div class="card">
-            <h3 class="titulo">Solicitudes, quejas y comentarios enviados por recepción</h3>
-
-            <div class="vacio" th:if="${#lists.isEmpty(solicitudes)}">
-                No hay solicitudes, quejas o comentarios registrados.
-            </div>
-
-            <div class="solicitudes-grid" th:if="${!#lists.isEmpty(solicitudes)}">
-
-                <div class="solicitud-card" th:each="s : ${solicitudes}">
-
-                    <div class="solicitud-header">
-                        <div class="tipo" th:text="${s.tipo}">QUEJA</div>
-
-                        <span class="estado"
-                              th:classappend="${s.estado == 'REVISADO'} ? ' revisado' : ' pendiente'"
-                              th:text="${s.estado}">
-                            PENDIENTE
-                        </span>
+                    <div class="vacio" th:if="${#lists.isEmpty(solicitudes)}">
+                        No hay solicitudes, quejas o comentarios registrados.
                     </div>
 
-                    <div class="meta">
-                        <b>Fecha:</b>
-                        <span th:text="${s.fechaEnvio}"></span>
+                    <div class="solicitudes-grid" th:if="${!#lists.isEmpty(solicitudes)}">
+
+                        <div class="solicitud-card" th:each="s : ${solicitudes}">
+
+                            <div class="solicitud-header">
+                                <div class="tipo" th:text="${s.tipo}">QUEJA</div>
+
+                                <span class="estado"
+                                      th:classappend="${s.estado == 'REVISADO'} ? ' revisado' : ' pendiente'"
+                                      th:text="${s.estado}">
+                                    PENDIENTE
+                                </span>
+                            </div>
+
+                            <div class="meta">
+                                <b>Fecha:</b>
+                                <span th:text="${s.fechaEnvio}"></span>
+                            </div>
+
+                            <div class="meta">
+                                <b>Recepcionista:</b>
+                                <span th:text="${s.nombreRecepcionista}"></span>
+                            </div>
+
+                            <div class="mensaje" th:text="${s.mensaje}">
+                                Mensaje de la solicitud.
+                            </div>
+
+                            <div class="acciones">
+                                <a th:if="${s.estado == 'PENDIENTE'}"
+                                   th:href="@{/admin/solicitudes/revisar/{id}(id=${s.idSolicitud})}"
+                                   class="btn-revisado">
+                                    Marcar como revisado
+                                </a>
+
+                                <span th:if="${s.estado == 'REVISADO'}" class="sin-accion">
+                                    Revisado
+                                </span>
+                            </div>
+
+                        </div>
+
                     </div>
-
-                    <div class="meta">
-                        <b>Recepcionista:</b>
-                        <span th:text="${s.nombreRecepcionista}"></span>
-                    </div>
-
-                    <div class="mensaje" th:text="${s.mensaje}">
-                        Mensaje de la solicitud.
-                    </div>
-
-                    <div class="acciones">
-                        <a th:if="${s.estado == 'PENDIENTE'}"
-                           th:href="@{/admin/solicitudes/revisar/{id}(id=${s.idSolicitud})}"
-                           class="btn-revisado">
-                            Marcar como revisado
-                        </a>
-
-                        <span th:if="${s.estado == 'REVISADO'}" class="sin-accion">
-                            Revisado
-                        </span>
-                    </div>
-
                 </div>
+            </section>
+        </main>
 
-            </div>
-        </div>
-    </section>
-</main>
-
-</body>
+    </body>
 </html>

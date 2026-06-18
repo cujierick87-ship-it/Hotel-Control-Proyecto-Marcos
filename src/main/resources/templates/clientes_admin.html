@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes con Reservas</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
+        body{display:flex;min-height:100vh;background:#f3f4f6;color:#1f2937}
+        .sidebar{width:250px;background:#1e293b;color:white}
+        .sidebar h2{padding:20px;color:#fbbf24}
+        .sidebar a{display:block;padding:14px 20px;color:#cbd5e1;text-decoration:none}
+        .sidebar a:hover,.activo{background:#0f172a;color:white;border-left:4px solid #fbbf24}
+        .main{flex:1}
+        .topbar{background:white;padding:15px 30px;display:flex;justify-content:space-between;border-bottom:1px solid #e5e7eb}
+        .topbar a{color:#ef4444;text-decoration:none;font-weight:bold}
+        .content{padding:30px}
+        .card{background:white;padding:25px;border-radius:8px;box-shadow:0 2px 5px #0001;margin-bottom:20px}
+        form{display:flex;gap:10px;margin:15px 0}
+        input{padding:10px;border:1px solid #d1d5db;border-radius:5px;width:260px}
+        button,.btn{padding:10px 15px;border:0;border-radius:5px;text-decoration:none;font-weight:bold;cursor:pointer}
+        button{background:#1e293b;color:white}
+        .btn{background:#e5e7eb;color:#111827}
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px}
+        th{background:#f9fafb;color:#6b7280;text-transform:uppercase;font-size:12px}
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <h2>HotelControl</h2>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/panel">Habitaciones</a>
+    <a href="/admin/reservas">Reservas</a>
+    <a href="/admin/reportes">Reportes</a>
+    <a href="/admin/clientes" class="activo">Clientes</a>
+    <a href="/admin/personal">Personal</a>
+    <a href="/admin/solicitudes">Solicitudes</a>
+</aside>
+
+<main class="main">
+    <header class="topbar">
+        <span>Panel / <b>Clientes</b></span>
+        <a href="/logout">Cerrar Sesion</a>
+    </header>
+
+    <section class="content">
+        <div class="card">
+            <h3>Buscar reservas de un cliente</h3>
+
+            <form th:action="@{/admin/clientes/buscar}" method="post">
+                <input type="text" name="cedula" placeholder="Ingrese cedula" th:value="${cedulaBuscada}" required>
+                <button type="submit">Buscar</button>
+                <a href="/admin/clientes" class="btn">Limpiar</a>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Clientes que han realizado reservas</h3>
+            <br>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Cedula</th>
+                    <th>Cliente</th>
+                    <th>Correo</th>
+                    <th>Telefono</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="c : ${clientes}">
+                    <td th:text="${c.cedulaCliente}"></td>
+                    <td th:text="${c.nombreCliente} + ' ' + ${c.apellidoCliente}"></td>
+                    <td th:text="${c.correo}"></td>
+                    <td th:text="${c.telefono}"></td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(clientes)}">
+                    <td colspan="4">No existen clientes con reservas.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card" th:if="${reservasCliente != null}">
+            <h3>Reservas del cliente</h3>
+            <br>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Codigo</th>
+                    <th>Habitacion</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="r : ${reservasCliente}">
+                    <td th:text="${r.codigoReserva}"></td>
+                    <td th:text="'Hab. ' + ${r.habitacion.numero}"></td>
+                    <td th:text="${r.fechaCheckIn}"></td>
+                    <td th:text="${r.fechaCheckOut}"></td>
+                    <td th:text="${r.estado}"></td>
+                    <td th:text="'$' + ${r.totalPagar}"></td>
+                </tr>
+
+                <tr th:if="${#lists.isEmpty(reservasCliente)}">
+                    <td colspan="6">No se encontraron reservas para esa cedula.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+
+</body>
+</html>

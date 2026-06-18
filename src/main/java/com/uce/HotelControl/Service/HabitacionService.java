@@ -141,4 +141,8 @@ public class HabitacionService {
             habitacionRepository.save(habitacion);
         }
     }
+    
+    public int contarPorEstado(String estado) {
+    return habitacionRepository.findByEstado(estado).size();
+}
 }

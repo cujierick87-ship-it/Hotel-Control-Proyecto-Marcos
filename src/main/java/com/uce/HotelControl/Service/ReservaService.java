@@ -4,8 +4,12 @@ import com.uce.HotelControl.Model.Habitacion;
 import com.uce.HotelControl.Model.Reserva;
 import com.uce.HotelControl.Repository.HabitacionRepository;
 import com.uce.HotelControl.Repository.ReservaRepository;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
@@ -100,6 +104,14 @@ public class ReservaService {
                 reserva.setEstado("CANCELADA");
             }
 
+            if (accion.equals("NOSHOW")) {
+                reserva.setEstado("NO-SHOW");
+
+                if (habitacion != null) {
+                    habitacion.setEstado("DISPONIBLE");
+                }
+            }
+
             reservaRepository.save(reserva);
             habitacionRepository.save(habitacion);
         }
@@ -176,6 +188,78 @@ public class ReservaService {
         reserva.setHabitacion(habitacion);
 
         return guardarReserva(reserva);
+    }
+
+    public double calcularIngresosValidos(List<Reserva> reservas) {
+        double total = 0;
+
+        for (Reserva reserva : reservas) {
+            if (reserva.getTotalPagar() != null
+                    && !"CANCELADA".equalsIgnoreCase(reserva.getEstado())
+                    && !"NO-SHOW".equalsIgnoreCase(reserva.getEstado())) {
+                total = total + reserva.getTotalPagar();
+            }
+        }
+
+        return total;
+    }
+
+    public int contarReservasPorEstado(String estado) {
+        int contador = 0;
+
+        for (Reserva reserva : reservaRepository.findAll()) {
+            if (estado.equalsIgnoreCase(reserva.getEstado())) {
+                contador++;
+            }
+        }
+
+        return contador;
+    }
+
+    public List<Reserva> buscarReservasPorRango(LocalDate fechaInicio, LocalDate fechaFin) {
+        List<Reserva> resultado = new ArrayList<>();
+
+        for (Reserva reserva : reservaRepository.findAll()) {
+            if (reserva.getFechaCheckIn() != null
+                    && !reserva.getFechaCheckIn().isBefore(fechaInicio)
+                    && !reserva.getFechaCheckIn().isAfter(fechaFin)) {
+                resultado.add(reserva);
+            }
+        }
+
+        return resultado;
+    }
+
+    public Map<String, Integer> obtenerHabitacionesMasReservadas() {
+        Map<String, Integer> conteo = new LinkedHashMap<>();
+
+        for (Reserva reserva : reservaRepository.findAll()) {
+            if (reserva.getHabitacion() != null) {
+                String numero = reserva.getHabitacion().getNumero();
+
+                if (!conteo.containsKey(numero)) {
+                    conteo.put(numero, 1);
+                } else {
+                    conteo.put(numero, conteo.get(numero) + 1);
+                }
+            }
+        }
+
+        return conteo;
+    }
+
+    public List<Reserva> obtenerClientesConReservas() {
+        List<Reserva> clientes = new ArrayList<>();
+        List<String> cedulas = new ArrayList<>();
+
+        for (Reserva reserva : reservaRepository.findAll()) {
+            if (reserva.getCedulaCliente() != null && !cedulas.contains(reserva.getCedulaCliente())) {
+                cedulas.add(reserva.getCedulaCliente());
+                clientes.add(reserva);
+            }
+        }
+
+        return clientes;
     }
 
 }

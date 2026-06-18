@@ -7,6 +7,7 @@ import com.uce.HotelControl.Service.ReservaService;
 import com.uce.HotelControl.Service.SolicitudRecepcionService;
 import com.uce.HotelControl.Service.UsuarioService;
 import java.io.IOException;
+import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -139,5 +140,66 @@ public class AdminController {
     public String marcarSolicitudRevisada(@PathVariable Long id) {
         solicitudRecepcionService.marcarComoRevisado(id);
         return "redirect:/admin/solicitudes";
+    }
+
+    @GetMapping("/admin/dashboard")
+    public String dashboardAdmin(Model model) {
+        int disponibles = habitacionService.contarPorEstado("DISPONIBLE");
+        int ocupadas = habitacionService.contarPorEstado("OCUPADA");
+        int limpieza = habitacionService.contarPorEstado("LIMPIEZA");
+        int mantenimiento = habitacionService.contarPorEstado("MANTENIMIENTO");
+
+        int totalHabitaciones = disponibles + ocupadas + limpieza + mantenimiento;
+        double porcentajeOcupacion = 0;
+
+        if (totalHabitaciones > 0) {
+            porcentajeOcupacion = (ocupadas * 100.0) / totalHabitaciones;
+        }
+
+        model.addAttribute("totalReservas", reservaService.obtenerTodasLasReservas().size());
+        model.addAttribute("ingresosTotales", reservaService.calcularIngresosValidos(reservaService.obtenerTodasLasReservas()));
+        model.addAttribute("disponibles", disponibles);
+        model.addAttribute("ocupadas", ocupadas);
+        model.addAttribute("limpieza", limpieza);
+        model.addAttribute("mantenimiento", mantenimiento);
+        model.addAttribute("porcentajeOcupacion", porcentajeOcupacion);
+        model.addAttribute("reservasCanceladas", reservaService.contarReservasPorEstado("CANCELADA"));
+        model.addAttribute("reservasNoShow", reservaService.contarReservasPorEstado("NO-SHOW"));
+        model.addAttribute("habitacionesMasReservadas", reservaService.obtenerHabitacionesMasReservadas());
+
+        return "dashboard_admin";
+    }
+
+    @GetMapping("/admin/reportes")
+    public String mostrarReportes(Model model) {
+        model.addAttribute("reservas", reservaService.obtenerTodasLasReservas());
+        model.addAttribute("ingresos", reservaService.calcularIngresosValidos(reservaService.obtenerTodasLasReservas()));
+        return "reporte_admin";
+    }
+
+    @PostMapping("/admin/reportes/buscar")
+    public String buscarReporte(LocalDate fechaInicio, LocalDate fechaFin, Model model) {
+        model.addAttribute("reservas", reservaService.buscarReservasPorRango(fechaInicio, fechaFin));
+        model.addAttribute("ingresos", reservaService.calcularIngresosValidos(reservaService.buscarReservasPorRango(fechaInicio, fechaFin)));
+        model.addAttribute("fechaInicio", fechaInicio);
+        model.addAttribute("fechaFin", fechaFin);
+
+        return "reporte_admin";
+    }
+
+    @GetMapping("/admin/clientes")
+    public String clientesConReservas(Model model) {
+        model.addAttribute("clientes", reservaService.obtenerClientesConReservas());
+        model.addAttribute("reservasCliente", null);
+        return "clientes_admin";
+    }
+
+    @PostMapping("/admin/clientes/buscar")
+    public String buscarClienteReservas(String cedula, Model model) {
+        model.addAttribute("clientes", reservaService.obtenerClientesConReservas());
+        model.addAttribute("reservasCliente", reservaService.buscarPorCedula(cedula));
+        model.addAttribute("cedulaBuscada", cedula);
+
+        return "clientes_admin";
     }
 }

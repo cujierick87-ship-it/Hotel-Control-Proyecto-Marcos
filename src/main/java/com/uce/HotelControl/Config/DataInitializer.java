@@ -1,6 +1,4 @@
-///
-///
-///para probar git
+
 package com.uce.HotelControl.Config;
 
 import com.uce.HotelControl.Model.Usuario;
