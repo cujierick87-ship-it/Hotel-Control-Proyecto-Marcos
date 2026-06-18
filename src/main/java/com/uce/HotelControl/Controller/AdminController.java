@@ -4,6 +4,7 @@ import com.uce.HotelControl.Model.Habitacion;
 import com.uce.HotelControl.Model.Usuario;
 import com.uce.HotelControl.Service.HabitacionService;
 import com.uce.HotelControl.Service.ReservaService;
+import com.uce.HotelControl.Service.SolicitudRecepcionService;
 import com.uce.HotelControl.Service.UsuarioService;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class AdminController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private SolicitudRecepcionService solicitudRecepcionService;
 
     // Carga el panel principal del administrador.
     // Muestra habitaciones y prepara el formulario para crear una nueva.
@@ -121,5 +125,19 @@ public class AdminController {
     public String eliminarPersonal(@PathVariable Long id) {
         usuarioService.eliminarUsuario(id);
         return "redirect:/admin/personal";
+    }
+
+    // Muestra las solicitudes, quejas y comentarios enviados por recepción.
+    @GetMapping("/admin/solicitudes")
+    public String verSolicitudes(Model model) {
+        model.addAttribute("solicitudes", solicitudRecepcionService.obtenerTodas());
+        return "panel_solicitudes";
+    }
+
+    // Marca una solicitud, queja o comentario como REVISADO.
+    @GetMapping("/admin/solicitudes/revisar/{id}")
+    public String marcarSolicitudRevisada(@PathVariable Long id) {
+        solicitudRecepcionService.marcarComoRevisado(id);
+        return "redirect:/admin/solicitudes";
     }
 }

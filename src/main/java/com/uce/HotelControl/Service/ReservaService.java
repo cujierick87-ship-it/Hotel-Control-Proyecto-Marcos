@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.UUID;
+
 @Service
 public class ReservaService {
 
@@ -30,6 +31,24 @@ public class ReservaService {
         }
 
         if ("MANTENIMIENTO".equalsIgnoreCase(habitacion.getEstado())) {
+            return null;
+        }
+
+        if (reserva.getFechaCheckIn() == null || reserva.getFechaCheckOut() == null) {
+            return null;
+        }
+
+        if (!reserva.getFechaCheckOut().isAfter(reserva.getFechaCheckIn())) {
+            return null;
+        }
+
+        List<Reserva> choques = reservaRepository.encontrarChoquesDeFechas(
+                habitacion.getIdHabitacion(),
+                reserva.getFechaCheckIn(),
+                reserva.getFechaCheckOut()
+        );
+
+        if (!choques.isEmpty()) {
             return null;
         }
 
@@ -121,4 +140,42 @@ public class ReservaService {
         reservaRepository.save(reserva);
         return true;
     }
+
+    // Busca reservas por código único o por cédula.
+// Si encuentra por código, devuelve solo esa reserva.
+// Si no encuentra por código, busca por cédula.
+    public List<Reserva> buscarPorCodigoOCedula(String filtro) {
+        if (filtro == null || filtro.trim().isEmpty()) {
+            return reservaRepository.findAll();
+        }
+
+        Reserva porCodigo = reservaRepository.findByCodigoReserva(filtro.trim());
+
+        if (porCodigo != null) {
+            return java.util.Collections.singletonList(porCodigo);
+        }
+
+        return reservaRepository.findByCedulaCliente(filtro.trim());
+    }
+
+// Obtiene las reservas activas de una habitación.
+// Se usa para pintar de rojo las fechas ocupadas en reserva presencial.
+    public List<Reserva> buscarReservasActivasPorHabitacion(Long idHabitacion) {
+        return reservaRepository.buscarReservasActivasPorHabitacion(idHabitacion);
+    }
+
+// Registra una reserva presencial desde recepción.
+// Reutiliza guardarReserva para validar fechas, calcular total y generar código.
+    public Reserva registrarReservaPresencial(Reserva reserva, Long idHabitacion) {
+        Habitacion habitacion = habitacionRepository.findById(idHabitacion).orElse(null);
+
+        if (habitacion == null) {
+            return null;
+        }
+
+        reserva.setHabitacion(habitacion);
+
+        return guardarReserva(reserva);
+    }
+
 }

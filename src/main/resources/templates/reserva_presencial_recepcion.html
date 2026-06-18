@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Completar Reserva Presencial</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
+        body{background:#f8f9fa;color:#333}
+        .navbar{background:#1e293b;padding:15px 50px;display:flex;justify-content:space-between;align-items:center}
+        .navbar a{color:white;text-decoration:none}
+        .navbar-brand{font-size:20px;font-weight:bold;color:#eab308!important}
+        .container{max-width:1050px;margin:35px auto;background:white;padding:25px;box-shadow:0 4px 15px #0001;border-radius:6px}
+        .layout{display:grid;grid-template-columns:1fr 1.2fr;gap:25px}
+        .foto{width:100%;height:260px;object-fit:cover;border-radius:6px;margin-bottom:12px}
+        h2{color:#1e293b;margin-bottom:15px}
+        .detalle p{margin-bottom:8px;color:#4b5563}
+        .precio{font-size:22px;font-weight:bold;color:#d4af37;margin-top:10px}
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .full{grid-column:span 2}
+        label{font-size:13px;font-weight:bold;color:#374151;margin-bottom:5px;display:block}
+        input,textarea{width:100%;padding:10px;border:1px solid #ccc;border-radius:4px;font-size:14px}
+        textarea{resize:vertical}
+        .footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px}
+        .btn{background:#e5c158;color:white;border:0;padding:12px 20px;border-radius:5px;font-weight:bold;cursor:pointer}
+        .btn:hover{background:#d4af37}
+        .volver{color:#555;text-decoration:none}
+        .volver:hover{text-decoration:underline}
+        .error{background:#fee2e2;color:#991b1b;padding:10px;border-radius:5px;margin-bottom:15px;text-align:center}
+
+        .flatpickr-calendar{font-size:13px!important;width:auto!important}
+        .flatpickr-day{height:33px!important;line-height:33px!important;max-width:33px!important;margin:1px!important}
+
+        .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.prevMonthDay,
+        .flatpickr-day.nextMonthDay{
+            background-color:#fca5a5!important;
+            color:#7f1d1d!important;
+            border-color:white!important;
+            border-radius:0!important;
+            opacity:1!important;
+        }
+
+        .flatpickr-day:not(.flatpickr-disabled):not(.prevMonthDay):not(.nextMonthDay){
+            background-color:#bbf7d0!important;
+            color:#065f46!important;
+            border-color:white!important;
+            border-radius:0!important;
+        }
+
+        .flatpickr-day:not(.flatpickr-disabled):hover{
+            background-color:#22c55e!important;
+            color:white!important;
+        }
+
+        dialog{border:0;border-radius:10px;padding:25px;width:360px;text-align:center;box-shadow:0 10px 25px #0005}
+        dialog::backdrop{background:#0008}
+        dialog h3{color:#1e293b;margin-bottom:10px}
+        dialog p{color:#4b5563;margin-bottom:20px}
+        dialog button{background:#e5c158;color:white;border:0;padding:10px 18px;border-radius:5px;font-weight:bold;cursor:pointer}
+
+        @media(max-width:850px){
+            .layout{grid-template-columns:1fr}
+            .form-grid{grid-template-columns:1fr}
+            .full{grid-column:span 1}
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <a href="/recepcion/panel" class="navbar-brand">🏨 HotelControl</a>
+    <a href="/recepcion/reserva-presencial">Cambiar habitación</a>
+</nav>
+
+<div class="container">
+    <div class="layout">
+
+        <section class="detalle">
+            <img class="foto"
+                 th:if="${habitacion.imagen != null and habitacion.imagen != ''}"
+                 th:src="${habitacion.imagen}"
+                 alt="Habitación">
+
+            <img class="foto"
+                 th:if="${habitacion.imagen == null or habitacion.imagen == ''}"
+                 src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80"
+                 alt="Habitación">
+
+            <h2 th:text="${habitacion.tipo} + ' - Hab. ' + ${habitacion.numero}"></h2>
+
+            <p th:text="${habitacion.descripcion}"></p>
+
+            <p>
+                <b>Capacidad:</b>
+                <span th:text="${habitacion.capacidad}"></span> personas
+            </p>
+
+            <p>
+                <b>Estado:</b>
+                <span th:text="${habitacion.estado}"></span>
+            </p>
+
+            <div class="precio">
+                $ <span th:text="${habitacion.precioNoche}"></span> / noche
+            </div>
+        </section>
+
+        <section>
+            <h2>Datos de la reserva presencial</h2>
+
+            <div class="error" th:if="${error}" th:text="${error}"></div>
+
+            <form th:action="@{/recepcion/reserva-presencial/guardar}"
+                  method="post"
+                  th:object="${reserva}"
+                  novalidate
+                  onsubmit="return validarReservaPresencial()">
+
+                <input type="hidden" name="idHabitacion" th:value="${habitacion.idHabitacion}">
+
+                <div class="form-grid">
+
+                    <div>
+                        <label>Nombres</label>
+                        <input type="text" th:field="*{nombreCliente}" required>
+                    </div>
+
+                    <div>
+                        <label>Apellidos</label>
+                        <input type="text" th:field="*{apellidoCliente}" required>
+                    </div>
+
+                    <div>
+                        <label>Cédula</label>
+                        <input type="text" th:field="*{cedulaCliente}" required>
+                    </div>
+
+                    <div>
+                        <label>Teléfono</label>
+                        <input type="text" th:field="*{telefono}" required>
+                    </div>
+
+                    <div class="full">
+                        <label>Correo</label>
+                        <input type="email" th:field="*{correo}">
+                    </div>
+
+                    <div>
+                        <label>Fecha de entrada</label>
+                        <input type="text" id="fechaCheckIn" th:field="*{fechaCheckIn}" placeholder="Seleccione fecha de entrada" required autocomplete="off">
+                    </div>
+
+                    <div>
+                        <label>Fecha de salida</label>
+                        <input type="text" id="fechaCheckOut" th:field="*{fechaCheckOut}" placeholder="Seleccione fecha de salida" required autocomplete="off">
+                    </div>
+
+                    <div class="full">
+                        <label>Notas</label>
+                        <textarea th:field="*{notas}" rows="3" placeholder="Notas adicionales..."></textarea>
+                    </div>
+
+                </div>
+
+                <div class="footer">
+                    <a href="/recepcion/reserva-presencial" class="volver">← Volver</a>
+                    <button type="submit" class="btn">Guardar reserva</button>
+                </div>
+            </form>
+        </section>
+
+    </div>
+</div>
+
+<dialog id="modalReserva">
+    <h3>Campos incompletos</h3>
+    <p>Complete las fechas de entrada y salida correctamente.</p>
+    <button type="button" onclick="cerrarModalReserva()">Aceptar</button>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/es.js"></script>
+
+<script th:inline="javascript">
+    let fechasOcupadas = [];
+
+    /*[# th:each="r : ${reservas}"]*/
+    fechasOcupadas.push({
+        from: /*[[${r.fechaCheckIn}]]*/ '',
+        to: /*[[${r.fechaCheckOut}]]*/ ''
+    });
+    /*[/]*/
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkOutPicker = flatpickr("#fechaCheckOut", {
+            locale: "es",
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: fechasOcupadas,
+            showMonths: 2
+        });
+
+        flatpickr("#fechaCheckIn", {
+            locale: "es",
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: fechasOcupadas,
+            showMonths: 2,
+            onChange: function (selectedDates) {
+                if (selectedDates.length > 0) {
+                    let minSalida = new Date(selectedDates[0]);
+                    minSalida.setDate(minSalida.getDate() + 1);
+                    checkOutPicker.set("minDate", minSalida);
+                }
+            }
+        });
+    });
+
+    function validarReservaPresencial() {
+        let inicio = document.getElementById("fechaCheckIn").value.trim();
+        let salida = document.getElementById("fechaCheckOut").value.trim();
+
+        if (inicio === "" || salida === "" || salida <= inicio) {
+            document.getElementById("modalReserva").showModal();
+            return false;
+        }
+
+        return true;
+    }
+
+    function cerrarModalReserva() {
+        document.getElementById("modalReserva").close();
+    }
+</script>
+
+</body>
+</html>

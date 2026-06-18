@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class HabitacionService {
 
     // Busca habitaciones libres en un rango de fechas.
     // Descarta habitaciones en mantenimiento y revisa cruces con reservas existentes.
-    public List<Habitacion> buscarHabitacionesLibresPorFechas(Date checkIn, Date checkOut) {
+    public List<Habitacion> buscarHabitacionesLibresPorFechas(LocalDate  checkIn, LocalDate  checkOut) {
         List<Habitacion> todas = habitacionRepository.findAll();
         List<Habitacion> disponibles = new ArrayList<>();
 
