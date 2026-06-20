@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.uce.HotelControl.Model.InformacionHotel;
 import com.uce.HotelControl.Model.Promocion;
@@ -57,10 +58,14 @@ public class AdminController {
     // También recibe la imagen subida desde la PC.
     @PostMapping("/admin/habitaciones/guardar")
     public String guardarHabitacion(@ModelAttribute Habitacion nuevaHabitacion,
-            @RequestParam("imagenArchivo") MultipartFile imagenArchivo)
+            @RequestParam("imagenArchivo") MultipartFile imagenArchivo,
+            RedirectAttributes redirectAttributes)
             throws IOException {
 
+        boolean esEdicion = nuevaHabitacion.getIdHabitacion() != null;
         habitacionService.guardarHabitacion(nuevaHabitacion, imagenArchivo);
+        redirectAttributes.addFlashAttribute("toastMensaje",
+                esEdicion ? "Habitacion actualizada correctamente." : "Habitacion creada correctamente.");
         return "redirect:/admin/panel";
     }
 
@@ -85,17 +90,19 @@ public class AdminController {
     // Da de baja una habitación.
     // Cambia su estado a MANTENIMIENTO.
     @GetMapping("/admin/habitaciones/baja/{id}")
-    public String darDeBaja(@PathVariable Long id) {
+    public String darDeBaja(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         habitacionService.darDeBaja(id);
+        redirectAttributes.addFlashAttribute("toastMensaje", "Habitacion enviada a mantenimiento.");
         return "redirect:/admin/panel";
     }
 
     // Actualiza el estado de una habitación desde el panel administrador.
     // Sirve para cambiar estado operativo sin editar todo el formulario.
     @PostMapping("/admin/habitaciones/estado")
-    public String actualizarEstadoHabitacion(Long idHabitacion, String estado) {
+    public String actualizarEstadoHabitacion(Long idHabitacion, String estado, RedirectAttributes redirectAttributes) {
         habitacionService.actualizarEstado(idHabitacion, estado);
-        return "redirect:/admin/panel";
+        redirectAttributes.addFlashAttribute("toastMensaje", "Estado de habitacion actualizado.");
+        return "redirect:/admin/panel#estados";
     }
 
     // Muestra todas las reservas registradas.
@@ -118,8 +125,11 @@ public class AdminController {
     // Guarda o actualiza un usuario del personal.
     // Se usa para administradores y recepcionistas.
     @PostMapping("/admin/personal/guardar")
-    public String guardarPersonal(Usuario usuario) {
+    public String guardarPersonal(Usuario usuario, RedirectAttributes redirectAttributes) {
+        boolean esEdicion = usuario.getIdUsuario() != null;
         usuarioService.guardarUsuario(usuario);
+        redirectAttributes.addFlashAttribute("toastMensaje",
+                esEdicion ? "Usuario actualizado correctamente." : "Usuario creado correctamente.");
         return "redirect:/admin/personal";
     }
 
@@ -134,8 +144,9 @@ public class AdminController {
     // Elimina un usuario del personal.
     // En esta versión se elimina directamente de la base de datos.
     @GetMapping("/admin/personal/eliminar/{id}")
-    public String eliminarPersonal(@PathVariable Long id) {
+    public String eliminarPersonal(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         usuarioService.eliminarUsuario(id);
+        redirectAttributes.addFlashAttribute("toastMensaje", "Usuario eliminado correctamente.");
         return "redirect:/admin/personal";
     }
 
@@ -148,8 +159,9 @@ public class AdminController {
 
     // Marca una solicitud, queja o comentario como REVISADO.
     @GetMapping("/admin/solicitudes/revisar/{id}")
-    public String marcarSolicitudRevisada(@PathVariable Long id) {
+    public String marcarSolicitudRevisada(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         solicitudRecepcionService.marcarComoRevisado(id);
+        redirectAttributes.addFlashAttribute("toastMensaje", "Solicitud marcada como revisada.");
         return "redirect:/admin/solicitudes";
     }
 
@@ -168,6 +180,10 @@ public class AdminController {
             porcentajeOcupacion = (ocupadas * 100.0) / totalHabitaciones;
         }
 
+        double porcentajeDisponibles = totalHabitaciones > 0 ? (disponibles * 100.0) / totalHabitaciones : 0;
+        double porcentajeLimpieza = totalHabitaciones > 0 ? (limpieza * 100.0) / totalHabitaciones : 0;
+        double porcentajeMantenimiento = totalHabitaciones > 0 ? (mantenimiento * 100.0) / totalHabitaciones : 0;
+
         model.addAttribute("totalReservas", reservaService.obtenerTodasLasReservas().size());
         model.addAttribute("ingresosTotales", reservaService.calcularIngresosValidos(reservaService.obtenerTodasLasReservas()));
         model.addAttribute("disponibles", disponibles);
@@ -175,6 +191,9 @@ public class AdminController {
         model.addAttribute("limpieza", limpieza);
         model.addAttribute("mantenimiento", mantenimiento);
         model.addAttribute("porcentajeOcupacion", porcentajeOcupacion);
+        model.addAttribute("porcentajeDisponibles", porcentajeDisponibles);
+        model.addAttribute("porcentajeLimpieza", porcentajeLimpieza);
+        model.addAttribute("porcentajeMantenimiento", porcentajeMantenimiento);
         model.addAttribute("reservasCanceladas", reservaService.contarReservasPorEstado("CANCELADA"));
         model.addAttribute("reservasNoShow", reservaService.contarReservasPorEstado("NO-SHOW"));
         model.addAttribute("habitacionesMasReservadas", reservaService.obtenerHabitacionesMasReservadas());
@@ -232,21 +251,25 @@ public class AdminController {
     // Guarda datos generales del hotel y su logo.
     @PostMapping("/admin/institucional/guardar-info")
     public String guardarInformacionHotel(@ModelAttribute InformacionHotel informacionHotel,
-            @RequestParam("logoArchivo") MultipartFile logoArchivo)
+            @RequestParam("logoArchivo") MultipartFile logoArchivo,
+            RedirectAttributes redirectAttributes)
             throws IOException {
 
         informacionHotelService.guardarInformacion(informacionHotel, logoArchivo);
+        redirectAttributes.addFlashAttribute("toastMensaje", "Informacion institucional actualizada.");
         return "redirect:/admin/institucional";
     }
 
     // Guarda o actualiza promociones visuales.
     @PostMapping("/admin/promociones/guardar")
     public String guardarPromocion(@ModelAttribute Promocion promocion,
-            @RequestParam("imagenArchivo") MultipartFile imagenArchivo)
+            @RequestParam("imagenArchivo") MultipartFile imagenArchivo,
+            RedirectAttributes redirectAttributes)
             throws IOException {
 
         promocionService.guardarPromocion(promocion, imagenArchivo);
-        return "redirect:/admin/institucional";
+        redirectAttributes.addFlashAttribute("toastMensaje", "Promocion guardada correctamente.");
+        return "redirect:/admin/institucional#promociones";
     }
 
     // Carga una promocion en el formulario para editarla.
@@ -261,15 +284,17 @@ public class AdminController {
 
     // Desactiva una promocion para ocultarla al cliente.
     @GetMapping("/admin/promociones/desactivar/{id}")
-    public String desactivarPromocion(@PathVariable Long id) {
+    public String desactivarPromocion(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         promocionService.cambiarEstado(id, "INACTIVA");
-        return "redirect:/admin/institucional";
+        redirectAttributes.addFlashAttribute("toastMensaje", "Promocion desactivada.");
+        return "redirect:/admin/institucional#promociones";
     }
 
     // Activa una promocion para mostrarla al cliente.
     @GetMapping("/admin/promociones/activar/{id}")
-    public String activarPromocion(@PathVariable Long id) {
+    public String activarPromocion(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         promocionService.cambiarEstado(id, "ACTIVA");
-        return "redirect:/admin/institucional";
+        redirectAttributes.addFlashAttribute("toastMensaje", "Promocion activada.");
+        return "redirect:/admin/institucional#promociones";
     }
 }

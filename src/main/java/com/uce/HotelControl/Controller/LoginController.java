@@ -2,13 +2,13 @@ package com.uce.HotelControl.Controller;
 
 import com.uce.HotelControl.Model.Usuario;
 import com.uce.HotelControl.Service.UsuarioService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class LoginController {
@@ -16,15 +16,54 @@ public class LoginController {
     @Autowired
     private UsuarioService usuarioService;
 
-    // Redirige la ruta principal hacia la pantalla de login.
+    // Devuelve la pagina principal del usuario segun su rol.
+    private String redirigirSegunRol(Usuario usuario) {
+        if (usuario == null) {
+            return null;
+        }
+
+        if (usuario.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
+            if (Boolean.TRUE.equals(usuario.getRequiereCambioPassword())) {
+                return "redirect:/cambiar-password-inicial";
+            }
+
+            return "redirect:/admin/panel";
+        }
+
+        if (usuario.getRol().equalsIgnoreCase("RECEPCIONISTA")) {
+            return "redirect:/recepcion/panel";
+        }
+
+        if (usuario.getRol().equalsIgnoreCase("CLIENTE")) {
+            return "redirect:/cliente/inicio";
+        }
+
+        return null;
+    }
+
+    // Redirige la ruta principal segun la sesion activa.
     @GetMapping("/")
-    public String inicio() {
+    public String inicio(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        String destino = redirigirSegunRol(usuario);
+
+        if (destino != null) {
+            return destino;
+        }
+
         return "redirect:/login";
     }
 
-    // Muestra la pantalla de inicio de sesión.
+    // Muestra el login solo si no existe una sesion activa.
     @GetMapping("/login")
-    public String mostrarLogin() {
+    public String mostrarLogin(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        String destino = redirigirSegunRol(usuario);
+
+        if (destino != null) {
+            return destino;
+        }
+
         return "login";
     }
 
@@ -35,25 +74,24 @@ public class LoginController {
         return "registro_cliente";
     }
 
-    // Procesa el registro del cliente.
-    // Valida usuario repetido, contraseña mínima y teléfono mínimo antes de guardar.
+    // Procesa el registro del cliente con validaciones basicas.
     @PostMapping("/registro")
     public String procesarRegistro(Usuario nuevoUsuario, Model model) {
 
         boolean hayErrores = false;
 
         if (usuarioService.existeNombreUsuario(nuevoUsuario.getNombreUsuario())) {
-            model.addAttribute("errorUsuario", "Este nombre de usuario ya está registrado.");
+            model.addAttribute("errorUsuario", "Este nombre de usuario ya esta registrado.");
             hayErrores = true;
         }
 
         if (nuevoUsuario.getPasswordHash() == null || nuevoUsuario.getPasswordHash().length() < 6) {
-            model.addAttribute("errorPassword", "La contraseña debe tener mínimo 6 caracteres.");
+            model.addAttribute("errorPassword", "La contrasena debe tener minimo 6 caracteres.");
             hayErrores = true;
         }
 
         if (nuevoUsuario.getTelefono() == null || nuevoUsuario.getTelefono().length() < 10) {
-            model.addAttribute("errorTelefono", "El teléfono debe tener mínimo 10 caracteres.");
+            model.addAttribute("errorTelefono", "El telefono debe tener minimo 10 caracteres.");
             hayErrores = true;
         }
 
@@ -66,7 +104,7 @@ public class LoginController {
         return "redirect:/login";
     }
 
-    // Procesa el inicio de sesion y redirige segun el rol del usuario.
+    // Procesa el inicio de sesion y redirige segun el rol.
     @PostMapping("/login")
     public String procesarLogin(Usuario usuario, Model model, HttpServletRequest request) {
         Usuario auth = usuarioService.validarLogin(
@@ -75,11 +113,10 @@ public class LoginController {
         );
 
         if (auth == null) {
-            model.addAttribute("error", "Usuario o contraseña incorrectos");
+            model.addAttribute("error", "Usuario o contrasena incorrectos");
             return "login";
         }
 
-        // Limpia cualquier sesion anterior para evitar datos mezclados entre roles.
         HttpSession sesionAnterior = request.getSession(false);
         if (sesionAnterior != null) {
             sesionAnterior.invalidate();
@@ -89,27 +126,17 @@ public class LoginController {
         session.setAttribute("usuarioLogueado", auth);
         session.setMaxInactiveInterval(30 * 60);
 
-        if (auth.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
-            if (Boolean.TRUE.equals(auth.getRequiereCambioPassword())) {
-                return "redirect:/cambiar-password-inicial";
-            }
+        String destino = redirigirSegunRol(auth);
 
-            return "redirect:/admin/panel";
-        }
-
-        if (auth.getRol().equalsIgnoreCase("RECEPCIONISTA")) {
-            return "redirect:/recepcion/panel";
-        }
-
-        if (auth.getRol().equalsIgnoreCase("CLIENTE")) {
-            return "redirect:/cliente/inicio";
+        if (destino != null) {
+            return destino;
         }
 
         model.addAttribute("error", "Rol no reconocido");
         return "login";
     }
-    // Muestra la pantalla para cambiar la contraseña inicial del administrador.
-    // Solo entra aquí si el usuario es administrador y requiere cambiar contraseña.
+
+    // Muestra la pantalla para cambiar la contrasena inicial del administrador.
     @GetMapping("/cambiar-password-inicial")
     public String mostrarCambioPasswordInicial(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
@@ -129,8 +156,7 @@ public class LoginController {
         return "cambiar_password_inicial";
     }
 
-    // Procesa el cambio de contraseña inicial del administrador.
-    // Valida contraseña actual, longitud mínima y confirmación de contraseña.
+    // Procesa el cambio de contrasena inicial del administrador.
     @PostMapping("/cambiar-password-inicial")
     public String cambiarPasswordInicial(String passwordActual,
                                           String nuevaPassword,
@@ -145,17 +171,17 @@ public class LoginController {
         }
 
         if (!usuario.getPasswordHash().equals(passwordActual)) {
-            model.addAttribute("errorActual", "La contraseña actual no es correcta.");
+            model.addAttribute("errorActual", "La contrasena actual no es correcta.");
             return "cambiar_password_inicial";
         }
 
         if (nuevaPassword == null || nuevaPassword.length() < 6) {
-            model.addAttribute("errorNueva", "La nueva contraseña debe tener mínimo 6 caracteres.");
+            model.addAttribute("errorNueva", "La nueva contrasena debe tener minimo 6 caracteres.");
             return "cambiar_password_inicial";
         }
 
         if (!nuevaPassword.equals(confirmarPassword)) {
-            model.addAttribute("errorConfirmar", "Las contraseñas no coinciden.");
+            model.addAttribute("errorConfirmar", "Las contrasenas no coinciden.");
             return "cambiar_password_inicial";
         }
 
@@ -165,8 +191,7 @@ public class LoginController {
         return "redirect:/admin/panel";
     }
 
-    // Cierra la sesión del usuario.
-    // Borra los datos guardados en sesión y retorna al login.
+    // Cierra la sesion del usuario y retorna al login.
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();

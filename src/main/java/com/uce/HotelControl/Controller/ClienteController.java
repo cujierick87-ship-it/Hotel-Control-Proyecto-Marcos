@@ -7,15 +7,18 @@ import com.uce.HotelControl.Service.HabitacionService;
 import com.uce.HotelControl.Service.ReservaService;
 import com.uce.HotelControl.Service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.uce.HotelControl.Service.InformacionHotelService;
 import com.uce.HotelControl.Service.PromocionService;
@@ -57,14 +60,38 @@ public class ClienteController {
     // Muestra el panel principal del cliente.
     // Solo permite entrar si existe una sesión activa de cliente.
     @GetMapping("/cliente/inicio")
-    public String inicioCliente(Model model, HttpSession session) {
+    public String inicioCliente(Model model, HttpSession session,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaSalida,
+            @RequestParam(required = false) String tipo) {
         Usuario cliente = obtenerClienteSesion(session);
 
         if (cliente == null) {
             return "redirect:/login?sesion=expirada";
         }
 
-        model.addAttribute("habitaciones", habitacionService.obtenerHabitacionesDisponibles());
+        List<Habitacion> habitaciones;
+        boolean filtroAplicado = false;
+
+        if (fechaInicio != null && fechaSalida != null && fechaSalida.isAfter(fechaInicio)) {
+            habitaciones = habitacionService.buscarHabitacionesLibresPorFechas(fechaInicio, fechaSalida);
+            filtroAplicado = true;
+        } else {
+            habitaciones = habitacionService.obtenerHabitacionesDisponibles();
+        }
+
+        if (tipo != null && !tipo.trim().isEmpty()) {
+            habitaciones = habitaciones.stream()
+                    .filter(h -> h.getTipo() != null && h.getTipo().equalsIgnoreCase(tipo.trim()))
+                    .collect(Collectors.toList());
+            filtroAplicado = true;
+        }
+
+        model.addAttribute("habitaciones", habitaciones);
+        model.addAttribute("fechaInicio", fechaInicio);
+        model.addAttribute("fechaSalida", fechaSalida);
+        model.addAttribute("tipoSeleccionado", tipo);
+        model.addAttribute("filtroAplicado", filtroAplicado);
         return "inicio_cliente";
     }
 
@@ -88,11 +115,7 @@ public class ClienteController {
             return "redirect:/cliente/inicio";
         }
 
-        List<Reserva> reservasHabitacion = reservaService.obtenerTodasLasReservas()
-                .stream()
-                .filter(r -> r.getHabitacion().getIdHabitacion().equals(id))
-                .filter(r -> !"CANCELADA".equalsIgnoreCase(r.getEstado()))
-                .collect(Collectors.toList());
+        List<Reserva> reservasHabitacion = reservaService.buscarReservasActivasPorHabitacion(id);
 
         model.addAttribute("habitacion", habitacion);
         model.addAttribute("reservas", reservasHabitacion);
@@ -120,11 +143,7 @@ public class ClienteController {
             return "redirect:/cliente/inicio";
         }
 
-        List<Reserva> reservasHabitacion = reservaService.obtenerTodasLasReservas()
-                .stream()
-                .filter(r -> r.getHabitacion().getIdHabitacion().equals(id))
-                .filter(r -> !"CANCELADA".equalsIgnoreCase(r.getEstado()))
-                .collect(Collectors.toList());
+        List<Reserva> reservasHabitacion = reservaService.buscarReservasActivasPorHabitacion(id);
 
         model.addAttribute("habitacion", habitacion);
         model.addAttribute("nuevaReserva", new Reserva());
@@ -136,7 +155,8 @@ public class ClienteController {
     // Guarda la reserva del cliente.
     // Toma automáticamente los datos personales desde la cuenta registrada.
     @PostMapping("/cliente/reserva/guardar")
-    public String guardarReserva(Reserva reserva, @RequestParam("idHab") Long idHab, HttpSession session) {
+    public String guardarReserva(Reserva reserva, @RequestParam("idHab") Long idHab,
+            HttpSession session, RedirectAttributes redirectAttributes) {
         Usuario cliente = obtenerClienteSesion(session);
 
         if (cliente == null) {
@@ -163,9 +183,11 @@ public class ClienteController {
         Reserva reservaGuardada = reservaService.guardarReserva(reserva);
 
         if (reservaGuardada == null) {
+            redirectAttributes.addFlashAttribute("toastMensaje", "No se pudo registrar la reserva. Revise la disponibilidad.");
             return "redirect:/cliente/inicio";
         }
 
+        redirectAttributes.addFlashAttribute("toastMensaje", "Reserva confirmada correctamente. Revise su comprobante.");
         return "redirect:/cliente/comprobante/" + reservaGuardada.getIdReserva();
     }
 

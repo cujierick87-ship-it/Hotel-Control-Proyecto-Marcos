@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class RecepcionController {
@@ -49,17 +50,20 @@ public class RecepcionController {
     // Procesa las acciones de recepción sobre una reserva.
     // Permite realizar CHECK-IN, CHECK-OUT o CANCELAR.
     @GetMapping("/recepcion/reservas/accion/{accion}/{id}")
-    public String accionReserva(@PathVariable String accion, @PathVariable Long id) {
+    public String accionReserva(@PathVariable String accion, @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
         reservaService.procesarAccionRecepcion(id, accion);
-        return "redirect:/recepcion/panel";
+        redirectAttributes.addFlashAttribute("toastMensaje", "Reserva actualizada correctamente.");
+        return "redirect:/recepcion/panel#reservas";
     }
 
     // Cambia una habitación de LIMPIEZA a DISPONIBLE.
     // Se usa cuando recepción confirma que la habitación ya fue limpiada.
     @GetMapping("/recepcion/habitaciones/limpiar/{id}")
-    public String limpiarHabitacion(@PathVariable Long id) {
+    public String limpiarHabitacion(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         habitacionService.marcarComoLimpia(id);
-        return "redirect:/recepcion/panel";
+        redirectAttributes.addFlashAttribute("toastMensaje", "Habitacion marcada como disponible.");
+        return "redirect:/recepcion/panel#limpieza";
     }
 
     // Muestra el formulario para enviar una solicitud, queja o comentario al administrador.
@@ -72,7 +76,8 @@ public class RecepcionController {
     // Guarda la solicitud enviada por recepción.
     // Si existe usuario en sesión, guarda el nombre del recepcionista.
     @PostMapping("/recepcion/solicitud/guardar")
-    public String guardarSolicitud(SolicitudRecepcion solicitud, HttpSession session) {
+    public String guardarSolicitud(SolicitudRecepcion solicitud, HttpSession session,
+            RedirectAttributes redirectAttributes) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
 
         if (usuario != null) {
@@ -88,6 +93,7 @@ public class RecepcionController {
         }
 
         solicitudRecepcionService.guardarSolicitud(solicitud);
+        redirectAttributes.addFlashAttribute("toastMensaje", "Solicitud enviada al administrador.");
         return "redirect:/recepcion/panel";
     }
 
@@ -114,7 +120,8 @@ public class RecepcionController {
     @PostMapping("/recepcion/reserva-presencial/guardar")
     public String guardarReservaPresencial(Reserva reserva,
             @RequestParam("idHabitacion") Long idHabitacion,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
         Reserva guardada = reservaService.registrarReservaPresencial(reserva, idHabitacion);
 
@@ -126,6 +133,7 @@ public class RecepcionController {
             return "reserva_presencial_recepcion";
         }
 
+        redirectAttributes.addFlashAttribute("toastMensaje", "Reserva presencial registrada correctamente.");
         return "redirect:/recepcion/panel";
     }
 }

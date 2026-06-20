@@ -20,8 +20,16 @@ public class Habitacion {
     private String numero;
     private String tipo;
     private Integer capacidad;
+    private Integer cantidadCamas;
+    private String tipoCama;
     private Double precioNoche;
     private String descripcion;
+
+    @Column(columnDefinition = "TEXT")
+    private String serviciosIncluidos;
+
+    @Column(columnDefinition = "TEXT")
+    private String caracteristicas;
 
     
     @Column(columnDefinition = "TEXT")
@@ -74,6 +82,22 @@ public class Habitacion {
         this.capacidad = capacidad;
     }
 
+    public Integer getCantidadCamas() {
+        return cantidadCamas;
+    }
+
+    public void setCantidadCamas(Integer cantidadCamas) {
+        this.cantidadCamas = cantidadCamas;
+    }
+
+    public String getTipoCama() {
+        return tipoCama;
+    }
+
+    public void setTipoCama(String tipoCama) {
+        this.tipoCama = tipoCama;
+    }
+
     public Double getPrecioNoche() {
         return precioNoche;
     }
@@ -88,6 +112,22 @@ public class Habitacion {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public String getServiciosIncluidos() {
+        return serviciosIncluidos;
+    }
+
+    public void setServiciosIncluidos(String serviciosIncluidos) {
+        this.serviciosIncluidos = serviciosIncluidos;
+    }
+
+    public String getCaracteristicas() {
+        return caracteristicas;
+    }
+
+    public void setCaracteristicas(String caracteristicas) {
+        this.caracteristicas = caracteristicas;
     }
 
     public String getImagen() {
