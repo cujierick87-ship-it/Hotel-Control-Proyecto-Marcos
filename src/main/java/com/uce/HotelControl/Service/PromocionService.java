@@ -15,18 +15,22 @@ public class PromocionService {
     @Autowired
     private PromocionRepository promocionRepository;
 
+    // Obtiene todas las promociones para administracion.
     public List<Promocion> obtenerTodas() {
         return promocionRepository.findAll();
     }
 
+    // Obtiene solo promociones activas para clientes.
     public List<Promocion> obtenerActivas() {
         return promocionRepository.findByEstado("ACTIVA");
     }
 
+    // Busca una promocion por ID para editarla.
     public Promocion obtenerPorId(Long id) {
         return promocionRepository.findById(id).orElse(new Promocion());
     }
 
+    // Guarda la promocion y conserva la imagen anterior si no se sube una nueva.
     public void guardarPromocion(Promocion promocion, MultipartFile imagenArchivo)
             throws IOException {
 
@@ -53,6 +57,7 @@ public class PromocionService {
         promocionRepository.save(promocion);
     }
 
+    // Cambia el estado de una promocion entre ACTIVA e INACTIVA.
     public void cambiarEstado(Long id, String estado) {
         Promocion promocion = promocionRepository.findById(id).orElse(null);
 

@@ -153,6 +153,7 @@ public class AdminController {
         return "redirect:/admin/solicitudes";
     }
 
+    // Muestra metricas generales de reservas, ingresos y ocupacion.
     @GetMapping("/admin/dashboard")
     public String dashboardAdmin(Model model) {
         int disponibles = habitacionService.contarPorEstado("DISPONIBLE");
@@ -181,6 +182,7 @@ public class AdminController {
         return "dashboard_admin";
     }
 
+    // Muestra el reporte general de reservas e ingresos.
     @GetMapping("/admin/reportes")
     public String mostrarReportes(Model model) {
         model.addAttribute("reservas", reservaService.obtenerTodasLasReservas());
@@ -188,6 +190,7 @@ public class AdminController {
         return "reporte_admin";
     }
 
+    // Filtra reservas e ingresos por rango de fechas.
     @PostMapping("/admin/reportes/buscar")
     public String buscarReporte(LocalDate fechaInicio, LocalDate fechaFin, Model model) {
         model.addAttribute("reservas", reservaService.buscarReservasPorRango(fechaInicio, fechaFin));
@@ -198,6 +201,7 @@ public class AdminController {
         return "reporte_admin";
     }
 
+    // Lista clientes que han realizado reservas.
     @GetMapping("/admin/clientes")
     public String clientesConReservas(Model model) {
         model.addAttribute("clientes", reservaService.obtenerClientesConReservas());
@@ -205,6 +209,7 @@ public class AdminController {
         return "clientes_admin";
     }
 
+    // Busca reservas de un cliente por cedula.
     @PostMapping("/admin/clientes/buscar")
     public String buscarClienteReservas(String cedula, Model model) {
         model.addAttribute("clientes", reservaService.obtenerClientesConReservas());
@@ -214,6 +219,7 @@ public class AdminController {
         return "clientes_admin";
     }
 
+    // Muestra el modulo de informacion institucional y promociones.
     @GetMapping("/admin/institucional")
     public String panelInstitucional(Model model) {
         model.addAttribute("informacionHotel", informacionHotelService.obtenerInformacion());
@@ -223,6 +229,7 @@ public class AdminController {
         return "admin_institucional";
     }
 
+    // Guarda datos generales del hotel y su logo.
     @PostMapping("/admin/institucional/guardar-info")
     public String guardarInformacionHotel(@ModelAttribute InformacionHotel informacionHotel,
             @RequestParam("logoArchivo") MultipartFile logoArchivo)
@@ -232,6 +239,7 @@ public class AdminController {
         return "redirect:/admin/institucional";
     }
 
+    // Guarda o actualiza promociones visuales.
     @PostMapping("/admin/promociones/guardar")
     public String guardarPromocion(@ModelAttribute Promocion promocion,
             @RequestParam("imagenArchivo") MultipartFile imagenArchivo)
@@ -241,6 +249,7 @@ public class AdminController {
         return "redirect:/admin/institucional";
     }
 
+    // Carga una promocion en el formulario para editarla.
     @GetMapping("/admin/promociones/editar/{id}")
     public String editarPromocion(@PathVariable Long id, Model model) {
         model.addAttribute("informacionHotel", informacionHotelService.obtenerInformacion());
@@ -250,12 +259,14 @@ public class AdminController {
         return "admin_institucional";
     }
 
+    // Desactiva una promocion para ocultarla al cliente.
     @GetMapping("/admin/promociones/desactivar/{id}")
     public String desactivarPromocion(@PathVariable Long id) {
         promocionService.cambiarEstado(id, "INACTIVA");
         return "redirect:/admin/institucional";
     }
 
+    // Activa una promocion para mostrarla al cliente.
     @GetMapping("/admin/promociones/activar/{id}")
     public String activarPromocion(@PathVariable Long id) {
         promocionService.cambiarEstado(id, "ACTIVA");

@@ -7,7 +7,6 @@ import com.uce.HotelControl.Repository.ReservaRepository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,7 @@ public class HabitacionService {
 
     // Busca habitaciones libres en un rango de fechas.
     // Descarta habitaciones en mantenimiento y revisa cruces con reservas existentes.
-    public List<Habitacion> buscarHabitacionesLibresPorFechas(LocalDate  checkIn, LocalDate  checkOut) {
+    public List<Habitacion> buscarHabitacionesLibresPorFechas(LocalDate checkIn, LocalDate checkOut) {
         List<Habitacion> todas = habitacionRepository.findAll();
         List<Habitacion> disponibles = new ArrayList<>();
 
@@ -41,10 +40,10 @@ public class HabitacionService {
             if (choques.isEmpty()) {
                 disponibles.add(hab);
             }
-        }   
+        }
         return disponibles;
     }
-    
+
     // Obtiene habitaciones con estado DISPONIBLE.
     // Se usa para mostrar habitaciones disponibles en el catálogo del cliente.
     public List<Habitacion> obtenerHabitacionesDisponibles() {
@@ -141,8 +140,9 @@ public class HabitacionService {
             habitacionRepository.save(habitacion);
         }
     }
-    
+
+    // Cuenta habitaciones por estado para el dashboard administrativo.
     public int contarPorEstado(String estado) {
-    return habitacionRepository.findByEstado(estado).size();
-}
+        return habitacionRepository.findByEstado(estado).size();
+    }
 }

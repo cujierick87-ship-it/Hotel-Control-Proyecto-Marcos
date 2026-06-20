@@ -23,7 +23,7 @@ public class SolicitudRecepcionService {
     }
 
     // Cambia el estado de una solicitud a REVISADO.
-// Se usa cuando el administrador ya leyó o atendió la solicitud.
+    // Se usa cuando el administrador ya leyó o atendió la solicitud.
     public void marcarComoRevisado(Long idSolicitud) {
         SolicitudRecepcion solicitud = solicitudRecepcionRepository.findById(idSolicitud).orElse(null);
 

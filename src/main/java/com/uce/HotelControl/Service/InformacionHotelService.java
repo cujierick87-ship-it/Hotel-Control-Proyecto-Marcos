@@ -15,6 +15,7 @@ public class InformacionHotelService {
     @Autowired
     private InformacionHotelRepository informacionHotelRepository;
 
+    // Obtiene la informacion principal del hotel o crea valores por defecto.
     public InformacionHotel obtenerInformacion() {
         List<InformacionHotel> lista = informacionHotelRepository.findAll();
 
@@ -32,6 +33,7 @@ public class InformacionHotelService {
         return info;
     }
 
+    // Guarda datos institucionales y conserva el logo si no se sube uno nuevo.
     public void guardarInformacion(InformacionHotel informacion, MultipartFile logoArchivo)
             throws IOException {
 

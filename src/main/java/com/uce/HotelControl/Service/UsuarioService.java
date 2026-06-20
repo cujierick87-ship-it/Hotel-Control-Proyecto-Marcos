@@ -100,7 +100,7 @@ public class UsuarioService {
     }
 
     // Actualiza los datos personales del cliente.
-// No cambia el nombre de usuario para evitar problemas con usuarios repetidos.
+    // No cambia el nombre de usuario para evitar problemas con usuarios repetidos.
     public Usuario actualizarPerfilCliente(Long idUsuario, Usuario datosPerfil) {
         Usuario usuario = usuarioRepository.findById(idUsuario).orElse(null);
 

@@ -264,6 +264,7 @@ public class ClienteController {
         return "perfil_cliente";
     }
 
+    // Muestra informacion institucional y promociones activas al cliente.
     @GetMapping("/cliente/informacion")
     public String verInformacionHotel(Model model, HttpSession session) {
         Usuario cliente = obtenerClienteSesion(session);

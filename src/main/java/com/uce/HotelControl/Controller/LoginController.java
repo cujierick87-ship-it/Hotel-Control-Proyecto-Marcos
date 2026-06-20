@@ -66,53 +66,48 @@ public class LoginController {
         return "redirect:/login";
     }
 
-// Procesa el inicio de sesión.
-// Si las credenciales son correctas, crea una sesión limpia y guarda el usuario logueado.
-@PostMapping("/login")
-public String procesarLogin(Usuario usuario, Model model, HttpServletRequest request) {
-    Usuario auth = usuarioService.validarLogin(
-            usuario.getNombreUsuario(),
-            usuario.getPasswordHash()
-    );
+    // Procesa el inicio de sesion y redirige segun el rol del usuario.
+    @PostMapping("/login")
+    public String procesarLogin(Usuario usuario, Model model, HttpServletRequest request) {
+        Usuario auth = usuarioService.validarLogin(
+                usuario.getNombreUsuario(),
+                usuario.getPasswordHash()
+        );
 
-    if (auth == null) {
-        model.addAttribute("error", "Usuario o contraseña incorrectos");
-        return "login";
-    }
-
-    // Se invalida cualquier sesión anterior para evitar datos mezclados entre roles.
-    HttpSession sesionAnterior = request.getSession(false);
-    if (sesionAnterior != null) {
-        sesionAnterior.invalidate();
-    }
-
-    // Se crea una sesión nueva y limpia para el usuario actual.
-    HttpSession session = request.getSession(true);
-    session.setAttribute("usuarioLogueado", auth);
-
-    // Tiempo de sesión: 30 minutos.
-    session.setMaxInactiveInterval(30 * 60);
-
-    if (auth.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
-        if (Boolean.TRUE.equals(auth.getRequiereCambioPassword())) {
-            return "redirect:/cambiar-password-inicial";
+        if (auth == null) {
+            model.addAttribute("error", "Usuario o contraseña incorrectos");
+            return "login";
         }
 
-        return "redirect:/admin/panel";
+        // Limpia cualquier sesion anterior para evitar datos mezclados entre roles.
+        HttpSession sesionAnterior = request.getSession(false);
+        if (sesionAnterior != null) {
+            sesionAnterior.invalidate();
+        }
+
+        HttpSession session = request.getSession(true);
+        session.setAttribute("usuarioLogueado", auth);
+        session.setMaxInactiveInterval(30 * 60);
+
+        if (auth.getRol().equalsIgnoreCase("ADMINISTRADOR")) {
+            if (Boolean.TRUE.equals(auth.getRequiereCambioPassword())) {
+                return "redirect:/cambiar-password-inicial";
+            }
+
+            return "redirect:/admin/panel";
+        }
+
+        if (auth.getRol().equalsIgnoreCase("RECEPCIONISTA")) {
+            return "redirect:/recepcion/panel";
+        }
+
+        if (auth.getRol().equalsIgnoreCase("CLIENTE")) {
+            return "redirect:/cliente/inicio";
+        }
+
+        model.addAttribute("error", "Rol no reconocido");
+        return "login";
     }
-
-    if (auth.getRol().equalsIgnoreCase("RECEPCIONISTA")) {
-        return "redirect:/recepcion/panel";
-    }
-
-    if (auth.getRol().equalsIgnoreCase("CLIENTE")) {
-        return "redirect:/cliente/inicio";
-    }
-
-    model.addAttribute("error", "Rol no reconocido");
-    return "login";
-}
-
     // Muestra la pantalla para cambiar la contraseña inicial del administrador.
     // Solo entra aquí si el usuario es administrador y requiere cambiar contraseña.
     @GetMapping("/cambiar-password-inicial")

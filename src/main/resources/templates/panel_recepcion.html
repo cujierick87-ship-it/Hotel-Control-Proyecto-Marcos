@@ -4,363 +4,79 @@
     <head>
         <meta charset="UTF-8">
         <title>Módulo Recepción</title>
-
-        ```
-        <style>
-            *{
-                box-sizing:border-box;
-                margin:0;
-                padding:0;
-                font-family:'Segoe UI',sans-serif
-            }
-            html,body{
-                width:100%;
-                min-height:100vh;
-                overflow-x:hidden;
-                background:#f3f4f6;
-                color:#1f2937
-            }
-
-            .sidebar{
-                position:fixed;
-                top:0;
-                left:0;
-                bottom:0;
-                width:260px;
-                background:#1e293b;
-                color:white
-            }
-            .sidebar h2{
-                padding:20px;
-                color:#fbbf24;
-                font-size:20px
-            }
-            .sidebar button,.sidebar a{
-                width:100%;
-                display:block;
-                padding:15px 20px;
-                background:none;
-                border:0;
-                color:#cbd5e1;
-                text-align:left;
-                font-size:15px;
-                cursor:pointer;
-                text-decoration:none
-            }
-            .sidebar button:hover,.sidebar a:hover,.sidebar button.activo{
-                background:#0f172a;
-                color:white;
-                border-left:4px solid #fbbf24
-            }
-
-            .main{
-                margin-left:260px;
-                width:calc(100% - 260px);
-                min-height:100vh
-            }
-            .topbar{
-                background:white;
-                padding:15px 30px;
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-                border-bottom:1px solid #e5e7eb
-            }
-            .topbar h2{
-                color:#1e293b;
-                font-size:20px
-            }
-            .logout{
-                color:#ef4444;
-                text-decoration:none;
-                font-weight:bold
-            }
-
-            .content{
-                padding:30px;
-                max-width:1300px;
-                margin:auto
-            }
-            .card{
-                background:white;
-                padding:25px;
-                border-radius:8px;
-                box-shadow:0 2px 6px #0002
-            }
-            h3{
-                border-bottom:1px solid #e5e7eb;
-                padding-bottom:10px;
-                margin-bottom:15px;
-                color:#1e293b
-            }
-
-            .seccion{
-                display:none
-            }
-            .seccion.activa{
-                display:block
-            }
-
-            .grid-cuartos{
-                display:flex;
-                flex-wrap:wrap;
-                gap:15px
-            }
-            .cuarto{
-                width:160px;
-                padding:18px;
-                border-radius:6px;
-                text-align:center;
-                color:white;
-                font-weight:bold
-            }
-            .cuarto small{
-                display:block;
-                margin-top:6px
-            }
-            .estado-DISPONIBLE{
-                background:#10b981
-            }
-            .estado-OCUPADA{
-                background:#ef4444
-            }
-            .estado-LIMPIEZA{
-                background:#f59e0b
-            }
-            .estado-MANTENIMIENTO{
-                background:#6b7280
-            }
-
-            .btn-limpiar{
-                display:block;
-                margin-top:10px;
-                background:white;
-                color:#1f2937;
-                padding:6px;
-                border-radius:4px;
-                text-decoration:none;
-                font-size:12px
-            }
-
-            .buscador{
-                display:flex;
-                gap:10px;
-                margin-bottom:15px;
-                flex-wrap:wrap
-            }
-            .buscador input{
-                width:300px;
-                padding:10px;
-                border:1px solid #d1d5db;
-                border-radius:5px
-            }
-            .buscador button,.btn-ver,.btn-presencial{
-                padding:10px 15px;
-                border:0;
-                border-radius:5px;
-                text-decoration:none;
-                cursor:pointer;
-                font-size:14px
-            }
-            .buscador button{
-                background:#1e293b;
-                color:white
-            }
-            .btn-ver{
-                background:#e5e7eb;
-                color:#374151
-            }
-            .btn-presencial{
-                background:#10b981;
-                color:white
-            }
-
-            table{
-                width:100%;
-                border-collapse:collapse
-            }
-            th,td{
-                padding:10px;
-                border-bottom:1px solid #e5e7eb;
-                text-align:left;
-                font-size:14px
-            }
-            th{
-                background:#f9fafb;
-                color:#6b7280
-            }
-            .estado-texto,.texto-finalizado{
-                font-weight:bold
-            }
-            .texto-finalizado{
-                color:#6b7280;
-                font-size:13px
-            }
-
-            .btn-accion{
-                display:inline-block;
-                padding:7px 12px;
-                border-radius:5px;
-                color:white;
-                text-decoration:none;
-                font-size:13px;
-                margin:0 5px 5px 0
-            }
-            .green{
-                background:#10b981
-            }
-            .gray{
-                background:#6b7280
-            }
-            .red{
-                background:#ef4444
-            }
-
-            dialog{
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                border: none;
-                border-radius: 10px;
-                padding: 25px;
-                width: 360px;
-                max-width: 90%;
-                text-align: center;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.35);
-            }
-            dialog::backdrop{
-                background: rgba(0,0,0,0.55);
-            }
-            .modal-btns{
-                display:flex;
-                justify-content:center;
-                gap:10px;
-                margin-top:20px
-            }
-            .btn-ok,.btn-cancelar{
-                padding:9px 15px;
-                border:0;
-                border-radius:5px;
-                cursor:pointer;
-                font-weight:bold
-            }
-            .btn-ok{
-                background:#10b981;
-                color:white
-            }
-            .btn-cancelar{
-                background:#e5e7eb;
-                color:#374151
-            }
-            .logo-menu{
-                padding:18px 20px;
-                color:#fbbf24;
-                display:flex;
-                align-items:center;
-                gap:10px;
-                font-weight:bold;
-                font-size:18px;
-            }
-
-            .logo-menu img{
-                width:38px;
-                height:38px;
-                object-fit:cover;
-                border-radius:6px;
-                background:white;
-            }
-
-            .logo-menu small{
-                display:block;
-                color:#cbd5e1;
-                font-size:12px;
-                margin-top:2px;
-            }
-        </style>
-        ```
-
-    </head>
+        <style>:root{--bg:#f6f7fb;--surface:#fff;--surface-soft:#f8fafc;--text:#172033;--muted:#667085;--line:#e4e7ec;--primary:#1f2937;--primary-dark:#111827;--accent:#2563eb;--accent-strong:#1d4ed8;--danger:#dc2626;--success:#059669;--warning:#d97706;--shadow:0 10px 24px rgba(16,24,40,.06)}*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif}html,body{min-height:100%;background:var(--bg);color:var(--text)}a{text-decoration:none;color:inherit}img{max-width:100%;display:block}h1,h2,h3,h4{color:var(--text);line-height:1.25}p{line-height:1.6;color:#475467}.navbar,.top{min-height:68px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);padding:14px 34px;display:flex;align-items:center;justify-content:space-between;gap:20px;position:sticky;top:0;z-index:20;box-shadow:0 1px 2px rgba(16,24,40,.04)}.brand,.navbar-brand,.top h2{display:flex;align-items:center;gap:10px;font-size:18px;font-weight:800;color:#111827!important}.brand img,.navbar-brand img,.top h2 img,.client-logo{width:36px!important;height:36px!important;object-fit:cover;border-radius:7px;background:white;border:1px solid var(--line);flex-shrink:0}.menu{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.menu a,.top a{color:#475467;font-weight:700;padding:8px 11px;border-radius:7px}.menu a:hover,.menu a.activo,.menu a.active,.top a:hover{background:#eff6ff;color:var(--accent)}.menu .salir,.logout{color:var(--danger)!important}body:has(.sidebar){display:flex;min-height:100vh}.sidebar{width:274px;min-height:100vh;background:#111827;color:white;flex-shrink:0;position:sticky;top:0;align-self:flex-start;border-right:1px solid #1f2937}.logo-menu{padding:20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;color:white;font-weight:800}.logo-menu img{width:40px!important;height:40px!important;object-fit:cover;border-radius:8px;background:white;flex-shrink:0}.logo-menu small{display:block;color:#9ca3af;font-size:12px;margin-top:2px;font-weight:600}.sidebar a,.sidebar button{width:100%;display:block;padding:12px 18px;background:transparent;border:0;border-left:3px solid transparent;color:#d1d5db;text-align:left;font-size:14px;font-weight:700;cursor:pointer}.sidebar a:hover,.sidebar button:hover,.sidebar .activo,.sidebar a.activo,.sidebar button.activo{background:#1f2937;color:white;border-left-color:var(--accent)}.side-section{padding:16px 18px;border-top:1px solid rgba(255,255,255,.08);margin-top:8px}.side-section h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:10px}.side-section p,.side-section span{color:#cbd5e1;font-size:13px;line-height:1.5}.side-metric{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)}.main{flex:1;min-width:0}.topbar{height:auto;min-height:72px;background:rgba(255,255,255,.96);border-bottom:1px solid var(--line);padding:16px 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;position:sticky;top:0;z-index:15;box-shadow:0 1px 2px rgba(16,24,40,.04)}.topbar h2{font-size:22px}.content{padding:30px;max-width:1320px;margin:0 auto;width:100%}.container,.contenedor{max-width:1160px;margin:28px auto;padding:0 22px}.container.card-like,.container:not(.plain){background:var(--surface);padding:28px;border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin-bottom:22px}.page-head h1,.page-head h2{font-size:30px;margin-bottom:6px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:800;margin-bottom:5px}.hero{background:white;border-bottom:1px solid var(--line);padding:30px 20px;text-align:center}.hero h1{font-size:30px;color:#111827;text-transform:none;margin-bottom:6px}.hero p{max-width:760px;margin:0 auto}.hero img.logo,.hero .logo,img.logo{width:68px!important;height:68px!important;object-fit:cover;border-radius:10px;margin:0 auto 12px;background:white;border:1px solid var(--line);box-shadow:var(--shadow)}.card,.tabla-card,.solicitud-card,.promo,.vacio{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}.card,.tabla-card{padding:22px;margin-bottom:20px}.card h3,.tabla-card h3{margin-bottom:16px}.card:hover,.promo:hover{box-shadow:0 12px 28px rgba(16,24,40,.08)}.grid,.info-grid,.promo-grid,.grid-cuartos,.form-grid,.layout,.solicitudes-grid{display:grid;gap:18px}.grid{grid-template-columns:repeat(auto-fit,minmax(245px,1fr))}.info-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.promo-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:minmax(0,1fr) minmax(340px,.75fr);align-items:start}.full,.full-width{grid-column:1 / -1}label{display:block;font-size:13px;font-weight:700;color:#344054;margin:14px 0 6px}input,select,textarea,.form-control{width:100%;padding:11px 12px;border:1px solid #d0d5dd;border-radius:7px;background:white;color:var(--text);font-size:14px;outline:none;transition:.18s}input:focus,select:focus,textarea:focus,.form-control:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}textarea{resize:vertical;min-height:96px}.toolbar,.buscador,form.buscador,.footer,.form-footer,.modal-btns{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.footer,.form-footer{justify-content:space-between;margin-top:18px}.buscador,.toolbar{margin-bottom:18px}.buscador input,.toolbar input{max-width:360px}.btn,button,.btn-accion,.btn-ver,.btn-presencial,.btn-revisado,.btn-reservar,.btn-volver{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;border:1px solid transparent;border-radius:7px;text-decoration:none;font-weight:800;cursor:pointer;font-size:14px;transition:.18s;background:var(--accent);color:white}.btn:hover,button:hover,.btn-accion:hover,.btn-ver:hover,.btn-presencial:hover,.btn-revisado:hover,.btn-reservar:hover{filter:brightness(.97);box-shadow:0 8px 18px rgba(37,99,235,.15)}.azul,.btn-blue,.btn-ok,.btn-revisado,.btn-reservar,.primary-action{background:var(--accent);color:white}.rojo,.btn-red,.red{background:var(--danger);color:white}.amarillo,.btn-presencial{background:#111827;color:white}.gris,.btn-ver,.gray,.btn-cancelar,.ghost{background:#f2f4f7!important;color:#344054!important;border-color:var(--line)!important}.verde,.green{background:var(--success);color:white}.volver,.btn-volver{color:#475467;background:transparent!important;border-color:transparent!important;padding-left:0}.table-wrap{width:100%;overflow:auto;border:1px solid var(--line);border-radius:8px;background:white}table{width:100%;min-width:820px;border-collapse:collapse;background:white}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;vertical-align:middle}th{background:#f9fafb;color:#667085;font-size:12px;text-transform:uppercase;letter-spacing:.04em}tr:hover td{background:#fcfcfd}.acciones a{margin-right:8px}.img-hab,.promo-img{width:90px;height:64px;object-fit:cover;border-radius:7px;background:#e5e7eb}.img-previa{width:140px;height:90px;object-fit:cover;border-radius:8px;margin-top:8px}.card-img,.foto{width:100%;object-fit:cover;border-radius:8px;background:#e5e7eb}.card-img{height:215px}.foto{height:320px;margin-bottom:16px}.room-card{overflow:hidden;padding:0}.room-card img{width:100%;height:215px;object-fit:cover}.room-card .info,.body,.info,.promo-body{padding:18px}.title{color:#111827;text-transform:none;margin-bottom:8px}.price,.precio{color:#111827;font-weight:900;font-size:20px;margin:12px 0}.desc,.texto{line-height:1.7;color:#475467}.features,.dato,.resumen-reserva{background:#f9fafb;border:1px solid var(--line);border-radius:8px;padding:14px}.features{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.right{border:1px solid var(--line);border-radius:8px;padding:22px;text-align:center;background:white;box-shadow:var(--shadow)}.right h3{margin-bottom:16px}.sin-imagen{height:190px;background:#f2f4f7;display:flex;align-items:center;justify-content:center;color:var(--muted)}.error,.mensaje-error{background:#fef2f2;color:#991b1b;padding:12px;border-radius:8px;margin-bottom:15px;text-align:center}.mensaje{background:#f0fdf4;color:#166534;border-left:4px solid var(--success);padding:12px;border-radius:6px;margin:12px 0}.vacio{padding:25px;text-align:center;color:var(--muted)}.grid-cuartos{display:flex;flex-wrap:wrap}.cuarto{width:165px;padding:18px;border-radius:8px;text-align:center;color:white;font-weight:800;box-shadow:var(--shadow)}.cuarto small{display:block;margin-top:6px}.estado-DISPONIBLE{background:#047857}.estado-OCUPADA{background:#b91c1c}.estado-LIMPIEZA{background:#b45309}.estado-MANTENIMIENTO{background:#475569}.btn-limpiar{display:block;margin-top:10px;background:white;color:#1f2937;padding:7px;border-radius:6px;text-decoration:none;font-size:12px}.seccion{display:none}.seccion.activa{display:block}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.mini-count,.pill,.room-meta span,.badge,.estado-texto{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#f2f4f7;border:1px solid var(--line);padding:6px 10px;font-size:12px;font-weight:800;color:#344054}.room-meta{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.solicitudes-grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}.solicitud-card{padding:18px}.solicitud-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.pendiente{background:#fffbeb;color:#92400e}.revisado{background:#ecfdf3;color:#047857}.meta{font-size:13px;color:var(--muted);margin-bottom:8px}.sin-accion{color:#15803d;font-weight:800;font-size:13px}.char-counter{text-align:right;font-size:12px;color:var(--muted);margin-top:6px}.hidden-filter{display:none!important}.auth-page,body:has(.login-card-combined),body:has(.register-card),body:has(.change-card),body:has(.container .logo){min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;background:#f3f4f6}.login-card-combined{width:min(980px,94vw);min-height:560px;background:white;border-radius:8px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;box-shadow:var(--shadow);border:1px solid var(--line)}.login-form-side{padding:46px;display:flex;flex-direction:column;justify-content:center}.login-image-side{background:url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=900&q=80') center/cover}.header-text{text-align:left;margin-bottom:24px}.header-text h1,.register-header h2{font-size:30px;color:#111827;margin-bottom:8px}.form-group{margin-bottom:16px}.btn-ingresar,.btn-register{width:100%;background:var(--accent);color:white;padding:12px;border-radius:7px;border:0;font-weight:900;margin-top:6px}.register-link,.register-footer a{display:block;text-align:center;margin-top:18px;color:var(--accent);font-weight:800}.error-msg,.session-msg{display:block;background:#fef2f2;color:#991b1b;border-radius:7px;padding:9px;margin:8px 0;font-size:13px}.session-msg{background:#eff6ff;color:#1d4ed8}.register-card,.change-card{width:min(620px,94vw);background:white;padding:34px;border-radius:8px;box-shadow:var(--shadow);border:1px solid var(--line)}.register-header{text-align:center;margin-bottom:22px}.register-header p{color:var(--muted)}.logo{font-size:28px;font-weight:900;color:#111827;margin-bottom:12px}.btn-group{display:flex;flex-direction:column;gap:14px;margin-top:22px}.btn-primary{background:var(--accent);color:white}.btn-secondary{background:white!important;color:var(--accent)!important;border:1px solid var(--accent)!important}.header-title{font-size:24px;color:#111827;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--line)}.estado-pendiente{background:#fffbeb;color:#92400e;padding:5px 9px;border-radius:6px;font-size:12px;font-weight:800}dialog{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);border:none;border-radius:8px;padding:26px;width:380px;max-width:90%;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.22)}dialog::backdrop{background:rgba(17,24,39,.55)}dialog h3{margin-bottom:12px}dialog p{margin-bottom:18px;color:#475467}.flatpickr-calendar{font-size:13px!important}.flatpickr-calendar.inline{width:100%!important;box-shadow:none!important;border:1px solid var(--line)}.flatpickr-innerContainer,.flatpickr-rContainer,.dayContainer,.flatpickr-days{width:100%!important}.flatpickr-day{height:34px!important;line-height:34px!important}.flatpickr-day.flatpickr-disabled,.flatpickr-day.prevMonthDay,.flatpickr-day.nextMonthDay{background-color:#fee2e2!important;color:#991b1b!important;border-color:white!important;border-radius:0!important;opacity:1!important}.flatpickr-day:not(.flatpickr-disabled):not(.prevMonthDay):not(.nextMonthDay){background-color:#dcfce7!important;color:#166534!important;border-color:white!important;border-radius:0!important}.flatpickr-day:not(.flatpickr-disabled):hover{background-color:#16a34a!important;color:white!important}.fecha-reservada{background:#dc2626!important;color:white!important;border-color:#dc2626!important}@media(max-width:900px){body:has(.sidebar){display:block}.sidebar{width:100%;min-height:auto;position:relative}.main{width:100%}.navbar,.top,.topbar{padding:14px 20px;flex-wrap:wrap}.content{padding:20px}.layout,.form-grid{grid-template-columns:1fr}.full,.full-width{grid-column:span 1}.footer,.form-footer{align-items:stretch}.btn-reservar{width:100%}.features{grid-template-columns:1fr}.page-head{display:block}.table-wrap table{min-width:720px}}@media(max-width:760px){.login-card-combined{grid-template-columns:1fr}.login-image-side{display:none}.login-form-side{padding:32px}}</style>
+</head>
 
     <body>
+    <aside class="sidebar">
+    <div class="logo-menu">
+        <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}" th:src="${hotelGlobal.logo}" alt="Logo">
+        <div>
+            <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+            <small>Recepción</small>
+        </div>
+    </div>
+    <button id="btnEstado" class="activo" onclick="mostrarSeccion('estado')">Estado de habitaciones</button>
+    <button id="btnReservas" onclick="mostrarSeccion('reservas')">Reservas y check-in/out</button>
+    <a href="/recepcion/reserva-presencial">Reserva presencial</a>
+    <a href="/recepcion/solicitud">Enviar solicitud</a>
+    <div class="side-section">
+        <h4>Atajos del turno</h4>
+        <p>Accede rápido al control diario de habitaciones, reservas presenciales y solicitudes para administración.</p>
+    </div>
+</aside>
 
-        <aside class="sidebar">
-            <div class="logo-menu">
-                <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}"
-                     th:src="${hotelGlobal.logo}"
-                     alt="Logo">
-
-                <div>
-                    <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
-                    <small>Recepción</small>
-                </div>
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Módulo operativo</p>
+                <h2>Panel de recepción</h2>
             </div>
-            ```
-            <button id="btnEstado" class="activo" onclick="mostrarSeccion('estado')">
-                🛏️ Estado de Habitaciones
-            </button>
+            <a href="/logout" class="logout">Cerrar sesión</a>
+        </header>
 
-            <button id="btnReservas" onclick="mostrarSeccion('reservas')">
-                📅 Reservas y Check-in/out
-            </button>
+        <section class="content">
+            <div class="page-head">
+                <div>
+                    <p class="eyebrow">Control diario</p>
+                    <h1>Recepción</h1>
+                    <p>Gestiona habitaciones, reservas, check-in, check-out y solicitudes al administrador.</p>
+                </div>
+                <a href="/recepcion/reserva-presencial" class="btn primary-action">Nueva reserva presencial</a>
+            </div>
 
-            <a href="/recepcion/reserva-presencial">➕ Reserva presencial</a>
-            <a href="/recepcion/solicitud">📨 Enviar solicitud</a>
-            ```
-
-        </aside>
-
-        <main class="main">
-
-            ```
-            <header class="topbar">
-                <h2>Módulo Operativo - Recepción</h2>
-                <a href="/logout" class="logout">Cerrar Sesión</a>
-            </header>
-
-            <section class="content">
-
-                <div id="seccionEstado" class="seccion activa">
-                    <div class="card">
-                        <h3>🛏️ Estado de Habitaciones en Vivo</h3>
-
-                        <div class="grid-cuartos">
-                            <div class="cuarto"
-                                 th:each="hab : ${habitaciones}"
-                                 th:classappend="' estado-' + ${hab.estado}">
-
-                                <div th:text="'Hab. ' + ${hab.numero}"></div>
-                                <small th:text="${hab.estado}"></small>
-
-                                <a th:if="${hab.estado == 'LIMPIEZA'}"
-                                   th:href="@{/recepcion/habitaciones/limpiar/{id}(id=${hab.idHabitacion})}"
-                                   class="btn-limpiar">
-                                    ✅ Marcar Limpia
-                                </a>
-                            </div>
+            <div id="seccionEstado" class="seccion activa">
+                <div class="card">
+                    <div class="section-head">
+                        <h3>Estado de habitaciones</h3>
+                        <span class="mini-count" th:text="${#lists.size(habitaciones)} + ' habitaciones'">0 habitaciones</span>
+                    </div>
+                    <div class="toolbar">
+                        <input type="text" id="filtroHabitaciones" placeholder="Filtrar por número o estado..." oninput="filtrarHabitaciones()">
+                    </div>
+                    <div class="grid-cuartos">
+                        <div class="cuarto" th:each="hab : ${habitaciones}" th:classappend="' estado-' + ${hab.estado}">
+                            <div th:text="'Hab. ' + ${hab.numero}"></div>
+                            <small th:text="${hab.estado}"></small>
+                            <a th:if="${hab.estado == 'LIMPIEZA'}" th:href="@{/recepcion/habitaciones/limpiar/{id}(id=${hab.idHabitacion})}" class="btn-limpiar">Marcar limpia</a>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div id="seccionReservas" class="seccion">
-                    <div class="card">
-                        <h3>📅 Gestión de Reservas y Check-in/out</h3>
-
-                        <form class="buscador" th:action="@{/recepcion/reservas/buscar}" method="post">
-                            <input type="text"
-                                   name="filtro"
-                                   placeholder="Buscar por código único o cédula..."
-                                   required>
-
-                            <button type="submit">🔍 Buscar</button>
-
-                            <a href="/recepcion/panel" class="btn-ver">Ver Todas</a>
-
-                            <a href="/recepcion/reserva-presencial" class="btn-presencial">
-                                ➕ Reserva presencial
-                            </a>
-                        </form>
-
+            <div id="seccionReservas" class="seccion">
+                <div class="card">
+                    <div class="section-head">
+                        <h3>Reservas y check-in/out</h3>
+                        <span class="mini-count" th:text="${#lists.size(reservas)} + ' reservas'">0 reservas</span>
+                    </div>
+                    <form class="buscador" th:action="@{/recepcion/reservas/buscar}" method="post">
+                        <input type="text" name="filtro" placeholder="Buscar por código único o cédula..." required>
+                        <button type="submit">Buscar</button>
+                        <a href="/recepcion/panel" class="btn-ver">Ver todas</a>
+                        <a href="/recepcion/reserva-presencial" class="btn-presencial">Reserva presencial</a>
+                    </form>
+                    <div class="table-wrap">
                         <table>
                             <thead>
                                 <tr>
@@ -376,7 +92,6 @@
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 <tr th:each="res : ${reservas}">
                                     <td th:text="'#' + ${res.idReserva}"></td>
@@ -386,43 +101,16 @@
                                     <td th:text="'Hab. ' + ${res.habitacion.numero}"></td>
                                     <td th:text="${res.fechaCheckIn}"></td>
                                     <td th:text="${res.fechaCheckOut}"></td>
-                                    <td>
-                                        <span class="estado-texto" th:text="${res.estado}"></span>
-                                    </td>
+                                    <td><span class="estado-texto" th:text="${res.estado}"></span></td>
                                     <td th:text="${res.notas}"></td>
-
                                     <td>
-                                        <a th:if="${res.estado == 'CONFIRMADA'}"
-                                           th:href="@{/recepcion/reservas/accion/CHECKIN/{id}(id=${res.idReserva})}"
-                                           class="btn-accion green"
-                                           onclick="abrirConfirmacion(event,this,'¿Confirmar Check-In del huésped?')">
-                                            Check-In
-                                        </a>
-
-                                        <a th:if="${res.estado == 'CHECK-IN'}"
-                                           th:href="@{/recepcion/reservas/accion/CHECKOUT/{id}(id=${res.idReserva})}"
-                                           class="btn-accion gray"
-                                           onclick="abrirConfirmacion(event,this,'¿Confirmar Check-Out y enviar habitación a limpieza?')">
-                                            Check-Out
-                                        </a>
-
-                                        <a th:if="${res.estado == 'CONFIRMADA'}"
-                                           th:href="@{/recepcion/reservas/accion/CANCELAR/{id}(id=${res.idReserva})}"
-                                           class="btn-accion red"
-                                           onclick="abrirConfirmacion(event,this,'¿Cancelar esta reserva?')">
-                                            Cancelar
-                                        </a>
-
-                                        <span th:if="${res.estado == 'FINALIZADA'}" class="texto-finalizado">
-                                            Completada
-                                        </span>
-
-                                        <span th:if="${res.estado == 'CANCELADA'}" class="texto-finalizado">
-                                            Cancelada
-                                        </span>
+                                        <a th:if="${res.estado == 'CONFIRMADA'}" th:href="@{/recepcion/reservas/accion/CHECKIN/{id}(id=${res.idReserva})}" class="btn-accion green" onclick="abrirConfirmacion(event,this,'¿Confirmar Check-In del huésped?')">Check-In</a>
+                                        <a th:if="${res.estado == 'CHECK-IN'}" th:href="@{/recepcion/reservas/accion/CHECKOUT/{id}(id=${res.idReserva})}" class="btn-accion gray" onclick="abrirConfirmacion(event,this,'¿Confirmar Check-Out y enviar habitación a limpieza?')">Check-Out</a>
+                                        <a th:if="${res.estado == 'CONFIRMADA'}" th:href="@{/recepcion/reservas/accion/CANCELAR/{id}(id=${res.idReserva})}" class="btn-accion red" onclick="abrirConfirmacion(event,this,'¿Cancelar esta reserva?')">Cancelar</a>
+                                        <span th:if="${res.estado == 'FINALIZADA'}" class="texto-finalizado">Completada</span>
+                                        <span th:if="${res.estado == 'CANCELADA'}" class="texto-finalizado">Cancelada</span>
                                     </td>
                                 </tr>
-
                                 <tr th:if="${#lists.isEmpty(reservas)}">
                                     <td colspan="10">No se encontraron reservas registradas.</td>
                                 </tr>
@@ -430,71 +118,69 @@
                         </table>
                     </div>
                 </div>
-
-            </section>
-            ```
-
-        </main>
-
-        <dialog id="modalConfirmacion">
-            <h3>Confirmar acción</h3>
-            <p id="textoConfirmacion">¿Está seguro?</p>
-
-            ```
-            <div class="modal-btns">
-                <button class="btn-ok" onclick="confirmarAccion()">Aceptar</button>
-                <button class="btn-cancelar" onclick="cerrarConfirmacion()">Cancelar</button>
             </div>
-            ```
+        </section>
+    </main>
 
-        </dialog>
+    <dialog id="modalConfirmacion">
+        <h3>Confirmar acción</h3>
+        <p id="textoConfirmacion">¿Está seguro?</p>
+        <div class="modal-btns">
+            <button class="btn-ok" onclick="confirmarAccion()">Aceptar</button>
+            <button class="btn-cancelar" onclick="cerrarConfirmacion()">Cancelar</button>
+        </div>
+    </dialog>
 
-        <script th:inline="javascript">
-            let urlAccion = "";
+    <script th:inline="javascript">
+        let urlAccion = "";
 
-            function mostrarSeccion(nombre) {
+        function mostrarSeccion(nombre) {
             document.getElementById("seccionEstado").classList.remove("activa");
             document.getElementById("seccionReservas").classList.remove("activa");
             document.getElementById("btnEstado").classList.remove("activo");
             document.getElementById("btnReservas").classList.remove("activo");
 
             if (nombre === "estado") {
-            document.getElementById("seccionEstado").classList.add("activa");
-            document.getElementById("btnEstado").classList.add("activo");
+                document.getElementById("seccionEstado").classList.add("activa");
+                document.getElementById("btnEstado").classList.add("activo");
             } else {
-            document.getElementById("seccionReservas").classList.add("activa");
-            document.getElementById("btnReservas").classList.add("activo");
+                document.getElementById("seccionReservas").classList.add("activa");
+                document.getElementById("btnReservas").classList.add("activo");
             }
-            }
+        }
 
-            function abrirConfirmacion(event, enlace, mensaje) {
+        function filtrarHabitaciones() {
+            let filtro = document.getElementById("filtroHabitaciones").value.toLowerCase();
+            document.querySelectorAll(".cuarto").forEach(function (card) {
+                card.classList.toggle("hidden-filter", !card.innerText.toLowerCase().includes(filtro));
+            });
+        }
+
+        function abrirConfirmacion(event, enlace, mensaje) {
             event.preventDefault();
             urlAccion = enlace.getAttribute("href");
             document.getElementById("textoConfirmacion").innerText = mensaje;
             document.getElementById("modalConfirmacion").showModal();
-            }
+        }
 
-            function cerrarConfirmacion() {
+        function cerrarConfirmacion() {
             document.getElementById("modalConfirmacion").close();
             urlAccion = "";
-            }
+        }
 
-            function confirmarAccion() {
+        function confirmarAccion() {
             if (urlAccion !== "") {
-            window.location.href = urlAccion;
+                window.location.href = urlAccion;
             }
-            }
+        }
 
-            document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
             let seccionActiva = /*[[${seccionActiva}]]*/ 'estado';
-
-            if (seccionActiva === "reservas") {
-            mostrarSeccion("reservas");
-            } else {
-            mostrarSeccion("estado");
+            if (window.location.hash === '#reservas') {
+                seccionActiva = 'reservas';
             }
-            });
-        </script>
-
-    </body>
+            mostrarSeccion(seccionActiva === "reservas" ? "reservas" : "estado");
+        });
+    </script>
+</body>
 </html>

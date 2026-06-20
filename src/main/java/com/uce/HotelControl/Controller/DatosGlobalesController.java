@@ -12,6 +12,7 @@ public class DatosGlobalesController {
     @Autowired
     private InformacionHotelService informacionHotelService;
 
+    // Carga el logo y nombre del hotel en todas las vistas.
     @ModelAttribute("hotelGlobal")
     public InformacionHotel cargarInformacionHotel() {
         return informacionHotelService.obtenerInformacion();

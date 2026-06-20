@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PromocionRepository extends JpaRepository<Promocion, Long> {
 
+    // Busca promociones por estado para mostrar u ocultar al cliente.
     List<Promocion> findByEstado(String estado);
 }

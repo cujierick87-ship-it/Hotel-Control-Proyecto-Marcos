@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.UUID;
 
 @Service
 public class ReservaService {
@@ -83,7 +82,7 @@ public class ReservaService {
         return reservaRepository.save(reserva);
     }
 
-    // Acciones del recepcionista: Check-In, Check-Out o Cancelar
+    // Procesa acciones operativas de recepcion sobre una reserva.
     public void procesarAccionRecepcion(Long idReserva, String accion) {
         Reserva reserva = reservaRepository.findById(idReserva).orElse(null);
 
@@ -117,10 +116,12 @@ public class ReservaService {
         }
     }
 
+    // Devuelve todas las reservas registradas.
     public List<Reserva> obtenerTodasLasReservas() {
         return reservaRepository.findAll();
     }
 
+    // Busca reservas por cedula del cliente.
     public List<Reserva> buscarPorCedula(String cedula) {
         return reservaRepository.findByCedulaCliente(cedula);
     }
@@ -131,8 +132,7 @@ public class ReservaService {
         return reservaRepository.findById(id).orElse(null);
     }
 
-    // Cancela una reserva del cliente.
-    // Solo permite cancelar si la reserva todavía está CONFIRMADA.
+    // Cancela una reserva del cliente solo si aun esta confirmada.
     public boolean cancelarReservaCliente(Long idReserva, String cedulaCliente) {
         Reserva reserva = reservaRepository.findById(idReserva).orElse(null);
 
@@ -153,9 +153,7 @@ public class ReservaService {
         return true;
     }
 
-    // Busca reservas por código único o por cédula.
-// Si encuentra por código, devuelve solo esa reserva.
-// Si no encuentra por código, busca por cédula.
+    // Busca reservas por codigo unico o por cedula.
     public List<Reserva> buscarPorCodigoOCedula(String filtro) {
         if (filtro == null || filtro.trim().isEmpty()) {
             return reservaRepository.findAll();
@@ -170,14 +168,12 @@ public class ReservaService {
         return reservaRepository.findByCedulaCliente(filtro.trim());
     }
 
-// Obtiene las reservas activas de una habitación.
-// Se usa para pintar de rojo las fechas ocupadas en reserva presencial.
+    // Obtiene reservas activas de una habitacion para bloquear fechas.
     public List<Reserva> buscarReservasActivasPorHabitacion(Long idHabitacion) {
         return reservaRepository.buscarReservasActivasPorHabitacion(idHabitacion);
     }
 
-// Registra una reserva presencial desde recepción.
-// Reutiliza guardarReserva para validar fechas, calcular total y generar código.
+    // Registra una reserva presencial reutilizando las validaciones generales.
     public Reserva registrarReservaPresencial(Reserva reserva, Long idHabitacion) {
         Habitacion habitacion = habitacionRepository.findById(idHabitacion).orElse(null);
 
@@ -190,6 +186,7 @@ public class ReservaService {
         return guardarReserva(reserva);
     }
 
+    // Suma ingresos sin contar reservas canceladas ni no-show.
     public double calcularIngresosValidos(List<Reserva> reservas) {
         double total = 0;
 
@@ -204,6 +201,7 @@ public class ReservaService {
         return total;
     }
 
+    // Cuenta reservas segun su estado.
     public int contarReservasPorEstado(String estado) {
         int contador = 0;
 
@@ -216,6 +214,7 @@ public class ReservaService {
         return contador;
     }
 
+    // Filtra reservas por fecha de entrada dentro de un rango.
     public List<Reserva> buscarReservasPorRango(LocalDate fechaInicio, LocalDate fechaFin) {
         List<Reserva> resultado = new ArrayList<>();
 
@@ -230,6 +229,7 @@ public class ReservaService {
         return resultado;
     }
 
+    // Genera un conteo simple de habitaciones mas reservadas.
     public Map<String, Integer> obtenerHabitacionesMasReservadas() {
         Map<String, Integer> conteo = new LinkedHashMap<>();
 
@@ -248,6 +248,7 @@ public class ReservaService {
         return conteo;
     }
 
+    // Lista clientes unicos usando la primera reserva encontrada por cedula.
     public List<Reserva> obtenerClientesConReservas() {
         List<Reserva> clientes = new ArrayList<>();
         List<String> cedulas = new ArrayList<>();
