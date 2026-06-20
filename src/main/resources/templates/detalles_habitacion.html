@@ -19,13 +19,27 @@
             }
             .navbar{
                 background:#1e293b;
-                padding:15px 50px
+                padding:15px 50px;
+                display:flex;
+                align-items:center;
             }
+
             .brand{
                 color:#eab308;
                 text-decoration:none;
                 font-size:20px;
-                font-weight:bold
+                font-weight:bold;
+                display:flex;
+                align-items:center;
+                gap:10px;
+            }
+
+            .brand img{
+                width:36px;
+                height:36px;
+                object-fit:cover;
+                border-radius:6px;
+                background:white;
             }
             .container{
                 max-width:1100px;
@@ -126,14 +140,43 @@
                     grid-template-columns:1fr
                 }
             }
+            .logo-menu{
+                padding:18px 20px;
+                color:#fbbf24;
+                display:flex;
+                align-items:center;
+                gap:10px;
+                font-weight:bold;
+                font-size:18px;
+            }
+
+            .logo-menu img{
+                width:38px;
+                height:38px;
+                object-fit:cover;
+                border-radius:6px;
+                background:white;
+            }
+
+            .logo-menu small{
+                display:block;
+                color:#cbd5e1;
+                font-size:12px;
+                margin-top:2px;
+            }
         </style>
     </head>
 
     <body>
 
         <nav class="navbar">
-            <a href="/cliente/inicio" class="brand">🏨 HotelControl</a>
-        </nav>
+            <a href="/cliente/inicio" class="brand">
+                <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}"
+                     th:src="${hotelGlobal.logo}"
+                     alt="Logo">
+
+                <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+            </a>        </nav>
 
         <main class="container">
 

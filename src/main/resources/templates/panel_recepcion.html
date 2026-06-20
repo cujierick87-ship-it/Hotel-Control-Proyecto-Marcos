@@ -1,293 +1,500 @@
 <!DOCTYPE html>
 
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Módulo Recepción</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Módulo Recepción</title>
 
-```
-<style>
-    *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
-    html,body{width:100%;min-height:100vh;overflow-x:hidden;background:#f3f4f6;color:#1f2937}
+        ```
+        <style>
+            *{
+                box-sizing:border-box;
+                margin:0;
+                padding:0;
+                font-family:'Segoe UI',sans-serif
+            }
+            html,body{
+                width:100%;
+                min-height:100vh;
+                overflow-x:hidden;
+                background:#f3f4f6;
+                color:#1f2937
+            }
 
-    .sidebar{position:fixed;top:0;left:0;bottom:0;width:260px;background:#1e293b;color:white}
-    .sidebar h2{padding:20px;color:#fbbf24;font-size:20px}
-    .sidebar button,.sidebar a{
-        width:100%;display:block;padding:15px 20px;background:none;border:0;
-        color:#cbd5e1;text-align:left;font-size:15px;cursor:pointer;text-decoration:none
-    }
-    .sidebar button:hover,.sidebar a:hover,.sidebar button.activo{
-        background:#0f172a;color:white;border-left:4px solid #fbbf24
-    }
+            .sidebar{
+                position:fixed;
+                top:0;
+                left:0;
+                bottom:0;
+                width:260px;
+                background:#1e293b;
+                color:white
+            }
+            .sidebar h2{
+                padding:20px;
+                color:#fbbf24;
+                font-size:20px
+            }
+            .sidebar button,.sidebar a{
+                width:100%;
+                display:block;
+                padding:15px 20px;
+                background:none;
+                border:0;
+                color:#cbd5e1;
+                text-align:left;
+                font-size:15px;
+                cursor:pointer;
+                text-decoration:none
+            }
+            .sidebar button:hover,.sidebar a:hover,.sidebar button.activo{
+                background:#0f172a;
+                color:white;
+                border-left:4px solid #fbbf24
+            }
 
-    .main{margin-left:260px;width:calc(100% - 260px);min-height:100vh}
-    .topbar{
-        background:white;padding:15px 30px;display:flex;justify-content:space-between;
-        align-items:center;border-bottom:1px solid #e5e7eb
-    }
-    .topbar h2{color:#1e293b;font-size:20px}
-    .logout{color:#ef4444;text-decoration:none;font-weight:bold}
+            .main{
+                margin-left:260px;
+                width:calc(100% - 260px);
+                min-height:100vh
+            }
+            .topbar{
+                background:white;
+                padding:15px 30px;
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                border-bottom:1px solid #e5e7eb
+            }
+            .topbar h2{
+                color:#1e293b;
+                font-size:20px
+            }
+            .logout{
+                color:#ef4444;
+                text-decoration:none;
+                font-weight:bold
+            }
 
-    .content{padding:30px;max-width:1300px;margin:auto}
-    .card{background:white;padding:25px;border-radius:8px;box-shadow:0 2px 6px #0002}
-    h3{border-bottom:1px solid #e5e7eb;padding-bottom:10px;margin-bottom:15px;color:#1e293b}
+            .content{
+                padding:30px;
+                max-width:1300px;
+                margin:auto
+            }
+            .card{
+                background:white;
+                padding:25px;
+                border-radius:8px;
+                box-shadow:0 2px 6px #0002
+            }
+            h3{
+                border-bottom:1px solid #e5e7eb;
+                padding-bottom:10px;
+                margin-bottom:15px;
+                color:#1e293b
+            }
 
-    .seccion{display:none}
-    .seccion.activa{display:block}
+            .seccion{
+                display:none
+            }
+            .seccion.activa{
+                display:block
+            }
 
-    .grid-cuartos{display:flex;flex-wrap:wrap;gap:15px}
-    .cuarto{width:160px;padding:18px;border-radius:6px;text-align:center;color:white;font-weight:bold}
-    .cuarto small{display:block;margin-top:6px}
-    .estado-DISPONIBLE{background:#10b981}
-    .estado-OCUPADA{background:#ef4444}
-    .estado-LIMPIEZA{background:#f59e0b}
-    .estado-MANTENIMIENTO{background:#6b7280}
+            .grid-cuartos{
+                display:flex;
+                flex-wrap:wrap;
+                gap:15px
+            }
+            .cuarto{
+                width:160px;
+                padding:18px;
+                border-radius:6px;
+                text-align:center;
+                color:white;
+                font-weight:bold
+            }
+            .cuarto small{
+                display:block;
+                margin-top:6px
+            }
+            .estado-DISPONIBLE{
+                background:#10b981
+            }
+            .estado-OCUPADA{
+                background:#ef4444
+            }
+            .estado-LIMPIEZA{
+                background:#f59e0b
+            }
+            .estado-MANTENIMIENTO{
+                background:#6b7280
+            }
 
-    .btn-limpiar{
-        display:block;margin-top:10px;background:white;color:#1f2937;
-        padding:6px;border-radius:4px;text-decoration:none;font-size:12px
-    }
+            .btn-limpiar{
+                display:block;
+                margin-top:10px;
+                background:white;
+                color:#1f2937;
+                padding:6px;
+                border-radius:4px;
+                text-decoration:none;
+                font-size:12px
+            }
 
-    .buscador{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap}
-    .buscador input{width:300px;padding:10px;border:1px solid #d1d5db;border-radius:5px}
-    .buscador button,.btn-ver,.btn-presencial{
-        padding:10px 15px;border:0;border-radius:5px;text-decoration:none;
-        cursor:pointer;font-size:14px
-    }
-    .buscador button{background:#1e293b;color:white}
-    .btn-ver{background:#e5e7eb;color:#374151}
-    .btn-presencial{background:#10b981;color:white}
+            .buscador{
+                display:flex;
+                gap:10px;
+                margin-bottom:15px;
+                flex-wrap:wrap
+            }
+            .buscador input{
+                width:300px;
+                padding:10px;
+                border:1px solid #d1d5db;
+                border-radius:5px
+            }
+            .buscador button,.btn-ver,.btn-presencial{
+                padding:10px 15px;
+                border:0;
+                border-radius:5px;
+                text-decoration:none;
+                cursor:pointer;
+                font-size:14px
+            }
+            .buscador button{
+                background:#1e293b;
+                color:white
+            }
+            .btn-ver{
+                background:#e5e7eb;
+                color:#374151
+            }
+            .btn-presencial{
+                background:#10b981;
+                color:white
+            }
 
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;font-size:14px}
-    th{background:#f9fafb;color:#6b7280}
-    .estado-texto,.texto-finalizado{font-weight:bold}
-    .texto-finalizado{color:#6b7280;font-size:13px}
+            table{
+                width:100%;
+                border-collapse:collapse
+            }
+            th,td{
+                padding:10px;
+                border-bottom:1px solid #e5e7eb;
+                text-align:left;
+                font-size:14px
+            }
+            th{
+                background:#f9fafb;
+                color:#6b7280
+            }
+            .estado-texto,.texto-finalizado{
+                font-weight:bold
+            }
+            .texto-finalizado{
+                color:#6b7280;
+                font-size:13px
+            }
 
-    .btn-accion{
-        display:inline-block;padding:7px 12px;border-radius:5px;color:white;
-        text-decoration:none;font-size:13px;margin:0 5px 5px 0
-    }
-    .green{background:#10b981}
-    .gray{background:#6b7280}
-    .red{background:#ef4444}
+            .btn-accion{
+                display:inline-block;
+                padding:7px 12px;
+                border-radius:5px;
+                color:white;
+                text-decoration:none;
+                font-size:13px;
+                margin:0 5px 5px 0
+            }
+            .green{
+                background:#10b981
+            }
+            .gray{
+                background:#6b7280
+            }
+            .red{
+                background:#ef4444
+            }
 
-    dialog{border:0;border-radius:10px;padding:25px;width:360px;text-align:center}
-    dialog::backdrop{background:#0008}
-    .modal-btns{display:flex;justify-content:center;gap:10px;margin-top:20px}
-    .btn-ok,.btn-cancelar{padding:9px 15px;border:0;border-radius:5px;cursor:pointer;font-weight:bold}
-    .btn-ok{background:#10b981;color:white}
-    .btn-cancelar{background:#e5e7eb;color:#374151}
-</style>
-```
+            dialog{
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                border: none;
+                border-radius: 10px;
+                padding: 25px;
+                width: 360px;
+                max-width: 90%;
+                text-align: center;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+            }
+            dialog::backdrop{
+                background: rgba(0,0,0,0.55);
+            }
+            .modal-btns{
+                display:flex;
+                justify-content:center;
+                gap:10px;
+                margin-top:20px
+            }
+            .btn-ok,.btn-cancelar{
+                padding:9px 15px;
+                border:0;
+                border-radius:5px;
+                cursor:pointer;
+                font-weight:bold
+            }
+            .btn-ok{
+                background:#10b981;
+                color:white
+            }
+            .btn-cancelar{
+                background:#e5e7eb;
+                color:#374151
+            }
+            .logo-menu{
+                padding:18px 20px;
+                color:#fbbf24;
+                display:flex;
+                align-items:center;
+                gap:10px;
+                font-weight:bold;
+                font-size:18px;
+            }
 
-</head>
+            .logo-menu img{
+                width:38px;
+                height:38px;
+                object-fit:cover;
+                border-radius:6px;
+                background:white;
+            }
 
-<body>
+            .logo-menu small{
+                display:block;
+                color:#cbd5e1;
+                font-size:12px;
+                margin-top:2px;
+            }
+        </style>
+        ```
 
-<aside class="sidebar">
-    <h2>🏨 Recepción</h2>
+    </head>
 
-```
-<button id="btnEstado" class="activo" onclick="mostrarSeccion('estado')">
-    🛏️ Estado de Habitaciones
-</button>
+    <body>
 
-<button id="btnReservas" onclick="mostrarSeccion('reservas')">
-    📅 Reservas y Check-in/out
-</button>
+        <aside class="sidebar">
+            <div class="logo-menu">
+                <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}"
+                     th:src="${hotelGlobal.logo}"
+                     alt="Logo">
 
-<a href="/recepcion/reserva-presencial">➕ Reserva presencial</a>
-<a href="/recepcion/solicitud">📨 Enviar solicitud</a>
-```
-
-</aside>
-
-<main class="main">
-
-```
-<header class="topbar">
-    <h2>Módulo Operativo - Recepción</h2>
-    <a href="/logout" class="logout">Cerrar Sesión</a>
-</header>
-
-<section class="content">
-
-    <div id="seccionEstado" class="seccion activa">
-        <div class="card">
-            <h3>🛏️ Estado de Habitaciones en Vivo</h3>
-
-            <div class="grid-cuartos">
-                <div class="cuarto"
-                     th:each="hab : ${habitaciones}"
-                     th:classappend="' estado-' + ${hab.estado}">
-
-                    <div th:text="'Hab. ' + ${hab.numero}"></div>
-                    <small th:text="${hab.estado}"></small>
-
-                    <a th:if="${hab.estado == 'LIMPIEZA'}"
-                       th:href="@{/recepcion/habitaciones/limpiar/{id}(id=${hab.idHabitacion})}"
-                       class="btn-limpiar">
-                        ✅ Marcar Limpia
-                    </a>
+                <div>
+                    <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+                    <small>Recepción</small>
                 </div>
             </div>
-        </div>
-    </div>
+            ```
+            <button id="btnEstado" class="activo" onclick="mostrarSeccion('estado')">
+                🛏️ Estado de Habitaciones
+            </button>
 
-    <div id="seccionReservas" class="seccion">
-        <div class="card">
-            <h3>📅 Gestión de Reservas y Check-in/out</h3>
+            <button id="btnReservas" onclick="mostrarSeccion('reservas')">
+                📅 Reservas y Check-in/out
+            </button>
 
-            <form class="buscador" th:action="@{/recepcion/reservas/buscar}" method="post">
-                <input type="text"
-                       name="filtro"
-                       placeholder="Buscar por código único o cédula..."
-                       required>
+            <a href="/recepcion/reserva-presencial">➕ Reserva presencial</a>
+            <a href="/recepcion/solicitud">📨 Enviar solicitud</a>
+            ```
 
-                <button type="submit">🔍 Buscar</button>
+        </aside>
 
-                <a href="/recepcion/panel" class="btn-ver">Ver Todas</a>
+        <main class="main">
 
-                <a href="/recepcion/reserva-presencial" class="btn-presencial">
-                    ➕ Reserva presencial
-                </a>
-            </form>
+            ```
+            <header class="topbar">
+                <h2>Módulo Operativo - Recepción</h2>
+                <a href="/logout" class="logout">Cerrar Sesión</a>
+            </header>
 
-            <table>
-                <thead>
-                <tr>
-                    <th>Nro</th>
-                    <th>Código</th>
-                    <th>Cliente</th>
-                    <th>Cédula</th>
-                    <th>Habitación</th>
-                    <th>Entrada</th>
-                    <th>Salida</th>
-                    <th>Estado</th>
-                    <th>Notas</th>
-                    <th>Acciones</th>
-                </tr>
-                </thead>
+            <section class="content">
 
-                <tbody>
-                <tr th:each="res : ${reservas}">
-                    <td th:text="'#' + ${res.idReserva}"></td>
-                    <td th:text="${res.codigoReserva}"></td>
-                    <td th:text="${res.nombreCliente} + ' ' + ${res.apellidoCliente}"></td>
-                    <td th:text="${res.cedulaCliente}"></td>
-                    <td th:text="'Hab. ' + ${res.habitacion.numero}"></td>
-                    <td th:text="${res.fechaCheckIn}"></td>
-                    <td th:text="${res.fechaCheckOut}"></td>
-                    <td>
-                        <span class="estado-texto" th:text="${res.estado}"></span>
-                    </td>
-                    <td th:text="${res.notas}"></td>
+                <div id="seccionEstado" class="seccion activa">
+                    <div class="card">
+                        <h3>🛏️ Estado de Habitaciones en Vivo</h3>
 
-                    <td>
-                        <a th:if="${res.estado == 'CONFIRMADA'}"
-                           th:href="@{/recepcion/reservas/accion/CHECKIN/{id}(id=${res.idReserva})}"
-                           class="btn-accion green"
-                           onclick="abrirConfirmacion(event,this,'¿Confirmar Check-In del huésped?')">
-                            Check-In
-                        </a>
+                        <div class="grid-cuartos">
+                            <div class="cuarto"
+                                 th:each="hab : ${habitaciones}"
+                                 th:classappend="' estado-' + ${hab.estado}">
 
-                        <a th:if="${res.estado == 'CHECK-IN'}"
-                           th:href="@{/recepcion/reservas/accion/CHECKOUT/{id}(id=${res.idReserva})}"
-                           class="btn-accion gray"
-                           onclick="abrirConfirmacion(event,this,'¿Confirmar Check-Out y enviar habitación a limpieza?')">
-                            Check-Out
-                        </a>
+                                <div th:text="'Hab. ' + ${hab.numero}"></div>
+                                <small th:text="${hab.estado}"></small>
 
-                        <a th:if="${res.estado == 'CONFIRMADA'}"
-                           th:href="@{/recepcion/reservas/accion/CANCELAR/{id}(id=${res.idReserva})}"
-                           class="btn-accion red"
-                           onclick="abrirConfirmacion(event,this,'¿Cancelar esta reserva?')">
-                            Cancelar
-                        </a>
+                                <a th:if="${hab.estado == 'LIMPIEZA'}"
+                                   th:href="@{/recepcion/habitaciones/limpiar/{id}(id=${hab.idHabitacion})}"
+                                   class="btn-limpiar">
+                                    ✅ Marcar Limpia
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                        <span th:if="${res.estado == 'FINALIZADA'}" class="texto-finalizado">
-                            Completada
-                        </span>
+                <div id="seccionReservas" class="seccion">
+                    <div class="card">
+                        <h3>📅 Gestión de Reservas y Check-in/out</h3>
 
-                        <span th:if="${res.estado == 'CANCELADA'}" class="texto-finalizado">
-                            Cancelada
-                        </span>
-                    </td>
-                </tr>
+                        <form class="buscador" th:action="@{/recepcion/reservas/buscar}" method="post">
+                            <input type="text"
+                                   name="filtro"
+                                   placeholder="Buscar por código único o cédula..."
+                                   required>
 
-                <tr th:if="${#lists.isEmpty(reservas)}">
-                    <td colspan="10">No se encontraron reservas registradas.</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+                            <button type="submit">🔍 Buscar</button>
 
-</section>
-```
+                            <a href="/recepcion/panel" class="btn-ver">Ver Todas</a>
 
-</main>
+                            <a href="/recepcion/reserva-presencial" class="btn-presencial">
+                                ➕ Reserva presencial
+                            </a>
+                        </form>
 
-<dialog id="modalConfirmacion">
-    <h3>Confirmar acción</h3>
-    <p id="textoConfirmacion">¿Está seguro?</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nro</th>
+                                    <th>Código</th>
+                                    <th>Cliente</th>
+                                    <th>Cédula</th>
+                                    <th>Habitación</th>
+                                    <th>Entrada</th>
+                                    <th>Salida</th>
+                                    <th>Estado</th>
+                                    <th>Notas</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
 
-```
-<div class="modal-btns">
-    <button class="btn-ok" onclick="confirmarAccion()">Aceptar</button>
-    <button class="btn-cancelar" onclick="cerrarConfirmacion()">Cancelar</button>
-</div>
-```
+                            <tbody>
+                                <tr th:each="res : ${reservas}">
+                                    <td th:text="'#' + ${res.idReserva}"></td>
+                                    <td th:text="${res.codigoReserva}"></td>
+                                    <td th:text="${res.nombreCliente} + ' ' + ${res.apellidoCliente}"></td>
+                                    <td th:text="${res.cedulaCliente}"></td>
+                                    <td th:text="'Hab. ' + ${res.habitacion.numero}"></td>
+                                    <td th:text="${res.fechaCheckIn}"></td>
+                                    <td th:text="${res.fechaCheckOut}"></td>
+                                    <td>
+                                        <span class="estado-texto" th:text="${res.estado}"></span>
+                                    </td>
+                                    <td th:text="${res.notas}"></td>
 
-</dialog>
+                                    <td>
+                                        <a th:if="${res.estado == 'CONFIRMADA'}"
+                                           th:href="@{/recepcion/reservas/accion/CHECKIN/{id}(id=${res.idReserva})}"
+                                           class="btn-accion green"
+                                           onclick="abrirConfirmacion(event,this,'¿Confirmar Check-In del huésped?')">
+                                            Check-In
+                                        </a>
 
-<script th:inline="javascript">
-    let urlAccion = "";
+                                        <a th:if="${res.estado == 'CHECK-IN'}"
+                                           th:href="@{/recepcion/reservas/accion/CHECKOUT/{id}(id=${res.idReserva})}"
+                                           class="btn-accion gray"
+                                           onclick="abrirConfirmacion(event,this,'¿Confirmar Check-Out y enviar habitación a limpieza?')">
+                                            Check-Out
+                                        </a>
 
-    function mostrarSeccion(nombre) {
-        document.getElementById("seccionEstado").classList.remove("activa");
-        document.getElementById("seccionReservas").classList.remove("activa");
-        document.getElementById("btnEstado").classList.remove("activo");
-        document.getElementById("btnReservas").classList.remove("activo");
+                                        <a th:if="${res.estado == 'CONFIRMADA'}"
+                                           th:href="@{/recepcion/reservas/accion/CANCELAR/{id}(id=${res.idReserva})}"
+                                           class="btn-accion red"
+                                           onclick="abrirConfirmacion(event,this,'¿Cancelar esta reserva?')">
+                                            Cancelar
+                                        </a>
 
-        if (nombre === "estado") {
+                                        <span th:if="${res.estado == 'FINALIZADA'}" class="texto-finalizado">
+                                            Completada
+                                        </span>
+
+                                        <span th:if="${res.estado == 'CANCELADA'}" class="texto-finalizado">
+                                            Cancelada
+                                        </span>
+                                    </td>
+                                </tr>
+
+                                <tr th:if="${#lists.isEmpty(reservas)}">
+                                    <td colspan="10">No se encontraron reservas registradas.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+            ```
+
+        </main>
+
+        <dialog id="modalConfirmacion">
+            <h3>Confirmar acción</h3>
+            <p id="textoConfirmacion">¿Está seguro?</p>
+
+            ```
+            <div class="modal-btns">
+                <button class="btn-ok" onclick="confirmarAccion()">Aceptar</button>
+                <button class="btn-cancelar" onclick="cerrarConfirmacion()">Cancelar</button>
+            </div>
+            ```
+
+        </dialog>
+
+        <script th:inline="javascript">
+            let urlAccion = "";
+
+            function mostrarSeccion(nombre) {
+            document.getElementById("seccionEstado").classList.remove("activa");
+            document.getElementById("seccionReservas").classList.remove("activa");
+            document.getElementById("btnEstado").classList.remove("activo");
+            document.getElementById("btnReservas").classList.remove("activo");
+
+            if (nombre === "estado") {
             document.getElementById("seccionEstado").classList.add("activa");
             document.getElementById("btnEstado").classList.add("activo");
-        } else {
+            } else {
             document.getElementById("seccionReservas").classList.add("activa");
             document.getElementById("btnReservas").classList.add("activo");
-        }
-    }
+            }
+            }
 
-    function abrirConfirmacion(event, enlace, mensaje) {
-        event.preventDefault();
-        urlAccion = enlace.getAttribute("href");
-        document.getElementById("textoConfirmacion").innerText = mensaje;
-        document.getElementById("modalConfirmacion").showModal();
-    }
+            function abrirConfirmacion(event, enlace, mensaje) {
+            event.preventDefault();
+            urlAccion = enlace.getAttribute("href");
+            document.getElementById("textoConfirmacion").innerText = mensaje;
+            document.getElementById("modalConfirmacion").showModal();
+            }
 
-    function cerrarConfirmacion() {
-        document.getElementById("modalConfirmacion").close();
-        urlAccion = "";
-    }
+            function cerrarConfirmacion() {
+            document.getElementById("modalConfirmacion").close();
+            urlAccion = "";
+            }
 
-    function confirmarAccion() {
-        if (urlAccion !== "") {
+            function confirmarAccion() {
+            if (urlAccion !== "") {
             window.location.href = urlAccion;
-        }
-    }
+            }
+            }
 
-    document.addEventListener("DOMContentLoaded", function () {
-        let seccionActiva = /*[[${seccionActiva}]]*/ 'estado';
+            document.addEventListener("DOMContentLoaded", function () {
+            let seccionActiva = /*[[${seccionActiva}]]*/ 'estado';
 
-        if (seccionActiva === "reservas") {
+            if (seccionActiva === "reservas") {
             mostrarSeccion("reservas");
-        } else {
+            } else {
             mostrarSeccion("estado");
-        }
-    });
-</script>
+            }
+            });
+        </script>
 
-</body>
+    </body>
 </html>

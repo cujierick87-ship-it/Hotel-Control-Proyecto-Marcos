@@ -1,81 +1,160 @@
 
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Reserva Presencial</title>
+    <head>
+        <meta charset="UTF-8">
+        <title>Reserva Presencial</title>
 
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
-        body{background:#f3f4f6;color:#1f2937}
-        .top{background:#1e293b;color:white;padding:15px 35px;display:flex;justify-content:space-between;align-items:center}
-        .top h2{color:#fbbf24;font-size:20px}
-        .top a{color:white;text-decoration:none}
-        .contenedor{max-width:1150px;margin:30px auto;padding:0 20px}
-        h3{margin-bottom:18px;color:#1e293b}
-        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
-        .card{background:white;border-radius:8px;box-shadow:0 2px 8px #0002;overflow:hidden}
-        .card img{width:100%;height:170px;object-fit:cover}
-        .info{padding:16px}
-        .info h4{color:#1e293b;margin-bottom:8px}
-        .info p{font-size:14px;color:#4b5563;margin-bottom:7px}
-        .precio{font-weight:bold;color:#d4af37;margin:10px 0}
-        .btn{display:block;text-align:center;background:#e5c158;color:white;text-decoration:none;padding:11px;border-radius:5px;font-weight:bold}
-        .btn:hover{background:#d4af37}
-        .vacio{background:white;padding:20px;border-radius:8px;text-align:center;color:#6b7280}
-    </style>
-</head>
+        <style>
+            *{
+                box-sizing:border-box;
+                margin:0;
+                padding:0;
+                font-family:'Segoe UI',sans-serif
+            }
+            body{
+                background:#f3f4f6;
+                color:#1f2937
+            }
+            .top{
+                background:#1e293b;
+                color:white;
+                padding:15px 35px;
+                display:flex;
+                justify-content:space-between;
+                align-items:center
+            }
+            .top h2{
+                color:#fbbf24;
+                font-size:20px
+            }
+            .top a{
+                color:white;
+                text-decoration:none
+            }
+            .contenedor{
+                max-width:1150px;
+                margin:30px auto;
+                padding:0 20px
+            }
+            h3{
+                margin-bottom:18px;
+                color:#1e293b
+            }
+            .grid{
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+                gap:18px
+            }
+            .card{
+                background:white;
+                border-radius:8px;
+                box-shadow:0 2px 8px #0002;
+                overflow:hidden
+            }
+            .card img{
+                width:100%;
+                height:170px;
+                object-fit:cover
+            }
+            .info{
+                padding:16px
+            }
+            .info h4{
+                color:#1e293b;
+                margin-bottom:8px
+            }
+            .info p{
+                font-size:14px;
+                color:#4b5563;
+                margin-bottom:7px
+            }
+            .precio{
+                font-weight:bold;
+                color:#d4af37;
+                margin:10px 0
+            }
+            .btn{
+                display:block;
+                text-align:center;
+                background:#e5c158;
+                color:white;
+                text-decoration:none;
+                padding:11px;
+                border-radius:5px;
+                font-weight:bold
+            }
+            .btn:hover{
+                background:#d4af37
+            }
+            .vacio{
+                background:white;
+                padding:20px;
+                border-radius:8px;
+                text-align:center;
+                color:#6b7280
+            }
+        </style>
+    </head>
 
-<body>
+    <body>
 
-<div class="top">
-    <h2>🏨 Reserva Presencial</h2>
-    <a href="/recepcion/panel">Volver al panel</a>
-</div>
+        <div class="top">
+            <h2>
+                <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}"
+                     th:src="${hotelGlobal.logo}"
+                     alt="Logo"
+                     style="width:32px;height:32px;object-fit:cover;border-radius:5px;background:white;vertical-align:middle;margin-right:8px;">
 
-<div class="contenedor">
-    <h3>Seleccione una habitación para registrar la reserva presencial</h3>
+                <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+                - Reserva Presencial
+            </h2>
+            <a href="/recepcion/panel">Volver al panel</a>
+        </div>
 
-    <div class="vacio" th:if="${#lists.isEmpty(habitaciones)}">
-        No hay habitaciones disponibles para reserva presencial.
-    </div>
+        <div class="contenedor">
+            <h3>Seleccione una habitación para registrar la reserva presencial</h3>
 
-    <div class="grid">
-        <div class="card" th:each="hab : ${habitaciones}">
+            <div class="vacio" th:if="${#lists.isEmpty(habitaciones)}">
+                No hay habitaciones disponibles para reserva presencial.
+            </div>
 
-            <img th:if="${hab.imagen != null and hab.imagen != ''}" th:src="${hab.imagen}" alt="Habitación">
+            <div class="grid">
+                <div class="card" th:each="hab : ${habitaciones}">
 
-            <img th:if="${hab.imagen == null or hab.imagen == ''}"
-                 src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80"
-                 alt="Habitación">
+                    <img th:if="${hab.imagen != null and hab.imagen != ''}" th:src="${hab.imagen}" alt="Habitación">
 
-            <div class="info">
-                <h4 th:text="${hab.tipo} + ' - Hab. ' + ${hab.numero}"></h4>
+                    <img th:if="${hab.imagen == null or hab.imagen == ''}"
+                         src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80"
+                         alt="Habitación">
 
-                <p th:text="${hab.descripcion}"></p>
+                    <div class="info">
+                        <h4 th:text="${hab.tipo} + ' - Hab. ' + ${hab.numero}"></h4>
 
-                <p>
-                    <b>Capacidad:</b>
-                    <span th:text="${hab.capacidad}"></span> personas
-                </p>
+                        <p th:text="${hab.descripcion}"></p>
 
-                <p>
-                    <b>Estado:</b>
-                    <span th:text="${hab.estado}"></span>
-                </p>
+                        <p>
+                            <b>Capacidad:</b>
+                            <span th:text="${hab.capacidad}"></span> personas
+                        </p>
 
-                <div class="precio">
-                    $ <span th:text="${hab.precioNoche}"></span> / noche
+                        <p>
+                            <b>Estado:</b>
+                            <span th:text="${hab.estado}"></span>
+                        </p>
+
+                        <div class="precio">
+                            $ <span th:text="${hab.precioNoche}"></span> / noche
+                        </div>
+
+                        <a class="btn"
+                           th:href="@{/recepcion/reserva-presencial/{id}(id=${hab.idHabitacion})}">
+                            Seleccionar habitación
+                        </a>
+                    </div>
                 </div>
-
-                <a class="btn"
-                   th:href="@{/recepcion/reserva-presencial/{id}(id=${hab.idHabitacion})}">
-                    Seleccionar habitación
-                </a>
             </div>
         </div>
-    </div>
-</div>
 
-</body>
+    </body>
 </html>

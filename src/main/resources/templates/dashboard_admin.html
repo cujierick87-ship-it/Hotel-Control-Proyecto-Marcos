@@ -1,126 +1,225 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard Administrativo</title>
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',sans-serif}
-        body{display:flex;min-height:100vh;background:#f3f4f6;color:#1f2937}
-        .sidebar{width:250px;background:#1e293b;color:white}
-        .sidebar h2{padding:20px;color:#fbbf24}
-        .sidebar a{display:block;padding:14px 20px;color:#cbd5e1;text-decoration:none}
-        .sidebar a:hover,.activo{background:#0f172a;color:white;border-left:4px solid #fbbf24}
-        .main{flex:1}
-        .topbar{background:white;padding:15px 30px;display:flex;justify-content:space-between;border-bottom:1px solid #e5e7eb}
-        .topbar a{color:#ef4444;text-decoration:none;font-weight:bold}
-        .content{padding:30px}
-        .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:25px}
-        .card{background:white;padding:22px;border-radius:8px;box-shadow:0 2px 5px #0001}
-        .card h3{font-size:15px;color:#6b7280;margin-bottom:10px}
-        .valor{font-size:30px;font-weight:bold;color:#1e293b}
-        .tabla-card{background:white;padding:25px;border-radius:8px;box-shadow:0 2px 5px #0001}
-        table{width:100%;border-collapse:collapse;margin-top:15px}
-        th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left}
-        th{background:#f9fafb;color:#6b7280;text-transform:uppercase;font-size:12px}
-    </style>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Dashboard Administrativo</title>
+        <style>
+            *{
+                box-sizing:border-box;
+                margin:0;
+                padding:0;
+                font-family:'Segoe UI',sans-serif
+            }
+            body{
+                display:flex;
+                min-height:100vh;
+                background:#f3f4f6;
+                color:#1f2937
+            }
+            .sidebar{
+                width:250px;
+                background:#1e293b;
+                color:white
+            }
+            .sidebar h2{
+                padding:20px;
+                color:#fbbf24
+            }
+            .sidebar a{
+                display:block;
+                padding:14px 20px;
+                color:#cbd5e1;
+                text-decoration:none
+            }
+            .sidebar a:hover,.activo{
+                background:#0f172a;
+                color:white;
+                border-left:4px solid #fbbf24
+            }
+            .main{
+                flex:1
+            }
+            .topbar{
+                background:white;
+                padding:15px 30px;
+                display:flex;
+                justify-content:space-between;
+                border-bottom:1px solid #e5e7eb
+            }
+            .topbar a{
+                color:#ef4444;
+                text-decoration:none;
+                font-weight:bold
+            }
+            .content{
+                padding:30px
+            }
+            .grid{
+                display:grid;
+                grid-template-columns:repeat(4,1fr);
+                gap:18px;
+                margin-bottom:25px
+            }
+            .card{
+                background:white;
+                padding:22px;
+                border-radius:8px;
+                box-shadow:0 2px 5px #0001
+            }
+            .card h3{
+                font-size:15px;
+                color:#6b7280;
+                margin-bottom:10px
+            }
+            .valor{
+                font-size:30px;
+                font-weight:bold;
+                color:#1e293b
+            }
+            .tabla-card{
+                background:white;
+                padding:25px;
+                border-radius:8px;
+                box-shadow:0 2px 5px #0001
+            }
+            table{
+                width:100%;
+                border-collapse:collapse;
+                margin-top:15px
+            }
+            th,td{
+                padding:10px;
+                border-bottom:1px solid #e5e7eb;
+                text-align:left
+            }
+            th{
+                background:#f9fafb;
+                color:#6b7280;
+                text-transform:uppercase;
+                font-size:12px
+            }
+            .logo-menu{
+                padding:18px 20px;
+                color:#fbbf24;
+                display:flex;
+                align-items:center;
+                gap:10px;
+                font-weight:bold;
+                font-size:18px;
+            }
 
-<aside class="sidebar">
-    <h2>HotelControl</h2>
-    <a href="/admin/dashboard" class="activo">Dashboard</a>
-    <a href="/admin/panel">Habitaciones</a>
-    <a href="/admin/reservas">Reservas</a>
-    <a href="/admin/reportes">Reportes</a>
-    <a href="/admin/clientes">Clientes</a>
-    <a href="/admin/personal">Personal</a>
-    <a href="/admin/solicitudes">Solicitudes</a>
-</aside>
+            .logo-menu img{
+                width:38px;
+                height:38px;
+                object-fit:cover;
+                border-radius:6px;
+                background:white;
+            }
+        </style>
+    </head>
+    <body>
 
-<main class="main">
-    <header class="topbar">
-        <span>Panel / <b>Dashboard</b></span>
-        <a href="/logout">Cerrar Sesion</a>
-    </header>
+        <aside class="sidebar">
+            <div class="logo-menu">
+                <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}"
+                     th:src="${hotelGlobal.logo}"
+                     alt="Logo">
 
-    <section class="content">
-        <div class="grid">
-            <div class="card">
-                <h3>Total reservas</h3>
-                <div class="valor" th:text="${totalReservas}">0</div>
-            </div>
+                <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+            </div>    <a href="/admin/dashboard" class="activo">Dashboard</a>
+            <a href="/admin/panel">Habitaciones</a>
+            <a href="/admin/reservas">Reservas</a>
+            <a href="/admin/reportes">Reportes</a>
+            <a href="/admin/clientes">Clientes</a>
+            <a href="/admin/institucional">Institucional</a>
+            <a href="/admin/personal">Personal</a>
+            <a href="/admin/solicitudes">Solicitudes</a>
+        </aside>
 
-            <div class="card">
-                <h3>Ingresos totales</h3>
-                <div class="valor" th:text="'$' + ${ingresosTotales}">$0</div>
-            </div>
+        <main class="main">
+            <header class="topbar">
+                <span>Panel / <b>Dashboard</b></span>
+                <a href="/logout">Cerrar Sesion</a>
+            </header>
 
-            <div class="card">
-                <h3>Ocupacion</h3>
-                <div class="valor" th:text="${#numbers.formatDecimal(porcentajeOcupacion,1,2)} + '%'">0%</div>
-            </div>
+            <section class="content">
+                <div class="grid">
+                    <div class="card">
+                        <h3>Total reservas</h3>
+                        <div class="valor" th:text="${totalReservas}">0</div>
+                    </div>
 
-            <div class="card">
-                <h3>No-show</h3>
-                <div class="valor" th:text="${reservasNoShow}">0</div>
-            </div>
-        </div>
+                    <div class="card">
+                        <h3>Ingresos totales</h3>
+                        <div class="valor" th:text="'$' + ${ingresosTotales}">$0</div>
+                    </div>
 
-        <div class="grid">
-            <div class="card">
-                <h3>Disponibles</h3>
-                <div class="valor" th:text="${disponibles}">0</div>
-            </div>
+                    <div class="card">
+                        <h3>Ocupacion</h3>
+                        <div class="valor" th:text="${#numbers.formatDecimal(porcentajeOcupacion,1,2)} + '%'">0%</div>
+                    </div>
 
-            <div class="card">
-                <h3>Ocupadas</h3>
-                <div class="valor" th:text="${ocupadas}">0</div>
-            </div>
+                    <div class="card">
+                        <h3>No-show</h3>
+                        <div class="valor" th:text="${reservasNoShow}">0</div>
+                    </div>
+                </div>
 
-            <div class="card">
-                <h3>Limpieza</h3>
-                <div class="valor" th:text="${limpieza}">0</div>
-            </div>
+                <div class="grid">
+                    <div class="card">
+                        <h3>Disponibles</h3>
+                        <div class="valor" th:text="${disponibles}">0</div>
+                    </div>
 
-            <div class="card">
-                <h3>Mantenimiento</h3>
-                <div class="valor" th:text="${mantenimiento}">0</div>
-            </div>
-        </div>
+                    <div class="card">
+                        <h3>Ocupadas</h3>
+                        <div class="valor" th:text="${ocupadas}">0</div>
+                    </div>
 
-        <div class="tabla-card">
-            <h3>Indicadores operativos</h3>
+                    <div class="card">
+                        <h3>Limpieza</h3>
+                        <div class="valor" th:text="${limpieza}">0</div>
+                    </div>
 
-            <p>
-                <b>Reservas canceladas:</b>
-                <span th:text="${reservasCanceladas}">0</span>
-            </p>
+                    <div class="card">
+                        <h3>Mantenimiento</h3>
+                        <div class="valor" th:text="${mantenimiento}">0</div>
+                    </div>
+                </div>
 
-            <br>
+                <div class="tabla-card">
+                    <h3>Indicadores operativos</h3>
 
-            <h3>Habitaciones mas reservadas</h3>
-            <table>
-                <thead>
-                <tr>
-                    <th>Habitacion</th>
-                    <th>Cantidad de reservas</th>
-                </tr>
-                </thead>
+                    <p>
+                        <b>Reservas canceladas:</b>
+                        <span th:text="${reservasCanceladas}">0</span>
+                    </p>
 
-                <tbody>
-                <tr th:each="item : ${habitacionesMasReservadas}">
-                    <td th:text="'Hab. ' + ${item.key}"></td>
-                    <td th:text="${item.value}"></td>
-                </tr>
+                    <br>
 
-                <tr th:if="${habitacionesMasReservadas.isEmpty()}">
-                    <td colspan="2">No hay reservas registradas.</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-</main>
+                    <h3>Habitaciones mas reservadas</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Habitacion</th>
+                                <th>Cantidad de reservas</th>
+                            </tr>
+                        </thead>
 
-</body>
+                        <tbody>
+                            <tr th:each="item : ${habitacionesMasReservadas}">
+                                <td th:text="'Hab. ' + ${item.key}"></td>
+                                <td th:text="${item.value}"></td>
+                            </tr>
+
+                            <tr th:if="${habitacionesMasReservadas.isEmpty()}">
+                                <td colspan="2">No hay reservas registradas.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+    </body>
 </html>

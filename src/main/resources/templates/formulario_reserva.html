@@ -142,11 +142,16 @@
                 color: white !important;
             }
 
-            dialog {
+            dialog{
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
                 border: none;
                 border-radius: 10px;
                 padding: 25px;
                 width: 360px;
+                max-width: 90%;
                 text-align: center;
                 box-shadow: 0 10px 25px rgba(0,0,0,0.35);
             }
@@ -178,12 +183,35 @@
             dialog button:hover {
                 background-color: #d4af37;
             }
+            .brand{
+                color:#eab308;
+                font-size:20px;
+                font-weight:bold;
+                text-decoration:none;
+                display:flex;
+                align-items:center;
+                gap:10px;
+            }
+
+            .brand img{
+                width:36px;
+                height:36px;
+                object-fit:cover;
+                border-radius:6px;
+                background:white;
+            }
         </style>
     </head>
     <body>
 
         <nav class="navbar">
-            <a href="/cliente/inicio" class="navbar-brand">🏨 HotelControl</a>
+            <a href="/cliente/inicio" class="brand">
+                <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}"
+                     th:src="${hotelGlobal.logo}"
+                     alt="Logo">
+
+                <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+            </a>
         </nav>
 
         <div class="container">
@@ -250,52 +278,52 @@
 
             /*[# th:each="r : ${reservas}"]*/
             fechasOcupadas.push({
-                from: /*[[${r.fechaCheckIn}]]*/ '',
-                to: /*[[${r.fechaCheckOut}]]*/ ''
+            from: /*[[${r.fechaCheckIn}]]*/ '',
+            to: /*[[${r.fechaCheckOut}]]*/ ''
             });
             /*[/]*/
 
             document.addEventListener('DOMContentLoaded', function() {
 
-                const checkOutPicker = flatpickr("#fechaCheckOut", {
-                    locale: "es",
-                    dateFormat: "Y-m-d",
-                    minDate: "today",
-                    disable: fechasOcupadas,
-                    showMonths: 2
-                });
+            const checkOutPicker = flatpickr("#fechaCheckOut", {
+            locale: "es",
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: fechasOcupadas,
+            showMonths: 2
+            });
 
-                flatpickr("#fechaCheckIn", {
-                    locale: "es",
-                    dateFormat: "Y-m-d",
-                    minDate: "today",
-                    disable: fechasOcupadas,
-                    showMonths: 2,
-                    onChange: function(selectedDates) {
-                        if (selectedDates.length > 0) {
-                            let minSalida = new Date(selectedDates[0]);
-                            minSalida.setDate(minSalida.getDate() + 1);
-                            checkOutPicker.set("minDate", minSalida);
-                        }
-                    }
-                });
+            flatpickr("#fechaCheckIn", {
+            locale: "es",
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            disable: fechasOcupadas,
+            showMonths: 2,
+            onChange: function(selectedDates) {
+            if (selectedDates.length > 0) {
+            let minSalida = new Date(selectedDates[0]);
+            minSalida.setDate(minSalida.getDate() + 1);
+            checkOutPicker.set("minDate", minSalida);
+            }
+            }
+            });
 
             });
 
             function validarReservaVacia() {
-                let fechaInicio = document.getElementById("fechaCheckIn").value.trim();
-                let fechaSalida = document.getElementById("fechaCheckOut").value.trim();
+            let fechaInicio = document.getElementById("fechaCheckIn").value.trim();
+            let fechaSalida = document.getElementById("fechaCheckOut").value.trim();
 
-                if (fechaInicio === "" || fechaSalida === "") {
-                    document.getElementById("modalCamposReserva").showModal();
-                    return false;
-                }
+            if (fechaInicio === "" || fechaSalida === "") {
+            document.getElementById("modalCamposReserva").showModal();
+            return false;
+            }
 
-                return true;
+            return true;
             }
 
             function cerrarModalReserva() {
-                document.getElementById("modalCamposReserva").close();
+            document.getElementById("modalCamposReserva").close();
             }
             /*]]>*/
         </script>

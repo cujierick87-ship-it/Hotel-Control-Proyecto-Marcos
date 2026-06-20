@@ -104,18 +104,42 @@
                 border-radius:8px;
                 color:#666
             }
+            .brand{
+                color:#eab308;
+                font-size:20px;
+                font-weight:bold;
+                text-decoration:none;
+                display:flex;
+                align-items:center;
+                gap:10px;
+            }
+
+            .brand img{
+                width:36px;
+                height:36px;
+                object-fit:cover;
+                border-radius:6px;
+                background:white;
+            }
         </style>
     </head>
 
     <body>
 
         <nav class="navbar">
-            <a href="/cliente/inicio" class="brand">🏨 HotelControl</a>
+            <a href="/cliente/inicio" class="brand">
+                <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}"
+                     th:src="${hotelGlobal.logo}"
+                     alt="Logo">
 
+                <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+            </a>
             <div class="menu">
+                <a href="/cliente/informacion">Hotel y promociones</a>
                 <a href="/cliente/perfil">Mi Perfil</a>
                 <a href="/cliente/historial">Mis Reservas</a>
                 <a href="/logout" class="salir">Cerrar Sesión</a>
+
             </div>
         </nav>
 

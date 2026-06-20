@@ -185,18 +185,41 @@
                 border-radius:8px;
                 border:1px dashed #d1d5db
             }
+            .logo-menu{
+                padding:18px 20px;
+                color:#fbbf24;
+                display:flex;
+                align-items:center;
+                gap:10px;
+                font-weight:bold;
+                font-size:18px;
+            }
+
+            .logo-menu img{
+                width:38px;
+                height:38px;
+                object-fit:cover;
+                border-radius:6px;
+                background:white;
+            }
         </style>
     </head>
 
     <body>
 
         <aside class="sidebar">
-            <h2>HotelControl</h2>
-            <a href="/admin/dashboard">Dashboard</a>
+            <div class="logo-menu">
+                <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}"
+                     th:src="${hotelGlobal.logo}"
+                     alt="Logo">
+
+                <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+            </div>            <a href="/admin/dashboard">Dashboard</a>
             <a href="/admin/panel">Habitaciones</a>
             <a href="/admin/reservas">Reservas</a>
             <a href="/admin/reportes">Reportes</a>
             <a href="/admin/clientes">Clientes</a>
+            <a href="/admin/institucional">Institucional</a>
             <a href="/admin/personal">Personal</a>
             <a href="/admin/solicitudes" class="activo">Solicitudes</a>
         </aside>

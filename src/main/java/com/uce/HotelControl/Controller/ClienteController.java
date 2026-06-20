@@ -1,4 +1,3 @@
-
 package com.uce.HotelControl.Controller;
 
 import com.uce.HotelControl.Model.Habitacion;
@@ -18,6 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.uce.HotelControl.Service.InformacionHotelService;
+import com.uce.HotelControl.Service.PromocionService;
+
 @Controller
 public class ClienteController {
 
@@ -29,6 +31,12 @@ public class ClienteController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private InformacionHotelService informacionHotelService;
+
+    @Autowired
+    private PromocionService promocionService;
 
     // Verifica si existe un cliente logueado en sesión.
     // Si no existe o el rol no es CLIENTE, devuelve null.
@@ -254,5 +262,19 @@ public class ClienteController {
         model.addAttribute("mensaje", "Perfil actualizado correctamente.");
 
         return "perfil_cliente";
+    }
+
+    @GetMapping("/cliente/informacion")
+    public String verInformacionHotel(Model model, HttpSession session) {
+        Usuario cliente = obtenerClienteSesion(session);
+
+        if (cliente == null) {
+            return "redirect:/login?sesion=expirada";
+        }
+
+        model.addAttribute("informacionHotel", informacionHotelService.obtenerInformacion());
+        model.addAttribute("promociones", promocionService.obtenerActivas());
+
+        return "info_hotel_cliente";
     }
 }

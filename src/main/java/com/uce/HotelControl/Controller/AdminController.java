@@ -18,6 +18,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.uce.HotelControl.Model.InformacionHotel;
+import com.uce.HotelControl.Model.Promocion;
+import com.uce.HotelControl.Service.InformacionHotelService;
+import com.uce.HotelControl.Service.PromocionService;
+
 @Controller
 public class AdminController {
 
@@ -32,6 +37,12 @@ public class AdminController {
 
     @Autowired
     private SolicitudRecepcionService solicitudRecepcionService;
+
+    @Autowired
+    private InformacionHotelService informacionHotelService;
+
+    @Autowired
+    private PromocionService promocionService;
 
     // Carga el panel principal del administrador.
     // Muestra habitaciones y prepara el formulario para crear una nueva.
@@ -201,5 +212,53 @@ public class AdminController {
         model.addAttribute("cedulaBuscada", cedula);
 
         return "clientes_admin";
+    }
+
+    @GetMapping("/admin/institucional")
+    public String panelInstitucional(Model model) {
+        model.addAttribute("informacionHotel", informacionHotelService.obtenerInformacion());
+        model.addAttribute("promocion", new Promocion());
+        model.addAttribute("promociones", promocionService.obtenerTodas());
+
+        return "admin_institucional";
+    }
+
+    @PostMapping("/admin/institucional/guardar-info")
+    public String guardarInformacionHotel(@ModelAttribute InformacionHotel informacionHotel,
+            @RequestParam("logoArchivo") MultipartFile logoArchivo)
+            throws IOException {
+
+        informacionHotelService.guardarInformacion(informacionHotel, logoArchivo);
+        return "redirect:/admin/institucional";
+    }
+
+    @PostMapping("/admin/promociones/guardar")
+    public String guardarPromocion(@ModelAttribute Promocion promocion,
+            @RequestParam("imagenArchivo") MultipartFile imagenArchivo)
+            throws IOException {
+
+        promocionService.guardarPromocion(promocion, imagenArchivo);
+        return "redirect:/admin/institucional";
+    }
+
+    @GetMapping("/admin/promociones/editar/{id}")
+    public String editarPromocion(@PathVariable Long id, Model model) {
+        model.addAttribute("informacionHotel", informacionHotelService.obtenerInformacion());
+        model.addAttribute("promocion", promocionService.obtenerPorId(id));
+        model.addAttribute("promociones", promocionService.obtenerTodas());
+
+        return "admin_institucional";
+    }
+
+    @GetMapping("/admin/promociones/desactivar/{id}")
+    public String desactivarPromocion(@PathVariable Long id) {
+        promocionService.cambiarEstado(id, "INACTIVA");
+        return "redirect:/admin/institucional";
+    }
+
+    @GetMapping("/admin/promociones/activar/{id}")
+    public String activarPromocion(@PathVariable Long id) {
+        promocionService.cambiarEstado(id, "ACTIVA");
+        return "redirect:/admin/institucional";
     }
 }
