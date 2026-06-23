@@ -121,6 +121,261 @@
             .toast-flotante{position:fixed;top:88px;right:24px;z-index:1000;background:#111827;color:white;border-left:4px solid var(--success);padding:14px 18px;border-radius:8px;box-shadow:0 18px 40px rgba(0,0,0,.22);font-weight:800;max-width:330px}
             @media(max-width:800px){.client-hero-inner h1{font-size:32px}.availability-form{grid-template-columns:1fr}.availability-panel{margin-top:-28px}}
         </style>
+        
+        <!-- Chatbot flotante para clientes -->
+<div class="hotel-chatbot" id="hotelChatbot">
+    <button type="button" class="chatbot-burbuja" id="chatbotAbrir">
+        Chat
+    </button>
+
+    <div class="chatbot-ventana" id="chatbotVentana">
+        <div class="chatbot-header">
+            <div>
+                <strong>Asistente HotelControl</strong>
+                <span>Consultas sobre habitaciones y reservas</span>
+            </div>
+            <button type="button" id="chatbotCerrar">x</button>
+        </div>
+
+        <div class="chatbot-mensajes" id="chatbotMensajes">
+            <div class="chatbot-msg bot">
+                Hola, puedo ayudarte con habitaciones, precios, disponibilidad e informacion del hotel.
+            </div>
+        </div>
+
+        <form class="chatbot-form" id="chatbotForm">
+            <input type="text"
+                   id="chatbotInput"
+                   placeholder="Escribe tu pregunta..."
+                   autocomplete="off">
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .hotel-chatbot {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 1500;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    .chatbot-burbuja {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: none;
+        background: #2563eb;
+        color: white;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 14px 35px rgba(37, 99, 235, .35);
+    }
+
+    .chatbot-ventana {
+        display: none;
+        width: 360px;
+        max-width: calc(100vw - 32px);
+        height: 460px;
+        background: white;
+        border: 1px solid #e4e7ec;
+        border-radius: 10px;
+        box-shadow: 0 22px 60px rgba(15, 23, 42, .24);
+        overflow: hidden;
+    }
+
+    .chatbot-ventana.abierto {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .chatbot-header {
+        background: #111827;
+        color: white;
+        padding: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .chatbot-header strong {
+        display: block;
+        font-size: 15px;
+    }
+
+    .chatbot-header span {
+        display: block;
+        color: #cbd5e1;
+        font-size: 12px;
+        margin-top: 2px;
+    }
+
+    .chatbot-header button {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        border: 1px solid rgba(255,255,255,.2);
+        background: transparent;
+        color: white;
+        cursor: pointer;
+        font-weight: 800;
+    }
+
+    .chatbot-mensajes {
+        flex: 1;
+        padding: 14px;
+        overflow-y: auto;
+        background: #f8fafc;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .chatbot-msg {
+        max-width: 84%;
+        padding: 10px 12px;
+        border-radius: 9px;
+        font-size: 14px;
+        line-height: 1.45;
+        word-wrap: break-word;
+    }
+
+    .chatbot-msg.bot {
+        align-self: flex-start;
+        background: white;
+        color: #172033;
+        border: 1px solid #e4e7ec;
+    }
+
+    .chatbot-msg.user {
+        align-self: flex-end;
+        background: #2563eb;
+        color: white;
+    }
+
+    .chatbot-msg.cargando {
+        color: #667085;
+        font-style: italic;
+    }
+
+    .chatbot-form {
+        display: flex;
+        gap: 8px;
+        padding: 12px;
+        background: white;
+        border-top: 1px solid #e4e7ec;
+    }
+
+    .chatbot-form input {
+        flex: 1;
+        border: 1px solid #d0d5dd;
+        border-radius: 7px;
+        padding: 10px;
+        font-size: 14px;
+        outline: none;
+    }
+
+    .chatbot-form input:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    .chatbot-form button {
+        border: none;
+        border-radius: 7px;
+        background: #2563eb;
+        color: white;
+        padding: 0 14px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    @media(max-width: 600px) {
+        .hotel-chatbot {
+            right: 16px;
+            bottom: 16px;
+        }
+
+        .chatbot-ventana {
+            width: calc(100vw - 32px);
+            height: 430px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const botonAbrir = document.getElementById("chatbotAbrir");
+        const botonCerrar = document.getElementById("chatbotCerrar");
+        const ventana = document.getElementById("chatbotVentana");
+        const form = document.getElementById("chatbotForm");
+        const input = document.getElementById("chatbotInput");
+        const mensajes = document.getElementById("chatbotMensajes");
+
+        if (!botonAbrir || !botonCerrar || !ventana || !form || !input || !mensajes) {
+            return;
+        }
+
+        botonAbrir.addEventListener("click", function () {
+            ventana.classList.add("abierto");
+            botonAbrir.style.display = "none";
+            input.focus();
+        });
+
+        botonCerrar.addEventListener("click", function () {
+            ventana.classList.remove("abierto");
+            botonAbrir.style.display = "block";
+        });
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const pregunta = input.value.trim();
+
+            if (pregunta.length === 0) {
+                return;
+            }
+
+            agregarMensaje(pregunta, "user");
+            input.value = "";
+
+            const mensajeCargando = agregarMensaje("Consultando asistente...", "bot cargando");
+
+            fetch("/cliente/chatbot/preguntar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    mensaje: pregunta
+                })
+            })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                mensajeCargando.remove();
+                agregarMensaje(data.respuesta || "No pude generar una respuesta.", "bot");
+            })
+            .catch(function () {
+                mensajeCargando.remove();
+                agregarMensaje("No pude conectarme con el asistente en este momento.", "bot");
+            });
+        });
+
+        function agregarMensaje(texto, tipo) {
+            const div = document.createElement("div");
+            div.className = "chatbot-msg " + tipo;
+            div.textContent = texto;
+            mensajes.appendChild(div);
+            mensajes.scrollTop = mensajes.scrollHeight;
+            return div;
+        }
+    });
+</script>
     
 <script>
     document.addEventListener("DOMContentLoaded", function () {
