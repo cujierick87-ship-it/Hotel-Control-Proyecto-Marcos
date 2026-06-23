@@ -52,6 +52,13 @@
             <a href="/admin/solicitudes">Solicitudes de recepcion</a>
         </div>
     </details>
+
+    <details class="menu-group">
+        <summary class="submenu-title">Satisfacción</summary>
+        <div class="submenu">
+            <a href="/admin/resenas">Reseñas de huéspedes</a>
+        </div>
+    </details>
 </aside>
 
         <main class="main">
@@ -164,6 +171,40 @@
             </table>
         </div>
     </div>
+    
+    <div class="card">
+    <div class="section-head">
+        <h3>Satisfacción de huéspedes</h3>
+        <span class="pill">Reseñas</span>
+    </div>
+
+    <div class="dashboard-kpis">
+        <div class="metric-pill">
+            <span>Positivas</span>
+            <strong th:text="${resenasPositivas}">0</strong>
+        </div>
+
+        <div class="metric-pill">
+            <span>Negativas</span>
+            <strong th:text="${resenasNegativas}">0</strong>
+        </div>
+
+        <div class="metric-pill">
+            <span>Neutras</span>
+            <strong th:text="${resenasNeutras}">0</strong>
+        </div>
+
+        <div class="metric-pill">
+            <span>Alertas críticas</span>
+            <strong th:text="${alertasCriticasResenas}">0</strong>
+        </div>
+
+        <div class="metric-pill">
+            <span>Categoría más afectada</span>
+            <strong th:text="${categoriaMasAfectadaResenas}">GENERAL</strong>
+        </div>
+    </div>
+</div>
 
     <style>
         .dashboard-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}

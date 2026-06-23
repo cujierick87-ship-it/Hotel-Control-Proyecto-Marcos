@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Opiniones de huéspedes</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f6f7fb;
+            color: #172033;
+        }
+
+        .navbar {
+            min-height: 68px;
+            background: white;
+            border-bottom: 1px solid #e4e7ec;
+            padding: 14px 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #111827;
+            text-decoration: none;
+        }
+
+        .brand img {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 7px;
+            border: 1px solid #e4e7ec;
+        }
+
+        .menu {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .menu a {
+            color: #475467;
+            font-weight: 700;
+            padding: 8px 11px;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .menu a:hover,
+        .menu a.activo {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .menu .salir {
+            color: #dc2626;
+        }
+
+        .container {
+            max-width: 1180px;
+            margin: 36px auto;
+            padding: 0 22px;
+        }
+
+        .page-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #2563eb;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: 30px;
+            color: #111827;
+        }
+
+        p {
+            color: #475467;
+            line-height: 1.6;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid #e4e7ec;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 10px 24px rgba(16, 24, 40, .06);
+        }
+
+        .comentario {
+            color: #344054;
+            margin: 12px 0;
+        }
+
+        .meta {
+            font-size: 13px;
+            color: #667085;
+            margin-top: 10px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            border: 1px solid #e4e7ec;
+            background: #f2f4f7;
+            color: #344054;
+            margin-right: 6px;
+        }
+
+        .positivo {
+            background: #ecfdf3;
+            color: #047857;
+        }
+
+        .negativo {
+            background: #fef2f2;
+            color: #b42318;
+        }
+
+        .neutro {
+            background: #f2f4f7;
+            color: #475467;
+        }
+
+        .vacio {
+            background: white;
+            border: 1px solid #e4e7ec;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            color: #667085;
+            box-shadow: 0 10px 24px rgba(16, 24, 40, .06);
+        }
+
+        @media (max-width: 760px) {
+            .navbar {
+                padding: 14px 20px;
+                flex-wrap: wrap;
+            }
+
+            .page-head {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <a href="/cliente/inicio" class="brand">
+        <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}" th:src="${hotelGlobal.logo}" alt="Logo">
+        <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+    </a>
+
+    <div class="menu">
+        <a href="/cliente/inicio">Habitaciones</a>
+        <a href="/cliente/informacion">Hotel y promociones</a>
+        <a href="/cliente/opiniones" class="activo">Opiniones de huéspedes</a>
+        <a href="/cliente/perfil">Mi perfil</a>
+        <a href="/cliente/historial">Mis reservas</a>
+        <a href="/logout" class="salir">Cerrar sesión</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="page-head">
+        <div>
+            <p class="eyebrow">Experiencias reales</p>
+            <h1>Opiniones de huéspedes</h1>
+            <p>Comentarios registrados por clientes que ya finalizaron su estadía.</p>
+        </div>
+    </div>
+
+    <div class="vacio" th:if="${#lists.isEmpty(resenas)}">
+        Todavía no hay opiniones registradas.
+    </div>
+
+    <div class="grid" th:if="${!#lists.isEmpty(resenas)}">
+        <article class="card" th:each="resena : ${resenas}">
+            <div>
+                <span class="pill"
+                      th:classappend="${resena.sentimiento == 'POSITIVO'} ? ' positivo' : (${resena.sentimiento == 'NEGATIVO'} ? ' negativo' : ' neutro')"
+                      th:text="${resena.sentimiento}">
+                    POSITIVO
+                </span>
+
+                <span class="pill" th:text="${resena.categoriaAfectada}">
+                    GENERAL
+                </span>
+            </div>
+
+            <p class="comentario" th:text="${resena.comentarioTexto}">
+                Comentario del huésped.
+            </p>
+
+            <div class="meta">
+                <span th:text="${resena.reserva.nombreCliente}">Cliente</span>
+                · Reserva
+                <span th:text="${resena.reserva.codigoReserva}">HC-000000</span>
+            </div>
+        </article>
+    </div>
+</div>
+
+</body>
+</html>
