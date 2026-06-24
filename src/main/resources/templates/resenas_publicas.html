@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Reseñas - HotelControl</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f6f7fb;
+            color: #172033;
+        }
+
+        .navbar {
+            min-height: 68px;
+            background: white;
+            border-bottom: 1px solid #e4e7ec;
+            padding: 14px 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #111827;
+            text-decoration: none;
+        }
+
+        .brand img {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 7px;
+            border: 1px solid #e4e7ec;
+        }
+
+        .menu {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .menu a {
+            color: #475467;
+            font-weight: 700;
+            padding: 8px 11px;
+            border-radius: 7px;
+            text-decoration: none;
+        }
+
+        .menu a:hover,
+        .menu a.activo {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .menu .salir {
+            color: #dc2626;
+        }
+
+        .contenedor {
+            max-width: 900px;
+            margin: 34px auto;
+            padding: 0 22px;
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: #2563eb;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 30px;
+            margin: 0 0 12px;
+            color: #111827;
+        }
+
+        p {
+            color: #475467;
+            line-height: 1.7;
+        }
+
+        .form-card,
+        .review-card,
+        .empty-card {
+            background: white;
+            border: 1px solid #e4e7ec;
+            border-radius: 8px;
+            box-shadow: 0 10px 24px rgba(16, 24, 40, .06);
+        }
+
+        .form-card {
+            margin: 28px 0 32px;
+            padding: 24px;
+            background: #f8fafc;
+            border-color: #bfdbfe;
+        }
+
+        .form-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .form-icon {
+            color: #2563eb;
+            font-size: 22px;
+        }
+
+        .form-title h3 {
+            margin: 0;
+            font-size: 17px;
+            color: #111827;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 110px;
+            padding: 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            outline: none;
+            color: #172033;
+            background: white;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 14px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            border-radius: 7px;
+            background: #2563eb;
+            color: white;
+            padding: 11px 18px;
+            font-weight: 800;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background: #f2f4f7;
+            color: #344054;
+            border-color: #e4e7ec;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .alerta-ok {
+            background: #ecfdf3;
+            color: #047857;
+            border: 1px solid #bbf7d0;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            margin: 18px 0;
+        }
+
+        .alerta-error {
+            background: #fef2f2;
+            color: #b42318;
+            border: 1px solid #fecaca;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-weight: 800;
+            margin: 18px 0;
+        }
+
+        .review-card {
+            border-left: 4px solid #2563eb;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+        }
+
+        .review-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .guest {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #2563eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
+
+        .guest strong {
+            display: block;
+            color: #111827;
+            font-size: 14px;
+        }
+
+        .guest small,
+        .date {
+            color: #667085;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .comment {
+            border-top: 1px solid #e4e7ec;
+            padding-top: 14px;
+            color: #344054;
+            font-size: 14px;
+        }
+
+        .empty-card {
+            margin-top: 28px;
+            padding: 48px 24px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 42px;
+            margin-bottom: 14px;
+        }
+
+        .empty-card h3 {
+            margin: 0 0 8px;
+            color: #111827;
+        }
+
+        .volver {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e4e7ec;
+        }
+
+        .volver a {
+            color: #475467;
+            font-size: 13px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        @media (max-width: 760px) {
+            .navbar {
+                padding: 14px 20px;
+                flex-wrap: wrap;
+            }
+
+            .review-head {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <a href="/cliente/inicio" class="brand">
+        <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}" th:src="${hotelGlobal.logo}" alt="Logo">
+        <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
+    </a>
+
+    <div class="menu">
+        <a href="/cliente/inicio">Habitaciones</a>
+        <a href="/cliente/informacion">Hotel y promociones</a>
+        <a href="/cliente/resenas" class="activo">Reseñas</a>
+        <a href="/cliente/perfil">Mi perfil</a>
+        <a href="/cliente/historial">Mis reservas</a>
+        <a href="/logout" class="salir">Cerrar sesión</a>
+    </div>
+</nav>
+
+<main class="contenedor">
+    <p class="eyebrow">Lo que dicen nuestros huéspedes</p>
+    <h1>Opiniones y Reseñas</h1>
+    <p>
+        Estas reseñas fueron escritas por huéspedes que completaron su estadía en nuestro hotel.
+        Cada opinión fue procesada con inteligencia artificial y análisis local para ayudarnos
+        a mejorar continuamente nuestro servicio.
+    </p>
+
+    <div class="alerta-ok" th:if="${exitoMensaje}" th:text="${exitoMensaje}">
+        Reseña enviada correctamente.
+    </div>
+
+    <div class="alerta-error" th:if="${errorMensaje}" th:text="${errorMensaje}">
+        No se pudo enviar la reseña.
+    </div>
+
+    <section class="form-card" th:if="${reservaElegible != null}">
+        <div class="form-title">
+            <span class="form-icon">✦</span>
+            <h3>Cuéntanos tu experiencia</h3>
+        </div>
+
+        <p>
+            Hemos detectado que completaste tu estadía en la habitación
+            <strong th:text="${reservaElegible.habitacion.numero}">1</strong>.
+            Tu reseña será analizada para evaluar el servicio.
+        </p>
+
+        <form th:action="@{/cliente/resenas/guardar}" method="post"
+              onsubmit="this.querySelector('button[type=submit]').disabled = true; this.querySelector('button[type=submit]').innerText = 'Procesando opinión...';">
+
+            <input type="hidden" name="idReserva" th:value="${reservaElegible.idReserva}">
+
+            <textarea name="comentarioTexto"
+                      required
+                      minlength="10"
+                      maxlength="1000"
+                      placeholder="¿Cómo estuvo la limpieza, la atención del personal y tu experiencia en general? Escribe aquí tu comentario..."></textarea>
+
+            <div class="form-actions">
+                <button type="submit" class="btn">Enviar mi opinión con IA</button>
+            </div>
+        </form>
+    </section>
+
+    <section th:if="${resenas != null and !#lists.isEmpty(resenas)}">
+        <article class="review-card" th:each="resena : ${resenas}">
+            <div class="review-head">
+                <div class="guest">
+                    <div class="avatar"
+                         th:text="${#strings.substring(resena.nombreCliente != null ? resena.nombreCliente : 'H', 0, 1)}">
+                        H
+                    </div>
+                    <div>
+                        <strong th:text="${resena.nombreCliente != null ? resena.nombreCliente : 'Huésped'}">
+                            Huésped
+                        </strong>
+                        <small>Huésped verificado</small>
+                    </div>
+                </div>
+
+                <span class="date"
+                      th:text="${#temporals.format(resena.fechaRegistro, 'dd MMM yyyy')}">
+                    23 jun 2026
+                </span>
+            </div>
+
+            <p class="comment" th:text="${resena.comentarioTexto}">
+                Comentario del huésped.
+            </p>
+        </article>
+    </section>
+
+    <section class="empty-card" th:if="${resenas == null or #lists.isEmpty(resenas)}">
+        <div class="empty-icon">◌</div>
+        <h3>Aún no hay reseñas</h3>
+        <p>
+            Sé el primero en compartir tu experiencia. Puedes dejar tu reseña desde esta sección
+            una vez completada tu estadía tras el Check-Out.
+        </p>
+
+        <div style="margin-top: 20px;">
+            <a href="/cliente/historial" class="btn btn-secondary">Ver mis reservas</a>
+        </div>
+    </section>
+
+    <div class="volver">
+        <a href="/cliente/inicio">← Volver a habitaciones</a>
+    </div>
+</main>
+
+</body>
+</html>

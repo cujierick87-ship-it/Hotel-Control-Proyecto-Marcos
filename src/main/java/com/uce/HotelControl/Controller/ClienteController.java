@@ -22,7 +22,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.uce.HotelControl.Service.InformacionHotelService;
 import com.uce.HotelControl.Service.PromocionService;
-import com.uce.HotelControl.Service.ResenaHotelService;
 
 @Controller
 public class ClienteController {
@@ -41,9 +40,6 @@ public class ClienteController {
 
     @Autowired
     private PromocionService promocionService;
-
-    @Autowired
-    private ResenaHotelService resenaHotelService;
 
     // Verifica si existe un cliente logueado en sesión.
     // Si no existe o el rol no es CLIENTE, devuelve null.
@@ -195,8 +191,6 @@ public class ClienteController {
         return "redirect:/cliente/comprobante/" + reservaGuardada.getIdReserva();
     }
 
-    // Muestra el historial de reservas del cliente.
-    // Busca las reservas usando la cédula del cliente logueado.
     @GetMapping("/cliente/historial")
     public String verHistorial(Model model, HttpSession session) {
         Usuario cliente = obtenerClienteSesion(session);
@@ -208,7 +202,6 @@ public class ClienteController {
         List<Reserva> reservasCliente = reservaService.buscarPorCedula(cliente.getCedula());
 
         model.addAttribute("listaCompleta", reservasCliente);
-        model.addAttribute("reservasConResena", resenaHotelService.obtenerIdsReservasConResena(reservasCliente));
 
         return "historial_cliente";
     }
@@ -309,76 +302,4 @@ public class ClienteController {
         return "info_hotel_cliente";
     }
 
-    // Muestra el formulario para dejar una reseña de una reserva finalizada.
-    @GetMapping("/cliente/resena/{idReserva}")
-    public String mostrarFormularioResena(@PathVariable Long idReserva, Model model, HttpSession session) {
-        Usuario cliente = obtenerClienteSesion(session);
-
-        if (cliente == null) {
-            return "redirect:/login?sesion=expirada";
-        }
-
-        Reserva reserva = reservaService.obtenerPorId(idReserva);
-
-        if (reserva == null) {
-            return "redirect:/cliente/historial";
-        }
-
-        if (!reserva.getCedulaCliente().equals(cliente.getCedula())) {
-            return "redirect:/cliente/historial";
-        }
-
-        if (!"FINALIZADA".equalsIgnoreCase(reserva.getEstado())) {
-            return "redirect:/cliente/historial";
-        }
-
-        if (resenaHotelService.existeResenaParaReserva(idReserva)) {
-            return "redirect:/cliente/historial";
-        }
-
-        model.addAttribute("reserva", reserva);
-
-        return "resena_hotel";
-    }
-
-// Guarda la reseña del cliente y ejecuta el análisis de sentimiento.
-    @PostMapping("/cliente/resena/guardar")
-    public String guardarResena(@RequestParam Long idReserva,
-            @RequestParam String comentarioTexto,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        Usuario cliente = obtenerClienteSesion(session);
-
-        if (cliente == null) {
-            return "redirect:/login?sesion=expirada";
-        }
-
-        if (comentarioTexto == null || comentarioTexto.trim().length() < 10) {
-            redirectAttributes.addFlashAttribute("toastMensaje", "Ingrese una reseña más detallada.");
-            return "redirect:/cliente/resena/" + idReserva;
-        }
-
-        if (resenaHotelService.guardarResena(idReserva, cliente.getCedula(), comentarioTexto.trim()) == null) {
-            redirectAttributes.addFlashAttribute("toastMensaje", "No se pudo guardar la reseña.");
-            return "redirect:/cliente/historial";
-        }
-
-        redirectAttributes.addFlashAttribute("toastMensaje", "Reseña enviada y analizada correctamente.");
-        return "redirect:/cliente/historial";
-    }
-
-// Muestra las reseñas registradas para que otros clientes las lean.
-    @GetMapping("/cliente/opiniones")
-    public String verOpinionesHuespedes(Model model, HttpSession session) {
-        Usuario cliente = obtenerClienteSesion(session);
-
-        if (cliente == null) {
-            return "redirect:/login?sesion=expirada";
-        }
-
-        model.addAttribute("resenas", resenaHotelService.obtenerResenasPublicas());
-
-        return "opiniones_huespedes";
-    }
 }

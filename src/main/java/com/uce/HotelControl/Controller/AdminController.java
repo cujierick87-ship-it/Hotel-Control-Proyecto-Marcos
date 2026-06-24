@@ -23,7 +23,7 @@ import com.uce.HotelControl.Model.InformacionHotel;
 import com.uce.HotelControl.Model.Promocion;
 import com.uce.HotelControl.Service.InformacionHotelService;
 import com.uce.HotelControl.Service.PromocionService;
-import com.uce.HotelControl.Service.ResenaHotelService;
+import com.uce.HotelControl.Service.ComentarioReservaService;
 
 @Controller
 public class AdminController {
@@ -47,7 +47,7 @@ public class AdminController {
     private PromocionService promocionService;
 
     @Autowired
-    private ResenaHotelService resenaHotelService;
+    private ComentarioReservaService comentarioReservaService;
 
     // Carga el panel principal del administrador.
     // Muestra habitaciones y prepara el formulario para crear una nueva.
@@ -202,12 +202,11 @@ public class AdminController {
         model.addAttribute("reservasNoShow", reservaService.contarReservasPorEstado("NO-SHOW"));
         model.addAttribute("habitacionesMasReservadas", reservaService.obtenerHabitacionesMasReservadas());
 
-        model.addAttribute("resenasPositivas", resenaHotelService.contarPorSentimiento("POSITIVO"));
-        model.addAttribute("resenasNegativas", resenaHotelService.contarPorSentimiento("NEGATIVO"));
-        model.addAttribute("resenasNeutras", resenaHotelService.contarPorSentimiento("NEUTRO"));
-        model.addAttribute("alertasCriticasResenas", resenaHotelService.contarAlertasCriticas());
-        model.addAttribute("categoriaMasAfectadaResenas", resenaHotelService.obtenerCategoriaMasAfectada());
-
+        model.addAttribute("resenasPositivas", comentarioReservaService.contarPorSentimiento("POSITIVO"));
+        model.addAttribute("resenasNegativas", comentarioReservaService.contarPorSentimiento("NEGATIVO"));
+        model.addAttribute("resenasNeutras", comentarioReservaService.contarPorSentimiento("NEUTRO"));
+        model.addAttribute("alertasCriticasResenas", comentarioReservaService.contarAlertasCriticas());
+        model.addAttribute("categoriaMasAfectadaResenas", comentarioReservaService.obtenerCategoriaMasAfectada());
         return "dashboard_admin";
     }
 
@@ -308,15 +307,14 @@ public class AdminController {
         return "redirect:/admin/institucional#promociones";
     }
 
-    // Muestra todas las reseñas y el análisis de satisfacción.
     @GetMapping("/admin/resenas")
     public String verResenasHotel(Model model) {
-        model.addAttribute("resenas", resenaHotelService.obtenerTodas());
-        model.addAttribute("positivas", resenaHotelService.contarPorSentimiento("POSITIVO"));
-        model.addAttribute("negativas", resenaHotelService.contarPorSentimiento("NEGATIVO"));
-        model.addAttribute("neutras", resenaHotelService.contarPorSentimiento("NEUTRO"));
-        model.addAttribute("alertasCriticas", resenaHotelService.contarAlertasCriticas());
-        model.addAttribute("categoriaMasAfectada", resenaHotelService.obtenerCategoriaMasAfectada());
+        model.addAttribute("resenas", comentarioReservaService.obtenerTodos());
+        model.addAttribute("positivas", comentarioReservaService.contarPorSentimiento("POSITIVO"));
+        model.addAttribute("negativas", comentarioReservaService.contarPorSentimiento("NEGATIVO"));
+        model.addAttribute("neutras", comentarioReservaService.contarPorSentimiento("NEUTRO"));
+        model.addAttribute("alertasCriticas", comentarioReservaService.contarAlertasCriticas());
+        model.addAttribute("categoriaMasAfectada", comentarioReservaService.obtenerCategoriaMasAfectada());
 
         return "resenas_admin";
     }

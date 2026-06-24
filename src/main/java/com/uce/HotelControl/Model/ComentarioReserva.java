@@ -1,26 +1,20 @@
 package com.uce.HotelControl.Model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "resenas_hotel")
-public class ResenaHotel {
+@Table(name = "comentarios_reserva")
+public class ComentarioReserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idResena;
+    private Long idComentario;
 
-    @OneToOne
-    @JoinColumn(name = "id_reserva", nullable = false, unique = true)
-    private Reserva reserva;
+    @Column(nullable = false, unique = true)
+    private Long reservaId;
+
+    private String nombreCliente;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String comentarioTexto;
@@ -30,23 +24,28 @@ public class ResenaHotel {
     private Boolean alertaCritica = false;
     private LocalDateTime fechaRegistro = LocalDateTime.now();
 
-    public ResenaHotel() {
+    public Long getIdComentario() {
+        return idComentario;
     }
 
-    public Long getIdResena() {
-        return idResena;
+    public void setIdComentario(Long idComentario) {
+        this.idComentario = idComentario;
     }
 
-    public void setIdResena(Long idResena) {
-        this.idResena = idResena;
+    public Long getReservaId() {
+        return reservaId;
     }
 
-    public Reserva getReserva() {
-        return reserva;
+    public void setReservaId(Long reservaId) {
+        this.reservaId = reservaId;
     }
 
-    public void setReserva(Reserva reserva) {
-        this.reserva = reserva;
+    public String getNombreCliente() {
+        return nombreCliente;
+    }
+
+    public void setNombreCliente(String nombreCliente) {
+        this.nombreCliente = nombreCliente;
     }
 
     public String getComentarioTexto() {
