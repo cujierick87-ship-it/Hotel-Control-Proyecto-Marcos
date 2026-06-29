@@ -17,6 +17,8 @@ public class InformacionHotel {
     private String direccion;
     private String telefono;
     private String correo;
+    private String horarioCheckIn;
+    private String horarioCheckOut;
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
@@ -68,6 +70,22 @@ public class InformacionHotel {
 
     public void setCorreo(String correo) {
         this.correo = correo;
+    }
+
+    public String getHorarioCheckIn() {
+        return horarioCheckIn;
+    }
+
+    public void setHorarioCheckIn(String horarioCheckIn) {
+        this.horarioCheckIn = horarioCheckIn;
+    }
+
+    public String getHorarioCheckOut() {
+        return horarioCheckOut;
+    }
+
+    public void setHorarioCheckOut(String horarioCheckOut) {
+        this.horarioCheckOut = horarioCheckOut;
     }
 
     public String getDescripcion() {

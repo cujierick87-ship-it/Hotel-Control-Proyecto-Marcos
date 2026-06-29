@@ -116,7 +116,7 @@ public class AnalisisSentimientoService {
         parts.addObject().put("text", crearPrompt(comentario));
 
         ObjectNode generationConfig = raiz.putObject("generationConfig");
-        generationConfig.put("temperature", 0.1);
+        generationConfig.put("temperature", 0.0);
         generationConfig.put("responseMimeType", "application/json");
 
         return objectMapper.writeValueAsString(raiz);
@@ -139,9 +139,9 @@ public class AnalisisSentimientoService {
                 + "Valores permitidos para categoriaAfectada:\n"
                 + "LIMPIEZA, ATENCION, INFRAESTRUCTURA, COMODIDAD, GENERAL\n\n"
                 + "Reglas:\n"
-                + "- POSITIVO si predomina una buena experiencia.\n"
+                + "- POSITIVO si predomina una buena experiencia, por ejemplo: buen servicio, excelente atencion, todo limpio.\n"
                 + "- NEGATIVO si predominan quejas o problemas.\n"
-                + "- NEUTRO si no hay una opinion clara.\n"
+                + "- NEUTRO si no hay una opinion clara o si el texto dice que fue normal, regular o nada del otro mundo.\n"
                 + "- alertaCritica debe ser true solo si hay peligro, robo, violencia, accidente, "
                 + "insalubridad grave, plagas, gas, incendio o una urgencia importante.\n"
                 + "- Si no hay categoria clara, usa GENERAL.\n\n"
@@ -230,16 +230,25 @@ public class AnalisisSentimientoService {
         String texto = limpiarTexto(comentario);
 
         int positivos = contarCoincidencias(texto,
-                "excelente", "bueno", "buena", "limpio", "limpia",
-                "amable", "comodo", "comoda", "rapido", "rapida",
-                "agradable", "recomendado", "bonito", "tranquilo",
-                "perfecto", "feliz");
+                "excelente", "buen", "bueno", "buena", "bien",
+                "buen servicio", "buena atencion", "excelente atencion",
+                "limpio", "limpia", "muy limpio", "muy limpia",
+                "amable", "amables", "comodo", "comoda", "rapido", "rapida",
+                "agradable", "recomendado", "recomiendo", "bonito", "tranquilo",
+                "perfecto", "feliz", "satisfecho", "satisfecha",
+                "me gusto", "sin problemas", "no hubo problemas");
 
         int negativos = contarCoincidencias(texto,
-                "malo", "mala", "sucio", "sucia", "ruido",
-                "demora", "lento", "lenta", "problema", "pesimo",
-                "incomodo", "incomoda", "danado", "danada", "mal",
-                "terrible", "horrible");
+                "malo", "mala", "sucio", "sucia", "muy sucio", "muy sucia",
+                "ruido", "demora", "demorado", "demorada", "lento", "lenta",
+                "problema", "problemas", "pesimo", "pesima",
+                "incomodo", "incomoda", "danado", "danada",
+                "mal servicio", "mala atencion", "no me gusto",
+                "terrible", "horrible", "deficiente");
+
+        int neutros = contarCoincidencias(texto,
+                "normal", "regular", "aceptable", "nada del otro mundo",
+                "mas o menos", "sin comentarios");
 
         String sentimiento = "NEUTRO";
 
@@ -249,6 +258,10 @@ public class AnalisisSentimientoService {
 
         if (negativos > positivos) {
             sentimiento = "NEGATIVO";
+        }
+
+        if (positivos == negativos && neutros > 0) {
+            sentimiento = "NEUTRO";
         }
 
         return new ResultadoAnalisisSentimiento(
@@ -292,7 +305,7 @@ public class AnalisisSentimientoService {
         int contador = 0;
 
         for (String palabra : palabras) {
-            if (texto.contains(palabra)) {
+            if (contienePalabraOFrase(texto, palabra)) {
                 contador++;
             }
         }
@@ -302,12 +315,26 @@ public class AnalisisSentimientoService {
 
     private Boolean contieneAlguna(String texto, String... palabras) {
         for (String palabra : palabras) {
-            if (texto.contains(palabra)) {
+            if (contienePalabraOFrase(texto, palabra)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private Boolean contienePalabraOFrase(String texto, String palabra) {
+        if (texto == null || palabra == null) {
+            return false;
+        }
+
+        String buscada = limpiarTexto(palabra).trim();
+
+        if (buscada.isBlank()) {
+            return false;
+        }
+
+        return texto.contains(" " + buscada + " ");
     }
 
     private String limpiarTexto(String texto) {
@@ -318,6 +345,10 @@ public class AnalisisSentimientoService {
         String minuscula = texto.toLowerCase();
         String normalizado = Normalizer.normalize(minuscula, Normalizer.Form.NFD);
 
-        return normalizado.replaceAll("\\p{M}", "");
+        String sinTildes = normalizado.replaceAll("\\p{M}", "");
+        String soloTexto = sinTildes.replaceAll("[^a-z0-9 ]", " ");
+        String compacto = soloTexto.replaceAll("\\s+", " ").trim();
+
+        return " " + compacto + " ";
     }
 }

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class HabitacionService {
     // Busca habitaciones libres en un rango de fechas.
     // Descarta habitaciones en mantenimiento y revisa cruces con reservas existentes.
     public List<Habitacion> buscarHabitacionesLibresPorFechas(LocalDate checkIn, LocalDate checkOut) {
-        List<Habitacion> todas = habitacionRepository.findAll();
+        List<Habitacion> todas = obtenerTodasLasHabitaciones();
         List<Habitacion> disponibles = new ArrayList<>();
 
         for (Habitacion hab : todas) {
@@ -41,13 +42,13 @@ public class HabitacionService {
                 disponibles.add(hab);
             }
         }
-        return disponibles;
+        return ordenarPorNumero(disponibles);
     }
 
     // Obtiene habitaciones con estado DISPONIBLE.
     // Se usa para mostrar habitaciones disponibles en el catálogo del cliente.
     public List<Habitacion> obtenerHabitacionesDisponibles() {
-        return habitacionRepository.findByEstado("DISPONIBLE");
+        return ordenarPorNumero(habitacionRepository.findByEstadoOrderByNumeroAsc("DISPONIBLE"));
     }
 
     // Guarda o actualiza una habitación sin procesar imagen.
@@ -93,13 +94,13 @@ public class HabitacionService {
     // Obtiene todas las habitaciones registradas.
     // Se usa en el panel administrador y en recepción.
     public List<Habitacion> obtenerTodasLasHabitaciones() {
-        return habitacionRepository.findAll();
+        return ordenarPorNumero(habitacionRepository.findAllByOrderByNumeroAsc());
     }
 
     // Busca habitaciones por número.
     // Se usa en el buscador del administrador.
     public List<Habitacion> buscarPorNumero(String numero) {
-        return habitacionRepository.findByNumero(numero);
+        return ordenarPorNumero(habitacionRepository.findByNumero(numero));
     }
 
     // Busca una habitación por ID.
@@ -144,5 +145,26 @@ public class HabitacionService {
     // Cuenta habitaciones por estado para el dashboard administrativo.
     public int contarPorEstado(String estado) {
         return habitacionRepository.findByEstado(estado).size();
+    }
+
+    // Ordena las habitaciones por numero; si el numero no es numerico, lo manda al final.
+    private List<Habitacion> ordenarPorNumero(List<Habitacion> habitaciones) {
+        List<Habitacion> ordenadas = new ArrayList<>(habitaciones);
+
+        ordenadas.sort(Comparator.comparingInt(this::convertirNumeroHabitacion));
+        return ordenadas;
+    }
+
+    // Convierte el numero de habitacion para evitar que 10 aparezca antes que 2.
+    private int convertirNumeroHabitacion(Habitacion habitacion) {
+        if (habitacion == null || habitacion.getNumero() == null) {
+            return Integer.MAX_VALUE;
+        }
+
+        try {
+            return Integer.parseInt(habitacion.getNumero().trim());
+        } catch (NumberFormatException e) {
+            return Integer.MAX_VALUE;
+        }
     }
 }

@@ -67,7 +67,7 @@
         <main class="main">
             <header class="topbar">
                 <span>Panel / <b>Habitaciones</b></span>
-                <a href="/logout">Cerrar Sesión</a>
+                <a href="/logout?rol=ADMINISTRADOR">Cerrar Sesión</a>
             </header>
 
             <section class="content">
@@ -106,11 +106,6 @@
                             <div>
                                 <label>Cantidad de camas</label>
                                 <input type="number" th:field="*{cantidadCamas}" min="1" placeholder="Ej. 1, 2">
-                            </div>
-
-                            <div>
-                                <label>Cama principal</label>
-                                <input type="text" th:field="*{tipoCama}" placeholder="Ej. Queen, King, individual">
                             </div>
 
                             <div>
@@ -197,7 +192,6 @@
                                 <td th:text="${hab.tipo}"></td>
                                 <td>
                                     <span th:text="${hab.cantidadCamas != null ? hab.cantidadCamas : '-'}"></span>
-                                    <span th:if="${hab.tipoCama != null and hab.tipoCama != ''}" th:text="' - ' + ${hab.tipoCama}"></span>
                                 </td>
                                 <td th:text="'$' + ${hab.precioNoche}"></td>
                                 <td th:text="${hab.descripcion}"></td>

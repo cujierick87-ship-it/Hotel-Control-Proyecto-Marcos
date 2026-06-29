@@ -54,6 +54,16 @@ public class Reserva {
     private String estado = "PENDIENTE"; // Por defecto
     private LocalDate fechaReserva = LocalDate.now();
 
+    // Auditoria simple para saber que acciones hizo cada recepcionista.
+    private String recepcionistaReserva;
+    private String recepcionistaCheckIn;
+    private String recepcionistaCheckOut;
+    private String recepcionistaCancelacion;
+    private LocalDate fechaReservaPresencial;
+    private LocalDate fechaCheckInReal;
+    private LocalDate fechaCheckOutReal;
+    private LocalDate fechaCancelacion;
+
     // Constructor vacío obligatorio para Spring Boot
     public Reserva() {
     }
@@ -176,6 +186,70 @@ public class Reserva {
 
     public void setCodigoReserva(String codigoReserva) {
         this.codigoReserva = codigoReserva;
+    }
+
+    public String getRecepcionistaReserva() {
+        return recepcionistaReserva;
+    }
+
+    public void setRecepcionistaReserva(String recepcionistaReserva) {
+        this.recepcionistaReserva = recepcionistaReserva;
+    }
+
+    public String getRecepcionistaCheckIn() {
+        return recepcionistaCheckIn;
+    }
+
+    public void setRecepcionistaCheckIn(String recepcionistaCheckIn) {
+        this.recepcionistaCheckIn = recepcionistaCheckIn;
+    }
+
+    public String getRecepcionistaCheckOut() {
+        return recepcionistaCheckOut;
+    }
+
+    public void setRecepcionistaCheckOut(String recepcionistaCheckOut) {
+        this.recepcionistaCheckOut = recepcionistaCheckOut;
+    }
+
+    public String getRecepcionistaCancelacion() {
+        return recepcionistaCancelacion;
+    }
+
+    public void setRecepcionistaCancelacion(String recepcionistaCancelacion) {
+        this.recepcionistaCancelacion = recepcionistaCancelacion;
+    }
+
+    public LocalDate getFechaReservaPresencial() {
+        return fechaReservaPresencial;
+    }
+
+    public void setFechaReservaPresencial(LocalDate fechaReservaPresencial) {
+        this.fechaReservaPresencial = fechaReservaPresencial;
+    }
+
+    public LocalDate getFechaCheckInReal() {
+        return fechaCheckInReal;
+    }
+
+    public void setFechaCheckInReal(LocalDate fechaCheckInReal) {
+        this.fechaCheckInReal = fechaCheckInReal;
+    }
+
+    public LocalDate getFechaCheckOutReal() {
+        return fechaCheckOutReal;
+    }
+
+    public void setFechaCheckOutReal(LocalDate fechaCheckOutReal) {
+        this.fechaCheckOutReal = fechaCheckOutReal;
+    }
+
+    public LocalDate getFechaCancelacion() {
+        return fechaCancelacion;
+    }
+
+    public void setFechaCancelacion(LocalDate fechaCancelacion) {
+        this.fechaCancelacion = fechaCancelacion;
     }
 
 }

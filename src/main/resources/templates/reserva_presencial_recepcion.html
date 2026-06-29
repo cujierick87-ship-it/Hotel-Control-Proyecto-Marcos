@@ -54,7 +54,7 @@
                 <p class="eyebrow">Reserva presencial</p>
                 <h2>Completar datos</h2>
             </div>
-            <a href="/logout" class="logout">Cerrar sesión</a>
+            <a href="/logout?rol=RECEPCIONISTA" class="logout">Cerrar sesión</a>
         </header>
 
         <section class="content">
@@ -156,8 +156,8 @@
 
         /*[# th:each="r : ${reservas}"]*/
         fechasOcupadas.push({
-            from: /*[[${r.fechaCheckIn}]]*/ '',
-            to: /*[[${r.fechaCheckOut}]]*/ ''
+            from: /*[[${r.fechaCheckIn.toString()}]]*/ '',
+            to: /*[[${r.fechaCheckOut.toString()}]]*/ ''
         });
         /*[/]*/
 

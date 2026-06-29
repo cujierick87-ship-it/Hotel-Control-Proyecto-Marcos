@@ -21,7 +21,6 @@ public class Habitacion {
     private String tipo;
     private Integer capacidad;
     private Integer cantidadCamas;
-    private String tipoCama;
     private Double precioNoche;
     private String descripcion;
 
@@ -88,14 +87,6 @@ public class Habitacion {
 
     public void setCantidadCamas(Integer cantidadCamas) {
         this.cantidadCamas = cantidadCamas;
-    }
-
-    public String getTipoCama() {
-        return tipoCama;
-    }
-
-    public void setTipoCama(String tipoCama) {
-        this.tipoCama = tipoCama;
     }
 
     public Double getPrecioNoche() {

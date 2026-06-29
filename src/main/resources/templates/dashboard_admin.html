@@ -64,7 +64,7 @@
         <main class="main">
             <header class="topbar">
                 <span>Panel / <b>Dashboard</b></span>
-                <a href="/logout">Cerrar Sesion</a>
+                <a href="/logout?rol=ADMINISTRADOR">Cerrar Sesion</a>
             </header>
 
                                     <section class="content">
@@ -172,39 +172,49 @@
         </div>
     </div>
     
-    <div class="card">
-    <div class="section-head">
-        <h3>Satisfacción de huéspedes</h3>
-        <span class="pill">Reseñas</span>
+    <div class="tabla-card">
+        <div class="section-head">
+            <h3>Reservas realizadas por recepcionista</h3>
+            <span class="pill">Actividad operativa</span>
+        </div>
+
+        <div class="recepcion-chart" th:if="${!#lists.isEmpty(resumenRecepcionistas)}">
+            <div class="recepcion-barra" th:each="item : ${resumenRecepcionistas}">
+                <span th:text="${item.nombre}">Recepcionista</span>
+                <div class="bar-track">
+                    <div class="bar-fill blue"
+                         th:attr="data-value=${item.reservasCreadas + item.checkIns + item.checkOuts + item.cancelaciones}"></div>
+                </div>
+                <b th:text="${item.reservasCreadas + item.checkIns + item.checkOuts + item.cancelaciones}">0</b>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Recepcionista</th>
+                        <th>Reservas creadas</th>
+                        <th>Check-ins</th>
+                        <th>Check-outs</th>
+                        <th>Cancelaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${resumenRecepcionistas}">
+                        <td th:text="${item.nombre}">Recepcionista</td>
+                        <td th:text="${item.reservasCreadas}">0</td>
+                        <td th:text="${item.checkIns}">0</td>
+                        <td th:text="${item.checkOuts}">0</td>
+                        <td th:text="${item.cancelaciones}">0</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(resumenRecepcionistas)}">
+                        <td colspan="5">Aun no hay acciones registradas por recepcionista.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-
-    <div class="dashboard-kpis">
-        <div class="metric-pill">
-            <span>Positivas</span>
-            <strong th:text="${resenasPositivas}">0</strong>
-        </div>
-
-        <div class="metric-pill">
-            <span>Negativas</span>
-            <strong th:text="${resenasNegativas}">0</strong>
-        </div>
-
-        <div class="metric-pill">
-            <span>Neutras</span>
-            <strong th:text="${resenasNeutras}">0</strong>
-        </div>
-
-        <div class="metric-pill">
-            <span>Alertas críticas</span>
-            <strong th:text="${alertasCriticasResenas}">0</strong>
-        </div>
-
-        <div class="metric-pill">
-            <span>Categoría más afectada</span>
-            <strong th:text="${categoriaMasAfectadaResenas}">GENERAL</strong>
-        </div>
-    </div>
-</div>
 
     <style>
         .dashboard-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
@@ -219,8 +229,9 @@
         .legend-list{display:grid;gap:12px;min-width:220px}.legend-list div{display:flex;align-items:center;gap:10px;color:#475467;font-weight:700}.legend-list b{margin-left:auto;color:#111827}
         .dot{width:11px;height:11px;border-radius:50%;display:inline-block}.blue{background:#2563eb}.green{background:#059669}.amber{background:#d97706}.gray{background:#64748b}.red{background:#dc2626}
         .bar-list{display:grid;gap:18px;margin-top:20px}.bar-row{display:grid;grid-template-columns:110px minmax(140px,1fr) 35px;gap:12px;align-items:center;color:#475467;font-weight:800}.bar-track{height:14px;background:#eef2f7;border-radius:999px;overflow:hidden}.bar-fill{height:100%;width:0;border-radius:999px;transition:.4s}
+        .recepcion-chart{display:grid;gap:12px;margin-bottom:18px}.recepcion-barra{display:grid;grid-template-columns:180px minmax(160px,1fr) 40px;gap:12px;align-items:center;font-weight:800;color:#475467}
         .toast-flotante{position:fixed;top:88px;right:24px;z-index:1000;background:#111827;color:white;border-left:4px solid var(--success);padding:14px 18px;border-radius:8px;box-shadow:0 18px 40px rgba(0,0,0,.22);font-weight:800;max-width:330px}
-        @media(max-width:900px){.dashboard-charts{grid-template-columns:1fr}.bar-row{grid-template-columns:1fr}.donut-chart{margin:auto}}
+        @media(max-width:900px){.dashboard-charts{grid-template-columns:1fr}.bar-row,.recepcion-barra{grid-template-columns:1fr}.donut-chart{margin:auto}}
     </style>
 
     <script>

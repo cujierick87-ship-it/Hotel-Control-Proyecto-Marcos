@@ -18,7 +18,11 @@ public class ComentarioController {
     private ComentarioReservaService comentarioReservaService;
 
     private Usuario obtenerClienteSesion(HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario usuario = (Usuario) session.getAttribute("usuarioCliente");
+
+        if (usuario == null) {
+            usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        }
 
         if (usuario == null || !"CLIENTE".equalsIgnoreCase(usuario.getRol())) {
             return null;

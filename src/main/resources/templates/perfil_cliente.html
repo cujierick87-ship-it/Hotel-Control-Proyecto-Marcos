@@ -20,7 +20,7 @@
         <a href="/cliente/perfil" class="activo">Mi perfil</a>
         <a href="/cliente/historial">Mis reservas</a>
         <a href="/cliente/resenas">Reseñas</a>
-        <a href="/logout" class="salir">Cerrar sesión</a>
+        <a href="/logout?rol=CLIENTE" class="salir">Cerrar sesión</a>
     </div>
 </nav>
 </div>
@@ -71,5 +71,6 @@
     </form>
 </div>
 
+    <div th:replace="~{chatbot_cliente_fragment :: chatbotCliente}"></div>
 </body>
 </html>

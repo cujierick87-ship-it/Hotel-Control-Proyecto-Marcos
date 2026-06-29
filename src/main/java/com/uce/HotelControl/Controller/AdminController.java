@@ -1,5 +1,4 @@
 package com.uce.HotelControl.Controller;
-
 import com.uce.HotelControl.Model.Habitacion;
 import com.uce.HotelControl.Model.Usuario;
 import com.uce.HotelControl.Service.HabitacionService;
@@ -24,6 +23,7 @@ import com.uce.HotelControl.Model.Promocion;
 import com.uce.HotelControl.Service.InformacionHotelService;
 import com.uce.HotelControl.Service.PromocionService;
 import com.uce.HotelControl.Service.ComentarioReservaService;
+
 
 @Controller
 public class AdminController {
@@ -201,12 +201,7 @@ public class AdminController {
         model.addAttribute("reservasCanceladas", reservaService.contarReservasPorEstado("CANCELADA"));
         model.addAttribute("reservasNoShow", reservaService.contarReservasPorEstado("NO-SHOW"));
         model.addAttribute("habitacionesMasReservadas", reservaService.obtenerHabitacionesMasReservadas());
-
-        model.addAttribute("resenasPositivas", comentarioReservaService.contarPorSentimiento("POSITIVO"));
-        model.addAttribute("resenasNegativas", comentarioReservaService.contarPorSentimiento("NEGATIVO"));
-        model.addAttribute("resenasNeutras", comentarioReservaService.contarPorSentimiento("NEUTRO"));
-        model.addAttribute("alertasCriticasResenas", comentarioReservaService.contarAlertasCriticas());
-        model.addAttribute("categoriaMasAfectadaResenas", comentarioReservaService.obtenerCategoriaMasAfectada());
+        model.addAttribute("resumenRecepcionistas", reservaService.obtenerResumenPorRecepcionista());
         return "dashboard_admin";
     }
 
@@ -315,6 +310,11 @@ public class AdminController {
         model.addAttribute("neutras", comentarioReservaService.contarPorSentimiento("NEUTRO"));
         model.addAttribute("alertasCriticas", comentarioReservaService.contarAlertasCriticas());
         model.addAttribute("categoriaMasAfectada", comentarioReservaService.obtenerCategoriaMasAfectada());
+        model.addAttribute("totalResenas", comentarioReservaService.contarTotal());
+        model.addAttribute("porcentajePositivo", comentarioReservaService.calcularPorcentajeSentimiento("POSITIVO"));
+        model.addAttribute("porcentajeNegativo", comentarioReservaService.calcularPorcentajeSentimiento("NEGATIVO"));
+        model.addAttribute("promedioCalificacion", comentarioReservaService.calcularPromedioCalificacion());
+        model.addAttribute("resenasPorMes", comentarioReservaService.contarResenasPorMes());
 
         return "resenas_admin";
     }

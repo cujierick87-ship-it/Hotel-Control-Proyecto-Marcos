@@ -44,7 +44,11 @@ public class ClienteController {
     // Verifica si existe un cliente logueado en sesión.
     // Si no existe o el rol no es CLIENTE, devuelve null.
     private Usuario obtenerClienteSesion(HttpSession session) {
-        Usuario cliente = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario cliente = (Usuario) session.getAttribute("usuarioCliente");
+
+        if (cliente == null) {
+            cliente = (Usuario) session.getAttribute("usuarioLogueado");
+        }
 
         if (cliente == null) {
             return null;
@@ -279,6 +283,7 @@ public class ClienteController {
                 datosPerfil
         );
 
+        session.setAttribute("usuarioCliente", actualizado);
         session.setAttribute("usuarioLogueado", actualizado);
 
         model.addAttribute("cliente", actualizado);

@@ -931,7 +931,7 @@
                 <a href="/cliente/perfil">Mi perfil</a>
                 <a href="/cliente/historial">Mis reservas</a>
                 <a href="/cliente/resenas">Reseñas</a>
-                <a href="/logout" class="salir">Cerrar sesión</a>
+                <a href="/logout?rol=CLIENTE" class="salir">Cerrar sesión</a>
             </div>
         </nav>
         <div class="toast-flotante" th:if="${toastMensaje}" th:text="${toastMensaje}"></div>
@@ -1232,6 +1232,7 @@
                 font-size: 14px;
                 line-height: 1.45;
                 word-wrap: break-word;
+                white-space: pre-line;
             }
 
             .chatbot-msg.bot {
@@ -1305,15 +1306,20 @@
             const form = document.getElementById("chatbotForm");
             const input = document.getElementById("chatbotInput");
             const mensajes = document.getElementById("chatbotMensajes");
+            const claveHistorial = "hotelcontrolChatHistorial";
+            const saludoInicial = "Hola, puedo ayudarte con habitaciones, precios, disponibilidad e informacion del hotel.";
 
             if (!botonAbrir || !botonCerrar || !ventana || !form || !input || !mensajes) {
             return;
             }
 
+            cargarHistorial();
+
             botonAbrir.addEventListener("click", function () {
             ventana.classList.add("abierto");
             botonAbrir.style.display = "none";
             input.focus();
+            mensajes.scrollTop = mensajes.scrollHeight;
             });
 
             botonCerrar.addEventListener("click", function () {
@@ -1330,10 +1336,10 @@
             return;
             }
 
-            agregarMensaje(pregunta, "user");
+            agregarMensaje(pregunta, "user", true);
             input.value = "";
 
-            const mensajeCargando = agregarMensaje("Consultando asistente...", "bot cargando");
+            const mensajeCargando = agregarMensaje("Consultando asistente...", "bot cargando", false);
 
             fetch("/cliente/chatbot/preguntar", {
             method: "POST",
@@ -1349,21 +1355,55 @@
             })
             .then(function (data) {
             mensajeCargando.remove();
-            agregarMensaje(data.respuesta || "No pude generar una respuesta.", "bot");
+            agregarMensaje(data.respuesta || "No pude generar una respuesta.", "bot", true);
             })
             .catch(function () {
             mensajeCargando.remove();
-            agregarMensaje("No pude conectarme con el asistente en este momento.", "bot");
+            agregarMensaje("No pude conectarme con el asistente en este momento.", "bot", true);
             });
             });
 
-            function agregarMensaje(texto, tipo) {
+            function cargarHistorial() {
+            let historial = obtenerHistorial();
+
+            if (historial.length === 0) {
+            historial = [{texto: saludoInicial, tipo: "bot"}];
+            guardarHistorial(historial);
+            }
+
+            mensajes.innerHTML = "";
+
+            historial.forEach(function (mensaje) {
+            agregarMensaje(mensaje.texto, mensaje.tipo, false);
+            });
+            }
+
+            function agregarMensaje(texto, tipo, guardar) {
             const div = document.createElement("div");
             div.className = "chatbot-msg " + tipo;
             div.textContent = texto;
             mensajes.appendChild(div);
             mensajes.scrollTop = mensajes.scrollHeight;
+
+            if (guardar) {
+            const historial = obtenerHistorial();
+            historial.push({texto: texto, tipo: tipo.replace(" cargando", "")});
+            guardarHistorial(historial);
+            }
+
             return div;
+            }
+
+            function obtenerHistorial() {
+            try {
+            return JSON.parse(localStorage.getItem(claveHistorial)) || [];
+            } catch (error) {
+            return [];
+            }
+            }
+
+            function guardarHistorial(historial) {
+            localStorage.setItem(claveHistorial, JSON.stringify(historial.slice(-40)));
             }
             });
         </script>

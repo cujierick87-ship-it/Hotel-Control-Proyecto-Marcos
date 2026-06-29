@@ -4,7 +4,9 @@ import com.uce.HotelControl.Model.ComentarioReserva;
 import com.uce.HotelControl.Model.Reserva;
 import com.uce.HotelControl.Repository.ComentarioReservaRepository;
 import com.uce.HotelControl.Repository.ReservaRepository;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +76,64 @@ public class ComentarioReservaService {
 
     public long contarPorSentimiento(String sentimiento) {
         return comentarioReservaRepository.countBySentimiento(sentimiento);
+    }
+
+    // Cuenta todas las resenas registradas.
+    public long contarTotal() {
+        return comentarioReservaRepository.count();
+    }
+
+    // Calcula el porcentaje de un sentimiento sobre el total de resenas.
+    public double calcularPorcentajeSentimiento(String sentimiento) {
+        long total = contarTotal();
+
+        if (total == 0) {
+            return 0;
+        }
+
+        return (contarPorSentimiento(sentimiento) * 100.0) / total;
+    }
+
+    // Estima una calificacion promedio usando el sentimiento detectado.
+    public double calcularPromedioCalificacion() {
+        List<ComentarioReserva> resenas = comentarioReservaRepository.findAll();
+
+        if (resenas.isEmpty()) {
+            return 0;
+        }
+
+        int suma = 0;
+
+        for (ComentarioReserva resena : resenas) {
+            if ("POSITIVO".equalsIgnoreCase(resena.getSentimiento())) {
+                suma += 5;
+            } else if ("NEGATIVO".equalsIgnoreCase(resena.getSentimiento())) {
+                suma += 1;
+            } else {
+                suma += 3;
+            }
+        }
+
+        return suma * 1.0 / resenas.size();
+    }
+
+    // Agrupa resenas por mes para graficar la evolucion de opiniones.
+    public Map<String, Integer> contarResenasPorMes() {
+        Map<String, Integer> conteo = new LinkedHashMap<>();
+
+        for (ComentarioReserva resena : comentarioReservaRepository.findAll()) {
+            if (resena.getFechaRegistro() == null) {
+                continue;
+            }
+
+            String mes = resena.getFechaRegistro().getYear()
+                    + "-"
+                    + String.format("%02d", resena.getFechaRegistro().getMonthValue());
+
+            conteo.put(mes, conteo.getOrDefault(mes, 0) + 1);
+        }
+
+        return conteo;
     }
 
     public long contarAlertasCriticas() {

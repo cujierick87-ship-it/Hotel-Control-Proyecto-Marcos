@@ -20,7 +20,7 @@
         <a href="/cliente/perfil">Mi perfil</a>
         <a href="/cliente/historial">Mis reservas</a>
         <a href="/cliente/resenas">Reseñas</a>
-        <a href="/logout" class="salir">Cerrar sesión</a>
+        <a href="/logout?rol=CLIENTE" class="salir">Cerrar sesión</a>
     </div>
 </nav>
 
@@ -96,8 +96,8 @@
 
             /*[# th:each="r : ${reservas}"]*/
             fechasOcupadas.push({
-            from: /*[[${r.fechaCheckIn}]]*/ '',
-            to: /*[[${r.fechaCheckOut}]]*/ ''
+            from: /*[[${r.fechaCheckIn.toString()}]]*/ '',
+            to: /*[[${r.fechaCheckOut.toString()}]]*/ ''
             });
             /*[/]*/
 
@@ -167,6 +167,7 @@
             let total = noches * precio;
             resumen.innerText = noches + " noche(s). Total estimado: $" + total.toFixed(2);
             }
+
             function validarReservaVacia() {
             let fechaInicio = document.getElementById("fechaCheckIn").value.trim();
             let fechaSalida = document.getElementById("fechaCheckOut").value.trim();
@@ -184,5 +185,6 @@
             }
             /*]]>*/
         </script>
+        <div th:replace="~{chatbot_cliente_fragment :: chatbotCliente}"></div>
     </body>
 </html>

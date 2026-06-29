@@ -3,257 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <title>Reseñas de huéspedes</title>
-
     <style>
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, sans-serif;
-        }
-
-        body {
-            margin: 0;
-            background: #f6f7fb;
-            color: #172033;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 274px;
-            background: #111827;
-            color: white;
-            min-height: 100vh;
-            flex-shrink: 0;
-        }
-
-        .logo-menu {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,.08);
-            font-weight: 800;
-        }
-
-        .sidebar a {
-            display: block;
-            color: #d1d5db;
-            text-decoration: none;
-            padding: 12px 18px;
-            font-weight: 700;
-            border-left: 3px solid transparent;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.activo {
-            background: #1f2937;
-            color: white;
-            border-left-color: #2563eb;
-        }
-
-        .main {
-            flex: 1;
-        }
-
-        .topbar {
-            min-height: 72px;
-            background: white;
-            border-bottom: 1px solid #e4e7ec;
-            padding: 18px 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .content {
-            padding: 30px;
-            max-width: 1320px;
-            margin: 0 auto;
-        }
-
-        .eyebrow {
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            color: #2563eb;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-
-        h1, h2, h3 {
-            margin: 0;
-            color: #111827;
-        }
-
-        p {
-            color: #667085;
-            line-height: 1.6;
-        }
-
-        .metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin: 24px 0;
-        }
-
-        .metric-card {
-            background: white;
-            border: 1px solid #e4e7ec;
-            border-radius: 8px;
-            padding: 18px;
-            box-shadow: 0 10px 24px rgba(16,24,40,.06);
-        }
-
-        .metric-card span {
-            color: #667085;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .metric-card strong {
-            display: block;
-            font-size: 28px;
-            margin-top: 8px;
-            color: #111827;
-        }
-
-        .tabla-card {
-            background: white;
-            border: 1px solid #e4e7ec;
-            border-radius: 8px;
-            padding: 22px;
-            box-shadow: 0 10px 24px rgba(16,24,40,.06);
-        }
-
-        .table-wrap {
-            overflow-x: auto;
-            margin-top: 16px;
-            border: 1px solid #e4e7ec;
-            border-radius: 8px;
-        }
-
-        table {
-            width: 100%;
-            min-width: 900px;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #e4e7ec;
-            text-align: left;
-            font-size: 14px;
-            vertical-align: top;
-        }
-
-        th {
-            background: #f9fafb;
-            color: #667085;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: .04em;
-        }
-
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 999px;
-            padding: 6px 10px;
-            font-size: 12px;
-            font-weight: 800;
-            background: #f2f4f7;
-            color: #344054;
-        }
-
-        .positivo {
-            background: #ecfdf3;
-            color: #047857;
-        }
-
-        .negativo {
-            background: #fef2f2;
-            color: #b42318;
-        }
-
-        .neutro {
-            background: #f2f4f7;
-            color: #475467;
-        }
-
-        .alerta {
-            background: #fef2f2;
-            color: #b42318;
-        }
-
-        .vacio {
-            text-align: center;
-            color: #667085;
-            padding: 24px;
-        }
+        :root{--bg:#f6f7fb;--surface:#fff;--text:#172033;--muted:#667085;--line:#e4e7ec;--accent:#2563eb;--success:#059669;--danger:#dc2626;--shadow:0 10px 24px rgba(16,24,40,.06)}
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Tahoma,sans-serif}
+        body{min-height:100vh;background:var(--bg);color:var(--text);display:flex}
+        a{text-decoration:none;color:inherit}.main{flex:1;min-width:0}.content{padding:30px;max-width:1320px;margin:auto}
+        .sidebar{width:274px;min-height:100vh;background:#111827;color:white;flex-shrink:0;position:sticky;top:0}
+        .logo-menu{padding:20px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:12px;font-weight:800}
+        .logo-menu img{width:40px;height:40px;object-fit:cover;border-radius:8px;background:white}
+        .sidebar a{display:block;padding:12px 18px;border-left:3px solid transparent;color:#d1d5db;font-size:14px;font-weight:700}
+        .sidebar a:hover,.sidebar a.activo{background:#1f2937;color:white;border-left-color:var(--accent)}
+        .menu-group{border-top:1px solid rgba(255,255,255,.08);padding:6px 0}.menu-group:first-of-type{border-top:0}
+        .submenu-title{list-style:none;cursor:pointer;padding:12px 18px;color:#f9fafb;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:900;display:flex;justify-content:space-between}
+        .submenu-title::-webkit-details-marker{display:none}.submenu-title::after{content:">";color:#93c5fd}.menu-group[open] .submenu-title::after{transform:rotate(90deg)}
+        .submenu a{font-size:13px;padding:10px 18px 10px 30px;color:#cbd5e1}
+        .topbar{min-height:72px;background:white;border-bottom:1px solid var(--line);padding:16px 30px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+        .topbar a{color:var(--danger);font-weight:800}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:800;margin-bottom:6px}
+        h1,h2,h3{color:#111827}.page-head{margin-bottom:22px}.page-head p{color:var(--muted);line-height:1.6;margin-top:6px}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
+        .card,.tabla-card{background:white;border:1px solid var(--line);border-radius:8px;padding:22px;box-shadow:var(--shadow);margin-bottom:20px}
+        .metric-card span{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;font-weight:800;letter-spacing:.04em}
+        .metric-card strong{display:block;margin-top:8px;font-size:26px;color:#111827}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+        .charts{display:grid;grid-template-columns:minmax(260px,.7fr) minmax(320px,1fr);gap:18px}.donut-wrap{display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+        .donut{width:180px;height:180px;border-radius:50%;background:#e5e7eb;display:grid;place-items:center;position:relative}.donut::after{content:"";position:absolute;width:110px;height:110px;border-radius:50%;background:white}
+        .donut span{position:relative;z-index:1;font-size:24px;font-weight:900}.legend{display:grid;gap:10px;color:#475467;font-weight:700}.dot{width:11px;height:11px;border-radius:50%;display:inline-block;margin-right:8px}
+        .pos{background:#059669}.neu{background:#64748b}.neg{background:#dc2626}.bars{display:grid;gap:12px}.bar-row{display:grid;grid-template-columns:85px minmax(140px,1fr) 35px;gap:10px;align-items:center;color:#475467;font-weight:800}
+        .track{height:14px;background:#eef2f7;border-radius:999px;overflow:hidden}.fill{height:100%;width:0;background:var(--accent);border-radius:999px;transition:.3s}
+        .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:8px}table{width:100%;min-width:900px;border-collapse:collapse;background:white}th,td{padding:12px;border-bottom:1px solid var(--line);text-align:left;font-size:14px;vertical-align:top}
+        th{background:#f9fafb;color:#667085;font-size:12px;text-transform:uppercase;letter-spacing:.04em}.pill{display:inline-flex;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:800;background:#f2f4f7;color:#344054}
+        .positivo{background:#ecfdf3;color:#047857}.negativo{background:#fef2f2;color:#b42318}.neutro{background:#f2f4f7;color:#475467}.alerta{background:#fef2f2;color:#b42318}.vacio{text-align:center;color:var(--muted);padding:24px}
+        @media(max-width:900px){body{display:block}.sidebar{width:100%;min-height:auto;position:relative}.content{padding:20px}.charts{grid-template-columns:1fr}.bar-row{grid-template-columns:1fr}}
     </style>
 </head>
-
 <body>
 
 <aside class="sidebar">
     <div class="logo-menu">
-        HotelControl Admin
+        <img th:if="${hotelGlobal.logo != null and hotelGlobal.logo != ''}" th:src="${hotelGlobal.logo}" alt="Logo">
+        <span th:text="${hotelGlobal.nombreHotel}">HotelControl</span>
     </div>
-
     <a href="/admin/dashboard">Dashboard</a>
-    <a href="/admin/panel">Habitaciones</a>
-    <a href="/admin/reservas">Reservas</a>
-    <a href="/admin/clientes">Clientes</a>
-    <a href="/admin/personal">Personal</a>
-    <a href="/admin/solicitudes">Solicitudes</a>
-    <a href="/admin/resenas" class="activo">Reseñas</a>
-    <a href="/admin/institucional">Institucional</a>
-    <a href="/logout">Cerrar sesión</a>
+    <details class="menu-group">
+        <summary class="submenu-title">Habitaciones</summary>
+        <div class="submenu">
+            <a href="/admin/panel#gestion">Gestion de habitaciones</a>
+            <a href="/admin/panel#estados">Estados de habitaciones</a>
+        </div>
+    </details>
+    <details class="menu-group">
+        <summary class="submenu-title">Reservas</summary>
+        <div class="submenu">
+            <a href="/admin/reservas">Todas las reservas</a>
+            <a href="/admin/reportes">Reportes por fechas</a>
+            <a href="/admin/clientes">Clientes con reservas</a>
+        </div>
+    </details>
+    <details class="menu-group">
+        <summary class="submenu-title">Usuarios</summary>
+        <div class="submenu">
+            <a href="/admin/personal">Personal y roles</a>
+        </div>
+    </details>
+    <details class="menu-group">
+        <summary class="submenu-title">Institucional</summary>
+        <div class="submenu">
+            <a href="/admin/institucional#info">Informacion del hotel</a>
+            <a href="/admin/institucional#promociones">Promociones</a>
+        </div>
+    </details>
+    <details class="menu-group">
+        <summary class="submenu-title">Solicitudes</summary>
+        <div class="submenu">
+            <a href="/admin/solicitudes">Solicitudes de recepcion</a>
+        </div>
+    </details>
+    <details class="menu-group" open>
+        <summary class="submenu-title">Satisfaccion</summary>
+        <div class="submenu">
+            <a href="/admin/resenas" class="activo">Reseñas de huespedes</a>
+        </div>
+    </details>
 </aside>
 
 <main class="main">
-    <div class="topbar">
-        <div>
-            <p class="eyebrow">Análisis de satisfacción</p>
-            <h2>Reseñas de huéspedes</h2>
-        </div>
-    </div>
+    <header class="topbar">
+        <span>Panel / <b>Reseñas de huéspedes</b></span>
+        <a href="/logout?rol=ADMINISTRADOR">Cerrar Sesion</a>
+    </header>
 
     <section class="content">
-        <p>
-            Aquí se muestran las reseñas enviadas por clientes con reservas finalizadas.
-            El sistema analiza cada comentario con Gemini y, si falla, usa análisis local.
-        </p>
+        <div class="page-head">
+            <p class="eyebrow">Analisis de satisfaccion</p>
+            <h1>Reseñas de huéspedes</h1>
+            <p>Comentarios enviados por clientes con reservas finalizadas. Gemini analiza primero y el analisis local queda como respaldo.</p>
+        </div>
 
-        <div class="metrics">
-            <div class="metric-card">
-                <span>Positivas</span>
-                <strong th:text="${positivas}">0</strong>
+        <!-- Estadisticas principales del modulo de reseñas. -->
+        <div class="grid">
+            <div class="card metric-card"><span>Total reseñas</span><strong th:text="${totalResenas}">0</strong></div>
+            <div class="card metric-card"><span>Porcentaje positivo</span><strong th:text="${#numbers.formatDecimal(porcentajePositivo,1,1)} + '%'">0%</strong></div>
+            <div class="card metric-card"><span>Porcentaje negativo</span><strong th:text="${#numbers.formatDecimal(porcentajeNegativo,1,1)} + '%'">0%</strong></div>
+            <div class="card metric-card"><span>Promedio estimado</span><strong th:text="${#numbers.formatDecimal(promedioCalificacion,1,1)} + ' / 5'">0 / 5</strong></div>
+            <div class="card metric-card"><span>Alertas criticas</span><strong th:text="${alertasCriticas}">0</strong></div>
+            <div class="card metric-card"><span>Categoria mas afectada</span><strong th:text="${categoriaMasAfectada}">GENERAL</strong></div>
+        </div>
+
+        <!-- Graficos simples hechos con CSS y JavaScript liviano. -->
+        <div class="charts">
+            <div class="card">
+                <div class="section-head"><h3>Sentimiento general</h3><span class="pill">Pastel</span></div>
+                <div class="donut-wrap">
+                    <div id="graficoSentimientos" class="donut"
+                         th:attr="data-pos=${positivas},data-neu=${neutras},data-neg=${negativas}">
+                        <span th:text="${totalResenas}">0</span>
+                    </div>
+                    <div class="legend">
+                        <div><i class="dot pos"></i>Positivas: <b th:text="${positivas}">0</b></div>
+                        <div><i class="dot neu"></i>Neutras: <b th:text="${neutras}">0</b></div>
+                        <div><i class="dot neg"></i>Negativas: <b th:text="${negativas}">0</b></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="metric-card">
-                <span>Negativas</span>
-                <strong th:text="${negativas}">0</strong>
-            </div>
-
-            <div class="metric-card">
-                <span>Neutras</span>
-                <strong th:text="${neutras}">0</strong>
-            </div>
-
-            <div class="metric-card">
-                <span>Alertas críticas</span>
-                <strong th:text="${alertasCriticas}">0</strong>
-            </div>
-
-            <div class="metric-card">
-                <span>Categoría más afectada</span>
-                <strong th:text="${categoriaMasAfectada}">GENERAL</strong>
+            <div class="card">
+                <div class="section-head"><h3>Reseñas por mes</h3><span class="pill">Barras</span></div>
+                <div class="bars">
+                    <div class="bar-row" th:each="item : ${resenasPorMes}">
+                        <span th:text="${item.key}">2026-06</span>
+                        <div class="track"><div class="fill" th:attr="data-value=${item.value}"></div></div>
+                        <b th:text="${item.value}">0</b>
+                    </div>
+                    <p class="vacio" th:if="${resenasPorMes.isEmpty()}">Todavia no hay datos mensuales.</p>
+                </div>
             </div>
         </div>
 
         <div class="tabla-card">
-            <h3>Reseñas registradas</h3>
-
+            <div class="section-head"><h3>Reseñas registradas</h3><span class="pill">Detalle</span></div>
             <div class="table-wrap">
                 <table>
                     <thead>
@@ -261,51 +147,26 @@
                         <th>Cliente</th>
                         <th>Comentario</th>
                         <th>Sentimiento</th>
-                        <th>Categoría</th>
+                        <th>Categoria</th>
                         <th>Alerta</th>
                         <th>Fecha</th>
                     </tr>
                     </thead>
-
                     <tbody>
                     <tr th:each="resena : ${resenas}">
                         <td th:text="${resena.nombreCliente}">Cliente</td>
-
-                        <td th:text="${resena.comentarioTexto}">
-                            Comentario
-                        </td>
-
+                        <td th:text="${resena.comentarioTexto}">Comentario</td>
                         <td>
                             <span class="pill"
                                   th:classappend="${resena.sentimiento == 'POSITIVO'} ? ' positivo' : (${resena.sentimiento == 'NEGATIVO'} ? ' negativo' : ' neutro')"
-                                  th:text="${resena.sentimiento}">
-                                NEUTRO
-                            </span>
+                                  th:text="${resena.sentimiento}">NEUTRO</span>
                         </td>
-
-                        <td>
-                            <span class="pill" th:text="${resena.categoriaAfectada}">
-                                GENERAL
-                            </span>
-                        </td>
-
-                        <td>
-                            <span class="pill"
-                                  th:classappend="${resena.alertaCritica} ? ' alerta' : ''"
-                                  th:text="${resena.alertaCritica ? 'SI' : 'NO'}">
-                                NO
-                            </span>
-                        </td>
-
-                        <td th:text="${#temporals.format(resena.fechaRegistro, 'yyyy-MM-dd HH:mm')}">
-                            2026-06-24
-                        </td>
+                        <td><span class="pill" th:text="${resena.categoriaAfectada}">GENERAL</span></td>
+                        <td><span class="pill" th:classappend="${resena.alertaCritica} ? ' alerta' : ''" th:text="${resena.alertaCritica ? 'SI' : 'NO'}">NO</span></td>
+                        <td th:text="${#temporals.format(resena.fechaRegistro, 'yyyy-MM-dd HH:mm')}">2026-06-24</td>
                     </tr>
-
                     <tr th:if="${#lists.isEmpty(resenas)}">
-                        <td colspan="6" class="vacio">
-                            Todavía no existen reseñas registradas.
-                        </td>
+                        <td colspan="6" class="vacio">Todavia no existen reseñas registradas.</td>
                     </tr>
                     </tbody>
                 </table>
@@ -314,5 +175,29 @@
     </section>
 </main>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let donut = document.getElementById("graficoSentimientos");
+        if (donut) {
+            let pos = Number(donut.dataset.pos || 0);
+            let neu = Number(donut.dataset.neu || 0);
+            let neg = Number(donut.dataset.neg || 0);
+            let total = pos + neu + neg;
+            if (total > 0) {
+                let p1 = pos * 100 / total;
+                let p2 = p1 + neu * 100 / total;
+                donut.style.background = "conic-gradient(#059669 0 " + p1 + "%, #64748b " + p1 + "% " + p2 + "%, #dc2626 " + p2 + "% 100%)";
+            }
+        }
+
+        let barras = document.querySelectorAll(".fill");
+        let max = 1;
+        barras.forEach(function (bar) { max = Math.max(max, Number(bar.dataset.value || 0)); });
+        barras.forEach(function (bar) {
+            let valor = Number(bar.dataset.value || 0);
+            bar.style.width = Math.max(7, valor * 100 / max) + "%";
+        });
+    });
+</script>
 </body>
 </html>

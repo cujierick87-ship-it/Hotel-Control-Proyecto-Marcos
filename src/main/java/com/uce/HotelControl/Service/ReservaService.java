@@ -16,6 +16,56 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReservaService {
 
+    // DTO simple para mostrar estadisticas por recepcionista en el dashboard.
+    public static class ResumenRecepcionista {
+
+        private String nombre;
+        private int reservasCreadas;
+        private int checkIns;
+        private int checkOuts;
+        private int cancelaciones;
+
+        public ResumenRecepcionista(String nombre) {
+            this.nombre = nombre;
+        }
+
+        public String getNombre() {
+            return nombre;
+        }
+
+        public int getReservasCreadas() {
+            return reservasCreadas;
+        }
+
+        public int getCheckIns() {
+            return checkIns;
+        }
+
+        public int getCheckOuts() {
+            return checkOuts;
+        }
+
+        public int getCancelaciones() {
+            return cancelaciones;
+        }
+
+        public void sumarReserva() {
+            reservasCreadas++;
+        }
+
+        public void sumarCheckIn() {
+            checkIns++;
+        }
+
+        public void sumarCheckOut() {
+            checkOuts++;
+        }
+
+        public void sumarCancelacion() {
+            cancelaciones++;
+        }
+    }
+
     @Autowired
     private ReservaRepository reservaRepository;
 
@@ -84,6 +134,11 @@ public class ReservaService {
 
     // Procesa acciones operativas de recepcion sobre una reserva.
     public void procesarAccionRecepcion(Long idReserva, String accion) {
+        procesarAccionRecepcion(idReserva, accion, null);
+    }
+
+    // Procesa acciones operativas y guarda quien las realizo para los reportes.
+    public void procesarAccionRecepcion(Long idReserva, String accion, String nombreRecepcionista) {
         Reserva reserva = reservaRepository.findById(idReserva).orElse(null);
 
         if (reserva != null) {
@@ -91,16 +146,26 @@ public class ReservaService {
 
             if (accion.equals("CHECKIN")) {
                 reserva.setEstado("CHECK-IN");
-                habitacion.setEstado("OCUPADA");
+                if (habitacion != null) {
+                    habitacion.setEstado("OCUPADA");
+                }
+                reserva.setRecepcionistaCheckIn(nombreRecepcionista);
+                reserva.setFechaCheckInReal(LocalDate.now());
             }
 
             if (accion.equals("CHECKOUT")) {
                 reserva.setEstado("FINALIZADA");
-                habitacion.setEstado("LIMPIEZA");
+                if (habitacion != null) {
+                    habitacion.setEstado("LIMPIEZA");
+                }
+                reserva.setRecepcionistaCheckOut(nombreRecepcionista);
+                reserva.setFechaCheckOutReal(LocalDate.now());
             }
 
             if (accion.equals("CANCELAR")) {
                 reserva.setEstado("CANCELADA");
+                reserva.setRecepcionistaCancelacion(nombreRecepcionista);
+                reserva.setFechaCancelacion(LocalDate.now());
             }
 
             if (accion.equals("NOSHOW")) {
@@ -112,7 +177,10 @@ public class ReservaService {
             }
 
             reservaRepository.save(reserva);
-            habitacionRepository.save(habitacion);
+
+            if (habitacion != null) {
+                habitacionRepository.save(habitacion);
+            }
         }
     }
 
@@ -175,6 +243,11 @@ public class ReservaService {
 
     // Registra una reserva presencial reutilizando las validaciones generales.
     public Reserva registrarReservaPresencial(Reserva reserva, Long idHabitacion) {
+        return registrarReservaPresencial(reserva, idHabitacion, null);
+    }
+
+    // Registra una reserva presencial e identifica al recepcionista que la creo.
+    public Reserva registrarReservaPresencial(Reserva reserva, Long idHabitacion, String nombreRecepcionista) {
         Habitacion habitacion = habitacionRepository.findById(idHabitacion).orElse(null);
 
         if (habitacion == null) {
@@ -182,6 +255,8 @@ public class ReservaService {
         }
 
         reserva.setHabitacion(habitacion);
+        reserva.setRecepcionistaReserva(nombreRecepcionista);
+        reserva.setFechaReservaPresencial(LocalDate.now());
 
         return guardarReserva(reserva);
     }
@@ -261,6 +336,94 @@ public class ReservaService {
         }
 
         return clientes;
+    }
+
+    // Cuenta las acciones realizadas hoy por un recepcionista especifico.
+    public Map<String, Integer> obtenerResumenHoyRecepcionista(String nombreRecepcionista) {
+        Map<String, Integer> resumen = new LinkedHashMap<>();
+        LocalDate hoy = LocalDate.now();
+
+        resumen.put("reservasCreadas", 0);
+        resumen.put("checkIns", 0);
+        resumen.put("checkOuts", 0);
+        resumen.put("cancelaciones", 0);
+
+        for (Reserva reserva : reservaRepository.findAll()) {
+            if (mismoRecepcionista(nombreRecepcionista, reserva.getRecepcionistaReserva())
+                    && hoy.equals(reserva.getFechaReservaPresencial())) {
+                resumen.put("reservasCreadas", resumen.get("reservasCreadas") + 1);
+            }
+
+            if (mismoRecepcionista(nombreRecepcionista, reserva.getRecepcionistaCheckIn())
+                    && hoy.equals(reserva.getFechaCheckInReal())) {
+                resumen.put("checkIns", resumen.get("checkIns") + 1);
+            }
+
+            if (mismoRecepcionista(nombreRecepcionista, reserva.getRecepcionistaCheckOut())
+                    && hoy.equals(reserva.getFechaCheckOutReal())) {
+                resumen.put("checkOuts", resumen.get("checkOuts") + 1);
+            }
+
+            if (mismoRecepcionista(nombreRecepcionista, reserva.getRecepcionistaCancelacion())
+                    && hoy.equals(reserva.getFechaCancelacion())) {
+                resumen.put("cancelaciones", resumen.get("cancelaciones") + 1);
+            }
+        }
+
+        return resumen;
+    }
+
+    // Agrupa reservas y acciones por recepcionista para el dashboard administrativo.
+    public List<ResumenRecepcionista> obtenerResumenPorRecepcionista() {
+        Map<String, ResumenRecepcionista> resumen = new LinkedHashMap<>();
+
+        for (Reserva reserva : reservaRepository.findAll()) {
+            sumarRecepcionista(resumen, reserva.getRecepcionistaReserva(), "RESERVA");
+            sumarRecepcionista(resumen, reserva.getRecepcionistaCheckIn(), "CHECKIN");
+            sumarRecepcionista(resumen, reserva.getRecepcionistaCheckOut(), "CHECKOUT");
+            sumarRecepcionista(resumen, reserva.getRecepcionistaCancelacion(), "CANCELACION");
+        }
+
+        return new ArrayList<>(resumen.values());
+    }
+
+    // Evita repetir codigo al contar acciones por recepcionista.
+    private void sumarRecepcionista(Map<String, ResumenRecepcionista> resumen,
+            String nombreRecepcionista, String accion) {
+
+        if (nombreRecepcionista == null || nombreRecepcionista.isBlank()) {
+            return;
+        }
+
+        ResumenRecepcionista item = resumen.computeIfAbsent(
+                nombreRecepcionista,
+                ResumenRecepcionista::new
+        );
+
+        if ("RESERVA".equals(accion)) {
+            item.sumarReserva();
+        }
+
+        if ("CHECKIN".equals(accion)) {
+            item.sumarCheckIn();
+        }
+
+        if ("CHECKOUT".equals(accion)) {
+            item.sumarCheckOut();
+        }
+
+        if ("CANCELACION".equals(accion)) {
+            item.sumarCancelacion();
+        }
+    }
+
+    // Compara nombres tolerando valores vacios.
+    private boolean mismoRecepcionista(String esperado, String actual) {
+        if (esperado == null || actual == null) {
+            return false;
+        }
+
+        return esperado.trim().equalsIgnoreCase(actual.trim());
     }
 
 }

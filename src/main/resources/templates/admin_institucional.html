@@ -67,7 +67,7 @@
         <main class="main">
             <header class="topbar">
                 <span>Panel / <b>Informacion institucional</b></span>
-                <a href="/logout">Cerrar Sesion</a>
+                <a href="/logout?rol=ADMINISTRADOR">Cerrar Sesion</a>
             </header>
 
             <section class="content">
@@ -97,6 +97,16 @@
                             <div>
                                 <label>Telefono</label>
                                 <input type="text" th:field="*{telefono}" required>
+                            </div>
+
+                            <div>
+                                <label>Horario de check-in</label>
+                                <input type="time" th:field="*{horarioCheckIn}">
+                            </div>
+
+                            <div>
+                                <label>Horario de check-out</label>
+                                <input type="time" th:field="*{horarioCheckOut}">
                             </div>
 
                             <div>

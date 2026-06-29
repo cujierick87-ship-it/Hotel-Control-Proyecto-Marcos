@@ -28,22 +28,72 @@ public class RecepcionController {
     @Autowired
     private SolicitudRecepcionService solicitudRecepcionService;
 
+    // Obtiene el recepcionista activo sin depender de otras sesiones abiertas.
+    private Usuario obtenerRecepcionistaSesion(HttpSession session) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioRecepcionista");
+
+        if (usuario == null) {
+            usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        }
+
+        if (usuario == null || !"RECEPCIONISTA".equalsIgnoreCase(usuario.getRol())) {
+            return null;
+        }
+
+        return usuario;
+    }
+
+    // Devuelve un nombre legible para guardar auditoria de acciones.
+    private String nombreRecepcionista(Usuario usuario) {
+        if (usuario == null) {
+            return "Recepcion";
+        }
+
+        String nombre = (usuario.getNombres() + " " + usuario.getApellidos()).trim();
+
+        if (nombre.equals("null null") || nombre.isBlank()) {
+            return usuario.getNombreUsuario();
+        }
+
+        return nombre;
+    }
+
+    // Carga las estadisticas diarias del recepcionista en la vista.
+    private void cargarResumenHoy(Model model, Usuario recepcionista) {
+        model.addAttribute("resumenHoy",
+                reservaService.obtenerResumenHoyRecepcionista(nombreRecepcionista(recepcionista)));
+    }
+
     // Carga el panel principal de recepción.
     // Muestra el estado de habitaciones y la lista de reservas registradas.
     @GetMapping("/recepcion/panel")
-    public String panelRecepcion(Model model) {
+    public String panelRecepcion(Model model, HttpSession session) {
+        Usuario recepcionista = obtenerRecepcionistaSesion(session);
+
+        if (recepcionista == null) {
+            return "redirect:/login?sesion=expirada";
+        }
+
         model.addAttribute("habitaciones", habitacionService.obtenerTodasLasHabitaciones());
         model.addAttribute("reservas", reservaService.obtenerTodasLasReservas());
+        cargarResumenHoy(model, recepcionista);
         return "panel_recepcion";
     }
 
     // Busca reservas por código único o por cédula.
     // Después de buscar, mantiene activa la sección de reservas.
     @PostMapping("/recepcion/reservas/buscar")
-    public String buscarReserva(String filtro, Model model) {
+    public String buscarReserva(String filtro, Model model, HttpSession session) {
+        Usuario recepcionista = obtenerRecepcionistaSesion(session);
+
+        if (recepcionista == null) {
+            return "redirect:/login?sesion=expirada";
+        }
+
         model.addAttribute("habitaciones", habitacionService.obtenerTodasLasHabitaciones());
         model.addAttribute("reservas", reservaService.buscarPorCodigoOCedula(filtro));
         model.addAttribute("seccionActiva", "reservas");
+        cargarResumenHoy(model, recepcionista);
         return "panel_recepcion";
     }
 
@@ -51,8 +101,15 @@ public class RecepcionController {
     // Permite realizar CHECK-IN, CHECK-OUT o CANCELAR.
     @GetMapping("/recepcion/reservas/accion/{accion}/{id}")
     public String accionReserva(@PathVariable String accion, @PathVariable Long id,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
-        reservaService.procesarAccionRecepcion(id, accion);
+        Usuario recepcionista = obtenerRecepcionistaSesion(session);
+
+        if (recepcionista == null) {
+            return "redirect:/login?sesion=expirada";
+        }
+
+        reservaService.procesarAccionRecepcion(id, accion, nombreRecepcionista(recepcionista));
         redirectAttributes.addFlashAttribute("toastMensaje", "Reserva actualizada correctamente.");
         return "redirect:/recepcion/panel#reservas";
     }
@@ -78,7 +135,7 @@ public class RecepcionController {
     @PostMapping("/recepcion/solicitud/guardar")
     public String guardarSolicitud(SolicitudRecepcion solicitud, HttpSession session,
             RedirectAttributes redirectAttributes) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario usuario = obtenerRecepcionistaSesion(session);
 
         if (usuario != null) {
             String nombre = usuario.getNombres() + " " + usuario.getApellidos();
@@ -120,10 +177,21 @@ public class RecepcionController {
     @PostMapping("/recepcion/reserva-presencial/guardar")
     public String guardarReservaPresencial(Reserva reserva,
             @RequestParam("idHabitacion") Long idHabitacion,
+            HttpSession session,
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        Reserva guardada = reservaService.registrarReservaPresencial(reserva, idHabitacion);
+        Usuario recepcionista = obtenerRecepcionistaSesion(session);
+
+        if (recepcionista == null) {
+            return "redirect:/login?sesion=expirada";
+        }
+
+        Reserva guardada = reservaService.registrarReservaPresencial(
+                reserva,
+                idHabitacion,
+                nombreRecepcionista(recepcionista)
+        );
 
         if (guardada == null) {
             model.addAttribute("error", "No se pudo registrar la reserva. Revise las fechas o la disponibilidad.");

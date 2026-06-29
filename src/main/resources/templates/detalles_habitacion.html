@@ -21,7 +21,7 @@
         <a href="/cliente/perfil">Mi perfil</a>
         <a href="/cliente/historial">Mis reservas</a>
         <a href="/cliente/resenas">Reseñas</a>
-        <a href="/logout" class="salir">Cerrar sesión</a>
+        <a href="/logout?rol=CLIENTE" class="salir">Cerrar sesión</a>
     </div>
 </nav>
 
@@ -48,7 +48,6 @@
                         <div><b>Precio:</b> $<span th:text="${habitacion.precioNoche}"></span> / noche</div>
                         <div><b>Capacidad:</b> <span th:text="${habitacion.capacidad}"></span> personas</div>
                         <div><b>Camas:</b> <span th:text="${habitacion.cantidadCamas != null ? habitacion.cantidadCamas : 'No especificado'}"></span></div>
-                        <div><b>Cama principal:</b> <span th:text="${habitacion.tipoCama != null and habitacion.tipoCama != '' ? habitacion.tipoCama : 'No especificado'}"></span></div>
                         <div><b>Estado:</b> <span th:text="${habitacion.estado}"></span></div>
                         <div><b>Wi-Fi:</b> Gratis</div>
                     </div>
@@ -112,8 +111,8 @@
 
             /*[# th:each="r : ${reservas}"]*/
             fechasOcupadas.push({
-            from: /*[[${r.fechaCheckIn}]]*/ '',
-            to: /*[[${r.fechaCheckOut}]]*/ ''
+            from: /*[[${r.fechaCheckIn.toString()}]]*/ '',
+            to: /*[[${r.fechaCheckOut.toString()}]]*/ ''
             });
             /*[/]*/
 
@@ -169,5 +168,6 @@
             }
         </script>
 
+        <div th:replace="~{chatbot_cliente_fragment :: chatbotCliente}"></div>
     </body>
 </html>

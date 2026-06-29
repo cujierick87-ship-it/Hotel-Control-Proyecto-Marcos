@@ -1,6 +1,8 @@
 package com.uce.HotelControl.Controller;
 
 import com.uce.HotelControl.Model.Usuario;
+import com.uce.HotelControl.Service.ComentarioReservaService;
+import com.uce.HotelControl.Service.HabitacionService;
 import com.uce.HotelControl.Service.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -9,12 +11,19 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class LoginController {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private HabitacionService habitacionService;
+
+    @Autowired
+    private ComentarioReservaService comentarioReservaService;
 
     // Devuelve la pagina principal del usuario segun su rol.
     private String redirigirSegunRol(Usuario usuario) {
@@ -41,29 +50,58 @@ public class LoginController {
         return null;
     }
 
-    // Redirige la ruta principal segun la sesion activa.
-    @GetMapping("/")
-    public String inicio(HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        String destino = redirigirSegunRol(usuario);
-
-        if (destino != null) {
-            return destino;
+    // Define la llave de sesion que corresponde a cada rol.
+    private String atributoPorRol(String rol) {
+        if ("ADMINISTRADOR".equalsIgnoreCase(rol)) {
+            return "usuarioAdmin";
         }
 
-        return "redirect:/login";
+        if ("RECEPCIONISTA".equalsIgnoreCase(rol)) {
+            return "usuarioRecepcionista";
+        }
+
+        if ("CLIENTE".equalsIgnoreCase(rol)) {
+            return "usuarioCliente";
+        }
+
+        return "usuarioLogueado";
     }
 
-    // Muestra el login solo si no existe una sesion activa.
-    @GetMapping("/login")
-    public String mostrarLogin(HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+    // Guarda el usuario por rol para permitir varias sesiones en el mismo navegador.
+    private void guardarUsuarioPorRol(HttpSession session, Usuario usuario) {
+        session.setAttribute(atributoPorRol(usuario.getRol()), usuario);
+        session.setAttribute("usuarioLogueado", usuario);
+    }
+
+    // Redirige la ruta principal segun la sesion activa.
+    @GetMapping("/")
+    public String inicio(HttpSession session, Model model) {
+        Usuario usuario = (Usuario) session.getAttribute("usuarioAdmin");
+        if (usuario == null) {
+            usuario = (Usuario) session.getAttribute("usuarioRecepcionista");
+        }
+        if (usuario == null) {
+            usuario = (Usuario) session.getAttribute("usuarioCliente");
+        }
+
         String destino = redirigirSegunRol(usuario);
 
         if (destino != null) {
             return destino;
         }
 
+        // La portada solo muestra una seleccion breve de los datos existentes.
+        model.addAttribute("habitacionesDestacadas",
+                habitacionService.obtenerHabitacionesDisponibles().stream().limit(3).toList());
+        model.addAttribute("ultimasResenas",
+                comentarioReservaService.obtenerTodos().stream().limit(3).toList());
+
+        return "index";
+    }
+
+    // Muestra el login aunque exista otro rol activo para permitir sesiones paralelas.
+    @GetMapping("/login")
+    public String mostrarLogin() {
         return "login";
     }
 
@@ -117,13 +155,8 @@ public class LoginController {
             return "login";
         }
 
-        HttpSession sesionAnterior = request.getSession(false);
-        if (sesionAnterior != null) {
-            sesionAnterior.invalidate();
-        }
-
         HttpSession session = request.getSession(true);
-        session.setAttribute("usuarioLogueado", auth);
+        guardarUsuarioPorRol(session, auth);
         session.setMaxInactiveInterval(30 * 60);
 
         String destino = redirigirSegunRol(auth);
@@ -139,7 +172,7 @@ public class LoginController {
     // Muestra la pantalla para cambiar la contrasena inicial del administrador.
     @GetMapping("/cambiar-password-inicial")
     public String mostrarCambioPasswordInicial(HttpSession session) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario usuario = (Usuario) session.getAttribute("usuarioAdmin");
 
         if (usuario == null) {
             return "redirect:/login";
@@ -164,7 +197,7 @@ public class LoginController {
                                           HttpSession session,
                                           Model model) {
 
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
+        Usuario usuario = (Usuario) session.getAttribute("usuarioAdmin");
 
         if (usuario == null) {
             return "redirect:/login";
@@ -186,15 +219,33 @@ public class LoginController {
         }
 
         Usuario actualizado = usuarioService.cambiarPasswordInicial(usuario.getIdUsuario(), nuevaPassword);
+        session.setAttribute("usuarioAdmin", actualizado);
         session.setAttribute("usuarioLogueado", actualizado);
 
         return "redirect:/admin/panel";
     }
 
-    // Cierra la sesion del usuario y retorna al login.
+    // Cierra solo el rol indicado; si no llega rol, cierra toda la sesion.
     @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
+    public String logout(HttpSession session, @RequestParam(required = false) String rol) {
+        if (rol == null || rol.isBlank()) {
+            session.invalidate();
+            return "redirect:/login";
+        }
+
+        session.removeAttribute(atributoPorRol(rol));
+
+        // Borra el contexto corto del chatbot cuando sale el cliente.
+        if ("CLIENTE".equalsIgnoreCase(rol)) {
+            session.removeAttribute("chatbotUltimoTema");
+            session.removeAttribute("chatbotUltimaFecha");
+        }
+
+        Usuario actual = (Usuario) session.getAttribute("usuarioLogueado");
+        if (actual != null && actual.getRol().equalsIgnoreCase(rol)) {
+            session.removeAttribute("usuarioLogueado");
+        }
+
         return "redirect:/login";
     }
 }

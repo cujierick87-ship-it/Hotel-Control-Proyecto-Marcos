@@ -42,18 +42,6 @@
         </div>
     </details>
 
-    <div class="side-section">
-        <h4>Resumen del turno</h4>
-        <div class="side-metric">
-            <span>Habitaciones</span>
-            <b th:text="${#lists.size(habitaciones)}">0</b>
-        </div>
-        <div class="side-metric">
-            <span>Reservas</span>
-            <b th:text="${#lists.size(reservas)}">0</b>
-        </div>
-        <p>Usa Reservas y check-in/out para buscar por codigo o cedula.</p>
-    </div>
 </aside>
 
     <main class="main">
@@ -62,7 +50,7 @@
                 <p class="eyebrow">Módulo operativo</p>
                 <h2>Panel de recepción</h2>
             </div>
-            <a href="/logout" class="logout">Cerrar sesión</a>
+            <a href="/logout?rol=RECEPCIONISTA" class="logout">Cerrar sesión</a>
         </header>
 
         <section class="content">
@@ -73,6 +61,25 @@
                     <p>Gestiona habitaciones, reservas, check-in, check-out y solicitudes al administrador.</p>
                 </div>
                 <a href="/recepcion/reserva-presencial" class="btn primary-action">Nueva reserva presencial</a>
+            </div>
+
+            <div class="recepcion-kpis">
+                <div class="metric-pill">
+                    <span>Reservas creadas hoy</span>
+                    <strong th:text="${resumenHoy['reservasCreadas']}">0</strong>
+                </div>
+                <div class="metric-pill">
+                    <span>Check-ins hoy</span>
+                    <strong th:text="${resumenHoy['checkIns']}">0</strong>
+                </div>
+                <div class="metric-pill">
+                    <span>Check-outs hoy</span>
+                    <strong th:text="${resumenHoy['checkOuts']}">0</strong>
+                </div>
+                <div class="metric-pill">
+                    <span>Cancelaciones hoy</span>
+                    <strong th:text="${resumenHoy['cancelaciones']}">0</strong>
+                </div>
             </div>
 
             <div id="seccionEstado" class="seccion activa">
@@ -239,6 +246,10 @@
 
         <style>
             .toast-flotante{position:fixed;top:88px;right:24px;z-index:1000;background:#111827;color:white;border-left:4px solid var(--success);padding:14px 18px;border-radius:8px;box-shadow:0 18px 40px rgba(0,0,0,.22);font-weight:800;max-width:330px}
+            .recepcion-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:18px}
+            .metric-pill{background:white;border:1px solid var(--line);border-radius:8px;padding:16px;box-shadow:var(--shadow)}
+            .metric-pill span{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;font-weight:800;letter-spacing:.04em}
+            .metric-pill strong{display:block;margin-top:8px;font-size:26px;color:#111827}
         </style>
 
 <script>
